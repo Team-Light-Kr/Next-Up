@@ -47,33 +47,68 @@ export function verifySessionToken(token: string): { userId: string; email: stri
   }
 }
 
+// Password hashing with PBKDF2 (SHA-512)
+export function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password: string, combinedHash: string): boolean {
+  try {
+    const [salt, originalHash] = combinedHash.split(":");
+    if (!salt || !originalHash) return false;
+    const testHash = crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
+    return crypto.timingSafeEqual(Buffer.from(testHash), Buffer.from(originalHash));
+  } catch {
+    return false;
+  }
+}
+
 // Get current user from server context (cookies)
 export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nextup_session")?.value;
-  if (!token) return null;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("nextup_session")?.value;
+    if (!token) return null;
 
-  const session = verifySessionToken(token);
-  if (!session) return null;
+    const session = verifySessionToken(token);
+    if (!session) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: {
-      id: true,
-      email: true,
-      displayName: true,
-      role: true,
-      profileCode: true,
-      bio: true,
-      avatarUrl: true,
-      twoFactorType: true,
-      phoneNumber: true,
-      status: true,
-      createdAt: true,
-    },
-  });
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        role: true,
+        profileCode: true,
+        passwordHash: true,
+        bio: true,
+        avatarUrl: true,
+        twoFactorType: true,
+        phoneNumber: true,
+        status: true,
+        createdAt: true,
+      },
+    });
 
-  return user;
+    if (!user) return null;
+
+    // Automatic Super-Admin escalation for admin@koharu.live
+    if (user.email === "admin@koharu.live" || user.email === "admin@nextups.xyz") {
+      user.role = "ADMIN";
+    }
+
+    const { passwordHash, ...safeUser } = user;
+    return {
+      ...safeUser,
+      hasPassword: Boolean(passwordHash),
+    };
+  } catch (error) {
+    console.error("getCurrentUser error:", error);
+    return null;
+  }
 }
 
 // Resend Email Sender (list.txt line 3030, 3038)

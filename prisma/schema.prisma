@@ -13,6 +13,7 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   displayName   String
+  passwordHash  String?   // Hashed password for secure authentication
   role          String    @default("USER") // USER, ADMIN
   profileCode   String    @unique // Random 8-character code for /profile/[code]
   bio           String?   @db.Text
@@ -193,13 +194,14 @@ model Report {
 
 model AdminAuditLog {
   id        String   @id @default(cuid())
-  userId    String
-  action    String   // CREATE_GAME, UPDATE_GAME, CREATE_UPDATE, DELETE_UPDATE, etc.
+  userId    String?
+  action    String   // REGISTER, LOGIN, CREATE_GAME, UPDATE_GAME, CREATE_UPDATE, SECURITY, etc.
+  title     String?  // Human-readable title
   details   Json?
   ipAddress String?
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([action])

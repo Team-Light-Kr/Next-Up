@@ -16,23 +16,35 @@ import {
   Layers,
   Check,
   X,
+  Send,
+  ShieldAlert,
+  History,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"collector" | "reports">("collector");
   const [jobs, setJobs] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [runningCollector, setRunningCollector] = useState(false);
   const [collectorResult, setCollectorResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [sendingTermsEmail, setSendingTermsEmail] = useState(false);
+  const [termsEmailStatus, setTermsEmailStatus] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
-      const [reportsRes] = await Promise.all([
+      const [authRes, reportsRes] = await Promise.all([
+        fetch("/api/auth/me"),
         fetch("/api/reports"),
       ]);
-      const reportsData = await reportsRes.json();
-      setReports(reportsData.reports || []);
+      const authData = await authRes.json();
+      setCurrentUser(authData.user);
+
+      if (reportsRes.ok) {
+        const reportsData = await reportsRes.json();
+        setReports(reportsData.reports || []);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -43,6 +55,26 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleBroadcastTerms = async () => {
+    if (!confirm("전체 등록 회원에게 이용약관 및 개인정보처리방침 개정 안내 이메일을 발송하시겠습니까?")) {
+      return;
+    }
+    setSendingTermsEmail(true);
+    setTermsEmailStatus(null);
+    try {
+      const res = await fetch("/api/admin/broadcast-terms", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "발송 실패");
+      setTermsEmailStatus(`전체 회원 ${data.sentCount}명 중 ${data.successCount}명에게 약관 개정 안내 메일 발송 완료!`);
+    } catch (err: any) {
+      alert(err.message || "발송 중 오류가 발생했습니다.");
+    } finally {
+      setSendingTermsEmail(false);
+    }
+  };
 
   const handleRunCollector = async () => {
     setRunningCollector(true);
@@ -83,8 +115,62 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const isAdmin = currentUser?.role === "ADMIN" || currentUser?.email === "admin@koharu.live";
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-24 flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <p className="text-sm text-slate-500 font-medium">관리자 권한 및 운영 데이터를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-24 text-center space-y-6">
+        <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto ring-8 ring-rose-50/50">
+          <ShieldAlert className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-extrabold text-slate-900">403 Forbidden - 접근 제한</h1>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            이 페이지는 NextUps 시스템 관리자 전용 공간입니다.<br />
+            관리자 계정(예: admin@koharu.live)으로 로그인한 후 이용해 주시기 바랍니다.
+          </p>
+        </div>
+        <div className="pt-2 flex justify-center gap-3">
+          <Link
+            href="/"
+            className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+          >
+            홈으로 돌아가기
+          </Link>
+          <Link
+            href="/auth/login"
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
+          >
+            관리자 로그인
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {termsEmailStatus && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between">
+          <span>{termsEmailStatus}</span>
+          <button
+            onClick={() => setTermsEmailStatus(null)}
+            className="text-emerald-600 hover:text-emerald-900 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -92,24 +178,43 @@ export default function AdminDashboardPage() {
             <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
               Admin Only
             </span>
-            <span className="text-xs text-slate-400">데이터 수집 및 운영 관리</span>
+            <span className="text-xs text-slate-400">데이터 수집 및 시스템 운영 통제</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             관리자 운영 대시보드
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/admin/logs"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-xs"
+          >
+            <History className="w-3.5 h-3.5 text-blue-400" />
+            <span>보안 감사 로그</span>
+          </Link>
+          <button
+            onClick={handleBroadcastTerms}
+            disabled={sendingTermsEmail}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors disabled:opacity-50 shadow-xs"
+          >
+            {sendingTermsEmail ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
+            <span>약관 개정 안내 메일 발송</span>
+          </button>
           <Link
             href="/admin/games/new"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
           >
             <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
             <span>게임 등록</span>
           </Link>
           <Link
             href="/admin/updates/new"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
           >
             <FileText className="w-3.5 h-3.5" />
             <span>패치노트 등록</span>

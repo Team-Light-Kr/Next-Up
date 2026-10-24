@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
@@ -77,6 +78,21 @@ export async function POST(request: Request) {
         }
       }
     }
+
+    // Dispatch audit log to Discord
+    await logToDiscord({
+      action: "GAME_CREATE",
+      title: `신규 게임 등록: ${game.canonicalName}`,
+      description: `회원 ${user.displayName} (${user.email})님이 새로운 게임 정보를 등록했습니다.`,
+      userId: user.id,
+      userEmail: user.email,
+      details: {
+        gameId: game.id,
+        slug: game.slug,
+        developer: game.developer,
+        platformCount: platforms?.length || 0,
+      },
+    });
 
     return NextResponse.json({ success: true, game });
   } catch (error: any) {

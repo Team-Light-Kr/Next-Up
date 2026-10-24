@@ -31,12 +31,15 @@ export default function SettingsPage() {
     avatarUrl: "",
     twoFactorType: "NONE",
     phoneNumber: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (!data.authenticated) {
@@ -44,13 +47,14 @@ export default function SettingsPage() {
           return;
         }
         setUser(data.user);
-        setFormData({
+        setFormData((prev) => ({
+          ...prev,
           displayName: data.user.displayName || "",
           bio: data.user.bio || "",
           avatarUrl: data.user.avatarUrl || "",
           twoFactorType: data.user.twoFactorType || "NONE",
           phoneNumber: data.user.phoneNumber || "",
-        });
+        }));
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -61,11 +65,32 @@ export default function SettingsPage() {
     setSaving(true);
     setStatusMsg(null);
 
+    if (formData.newPassword) {
+      if (formData.newPassword.length < 6) {
+        setStatusMsg({ type: "error", text: "새 비밀번호는 최소 6자 이상이어야 합니다." });
+        setSaving(false);
+        return;
+      }
+      if (formData.newPassword !== formData.confirmPassword) {
+        setStatusMsg({ type: "error", text: "새 비밀번호와 비밀번호 확인이 일치하지 않습니다." });
+        setSaving(false);
+        return;
+      }
+    }
+
     try {
       const res = await fetch("/api/auth/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          displayName: formData.displayName,
+          bio: formData.bio,
+          avatarUrl: formData.avatarUrl,
+          twoFactorType: formData.twoFactorType,
+          phoneNumber: formData.phoneNumber,
+          currentPassword: formData.currentPassword || undefined,
+          newPassword: formData.newPassword || undefined,
+        }),
       });
 
       const data = await res.json();
@@ -73,8 +98,14 @@ export default function SettingsPage() {
         throw new Error(data.error || "설정 저장에 실패했습니다.");
       }
 
-      setStatusMsg({ type: "success", text: "프로필 및 2단계 인증 설정이 안전하게 저장되었습니다." });
       setUser(data.user);
+      setFormData((prev) => ({
+        ...prev,
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      }));
+      setStatusMsg({ type: "success", text: "설정이 성공적으로 저장되었습니다." });
     } catch (err: any) {
       setStatusMsg({ type: "error", text: err.message });
     } finally {
@@ -112,6 +143,18 @@ export default function SettingsPage() {
           프로필을 자유롭게 꾸미고 계정 보호를 위한 2단계 인증 수단을 지정합니다.
         </p>
       </div>
+
+      {user && !user.hasPassword && (
+        <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-xs flex items-start gap-2.5 shadow-2xs">
+          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="font-bold">계정 보안 알림: 비밀번호 미설정 계정</div>
+            <p className="text-amber-700 leading-relaxed">
+              이전에 비밀번호 없이 생성된 계정입니다. 안전한 로그인 및 계정 보호를 위해 아래 <strong>비밀번호 설정</strong> 항목에서 비밀번호를 생성해 주세요.
+            </p>
+          </div>
+        </div>
+      )}
 
       {statusMsg && (
         <div
@@ -171,6 +214,70 @@ export default function SettingsPage() {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Password Setup and Change Section */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-blue-600" />
+              <span>{user?.hasPassword ? "비밀번호 변경" : "비밀번호 최초 설정 (필수)"}</span>
+            </h2>
+            <span className="text-[11px] font-medium text-slate-400">
+              {user?.hasPassword ? "기존 비밀번호가 설정되어 있습니다" : "비밀번호가 미설정 상태입니다"}
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-500">
+            {user?.hasPassword
+              ? "비밀번호를 변경하려면 현재 비밀번호와 새로운 비밀번호를 입력해 주세요."
+              : "보안 계정 이용을 위해 사용할 비밀번호(최소 6자)를 등록해 주세요."}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {user?.hasPassword && (
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  현재 비밀번호
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.currentPassword}
+                  onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                  className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {user?.hasPassword ? "새 비밀번호 (변경 시에만 입력)" : "새로 등록할 비밀번호 *"}
+              </label>
+              <input
+                type="password"
+                minLength={6}
+                placeholder="최소 6자 이상"
+                value={formData.newPassword}
+                onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                새 비밀번호 확인
+              </label>
+              <input
+                type="password"
+                minLength={6}
+                placeholder="비밀번호 재입력"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>

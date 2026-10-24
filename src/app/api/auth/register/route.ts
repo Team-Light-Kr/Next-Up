@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { generateProfileCode, signSessionToken } from "@/lib/auth";
+import { generateProfileCode, signSessionToken, hashPassword } from "@/lib/auth";
+import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
-    const { email, code, displayName } = await request.json();
+    const { email, code, displayName, password } = await request.json();
 
-    if (!email || !code || !displayName) {
-      return NextResponse.json({ error: "이메일, 인증번호, 닉네임은 필수입니다." }, { status: 400 });
+    if (!email || !code || !displayName || !password) {
+      return NextResponse.json(
+        { error: "이메일, 인증번호, 닉네임, 비밀번호는 필수 입력 항목입니다." },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: "비밀번호는 최소 6자 이상이어야 합니다." },
+        { status: 400 }
+      );
     }
 
     const cleanEmail = email.trim().toLowerCase();
@@ -25,7 +36,10 @@ export async function POST(request: Request) {
     });
 
     if (!validCode) {
-      return NextResponse.json({ error: "인증번호가 일치하지 않거나 만료되었습니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: "인증번호가 일치하지 않거나 만료되었습니다." },
+        { status: 400 }
+      );
     }
 
     // Mark code as used
@@ -51,12 +65,16 @@ export async function POST(request: Request) {
       collision = await prisma.user.findUnique({ where: { profileCode } });
     }
 
+    // Check admin email
+    const isAdmin = cleanEmail === "admin@koharu.live" || cleanEmail === "admin@nextups.xyz";
+
     const user = await prisma.user.create({
       data: {
         email: cleanEmail,
         displayName: displayName.trim(),
+        passwordHash: hashPassword(password),
         profileCode,
-        role: "USER",
+        role: isAdmin ? "ADMIN" : "USER",
         status: "ACTIVE",
       },
     });
@@ -66,6 +84,20 @@ export async function POST(request: Request) {
       email: user.email,
       role: user.role,
       profileCode: user.profileCode,
+    });
+
+    // Dispatch log to Discord Webhook
+    await logToDiscord({
+      action: "USER_REGISTER",
+      title: `신규 회원 가입: ${user.displayName} (${user.email})`,
+      description: `새로운 사용자가 성공적으로 회원가입을 완료했습니다. (권한: ${user.role}, 프로필 코드: ${user.profileCode})`,
+      userId: user.id,
+      userEmail: user.email,
+      details: {
+        profileCode: user.profileCode,
+        role: user.role,
+        hasPassword: true,
+      },
     });
 
     const response = NextResponse.json({

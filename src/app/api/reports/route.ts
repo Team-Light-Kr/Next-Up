@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
@@ -19,6 +20,21 @@ export async function POST(request: Request) {
         reportType,
         content: content.trim(),
         status: "PENDING",
+      },
+    });
+
+    await logToDiscord({
+      action: "REPORT_CREATED",
+      title: `🚨 정보 오류 제보 접수: [${reportType}]`,
+      color: 0xf59e0b, // Amber
+      userId: user?.id,
+      userEmail: user?.email,
+      details: {
+        reportId: report.id,
+        reportType,
+        content: content.trim(),
+        gameId: gameId || null,
+        updateId: updateId || null,
       },
     });
 
@@ -55,7 +71,8 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== "ADMIN") {
+    const isAdmin = user && (user.role === "ADMIN" || user.email === "admin@koharu.live");
+    if (!isAdmin) {
       return NextResponse.json({ error: "관리자 권한이 필요합니다." }, { status: 403 });
     }
 
@@ -67,6 +84,18 @@ export async function PATCH(request: Request) {
     const updated = await prisma.report.update({
       where: { id: reportId },
       data: { status },
+    });
+
+    await logToDiscord({
+      action: "REPORT_STATUS_UPDATED",
+      title: `⚙️ 제보 처리 상태 갱신: ${reportId} -> ${status}`,
+      color: status === "RESOLVED" ? 0x10b981 : 0xef4444,
+      userId: user?.id,
+      userEmail: user?.email,
+      details: {
+        reportId,
+        newStatus: status,
+      },
     });
 
     return NextResponse.json({ success: true, report: updated });

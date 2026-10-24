@@ -45,6 +45,11 @@ export default function RootLayout({
     <html lang="ko" className="h-full antialiased light" style={{ colorScheme: "light" }}>
       <head>
         <meta name="color-scheme" content="light" />
+        <meta
+          name="discord:component-embed"
+          content='{"version":2,"accent_color":"#2563eb","components":[{"type":"container","components":[{"type":"section","components":[{"type":"text_display","content":"# NextUps • 게임 업데이트 정보 통합 플랫폼\nWindows, Android, iOS, macOS 최신 공식 패치 노트를 확인하세요."},{"type":"thumbnail","media":{"url":"https://www.nextups.xyz/logo.png"}}]},{"type":"separator"},{"type":"action_row","components":[{"type":"link_button","label":"패치 목록 보기 ↗","url":"https://www.nextups.xyz/games"}]}]}]}'
+        />
+        <link rel="alternate" type="application/json+discord-component-embed" href="/discord-embed.json" />
         <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="shortcut icon" href="/favicon.png" />

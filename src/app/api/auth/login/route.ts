@@ -1,38 +1,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { signSessionToken } from "@/lib/auth";
+import { signSessionToken, verifyPassword, hashPassword } from "@/lib/auth";
+import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
-    const { email, code } = await request.json();
+    const { email, code, password } = await request.json();
 
-    if (!email || !code) {
-      return NextResponse.json({ error: "이메일과 인증번호를 입력해 주세요." }, { status: 400 });
+    if (!email) {
+      return NextResponse.json({ error: "이메일을 입력해 주세요." }, { status: 400 });
     }
 
     const cleanEmail = email.trim().toLowerCase();
-
-    // Verify code
-    const validCode = await prisma.verificationCode.findFirst({
-      where: {
-        email: cleanEmail,
-        code: code.trim(),
-        purpose: { in: ["LOGIN", "2FA"] },
-        used: false,
-        expiresAt: { gt: new Date() },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    if (!validCode) {
-      return NextResponse.json({ error: "인증번호가 일치하지 않거나 만료되었습니다." }, { status: 400 });
-    }
-
-    // Mark code as used
-    await prisma.verificationCode.update({
-      where: { id: validCode.id },
-      data: { used: true },
-    });
 
     const user = await prisma.user.findUnique({
       where: { email: cleanEmail },
@@ -42,11 +21,106 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "등록된 사용자를 찾을 수 없습니다." }, { status: 404 });
     }
 
+    // 1. Password Verification (Mandatory)
+    if (user.passwordHash) {
+      if (!password) {
+        return NextResponse.json(
+          { error: "비밀번호를 입력해 주세요.", requirePassword: true },
+          { status: 400 }
+        );
+      }
+      const isValidPassword = verifyPassword(password, user.passwordHash);
+      if (!isValidPassword) {
+        await logToDiscord({
+          action: "SECURITY_ALERT",
+          title: `로그인 실패 (비밀번호 불일치): ${user.email}`,
+          description: `사용자 계정의 비밀번호 입력이 일치하지 않아 로그인이 차단되었습니다.`,
+          userId: user.id,
+          userEmail: user.email,
+        });
+        return NextResponse.json({ error: "비밀번호가 일치하지 않습니다." }, { status: 400 });
+      }
+    } else {
+      // Legacy user without password - if password provided, save it!
+      if (password && password.length >= 6) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { passwordHash: hashPassword(password) },
+        });
+      } else {
+        // Create an alert notification for the user to set their password
+        try {
+          await prisma.notification.create({
+            data: {
+              userId: user.id,
+              title: "계정 보안: 비밀번호 설정 필요",
+              message:
+                "보안 체계 업데이트로 계정 비밀번호 설정이 필수가 되었습니다. 프로필 설정 페이지에서 비밀번호를 설정해 주세요.",
+            },
+          });
+        } catch {
+          // ignore notification collision
+        }
+      }
+    }
+
+    // 2. Email verification code check (2FA or standard code)
+    if (code) {
+      const validCode = await prisma.verificationCode.findFirst({
+        where: {
+          email: cleanEmail,
+          code: code.trim(),
+          purpose: { in: ["LOGIN", "2FA"] },
+          used: false,
+          expiresAt: { gt: new Date() },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (!validCode) {
+        return NextResponse.json(
+          { error: "인증번호가 일치하지 않거나 만료되었습니다." },
+          { status: 400 }
+        );
+      }
+
+      await prisma.verificationCode.update({
+        where: { id: validCode.id },
+        data: { used: true },
+      });
+    }
+
+    // Check admin escalation for admin@koharu.live
+    let userRole = user.role;
+    if (cleanEmail === "admin@koharu.live" || cleanEmail === "admin@nextups.xyz") {
+      userRole = "ADMIN";
+      if (user.role !== "ADMIN") {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { role: "ADMIN" },
+        });
+      }
+    }
+
     const token = signSessionToken({
       userId: user.id,
       email: user.email,
-      role: user.role,
+      role: userRole,
       profileCode: user.profileCode,
+    });
+
+    // Send login audit log to Discord
+    await logToDiscord({
+      action: "USER_LOGIN",
+      title: `로그인 성공: ${user.displayName} (${user.email})`,
+      description: `사용자가 서비스에 성공적으로 로그인했습니다. (역할: ${userRole})`,
+      userId: user.id,
+      userEmail: user.email,
+      details: {
+        profileCode: user.profileCode,
+        role: userRole,
+        hasPassword: Boolean(user.passwordHash || password),
+      },
     });
 
     const response = NextResponse.json({
@@ -56,7 +130,8 @@ export async function POST(request: Request) {
         email: user.email,
         displayName: user.displayName,
         profileCode: user.profileCode,
-        role: user.role,
+        role: userRole,
+        hasPassword: Boolean(user.passwordHash || password),
         twoFactorType: user.twoFactorType,
       },
     });

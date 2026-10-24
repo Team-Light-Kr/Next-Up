@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
     const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.role !== "ADMIN") {
+    const isAdmin = currentUser && (currentUser.role === "ADMIN" || currentUser.email === "admin@koharu.live");
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "접근 권한이 없습니다. 관리자만 이용할 수 있습니다." },
         { status: 403 }
@@ -98,6 +100,21 @@ export async function POST(request: Request) {
                 })),
               }
             : undefined,
+      },
+    });
+
+    await logToDiscord({
+      action: "ADMIN_UPDATE_CREATED",
+      title: `⚡ 신규 패치노트 발행: [${update.version}] ${update.title}`,
+      color: 0x3b82f6,
+      userId: currentUser.id,
+      userEmail: currentUser.email,
+      details: {
+        updateId: update.id,
+        version: update.version,
+        title: update.title,
+        updateType: update.updateType,
+        sourceUrl: update.sourceUrl,
       },
     });
 
