@@ -14,6 +14,7 @@ import {
   Clock,
   ShieldAlert,
 } from "lucide-react";
+import { buildUpdateEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
 
@@ -37,50 +38,8 @@ export async function generateMetadata({ params }: UpdatePageProps) {
 
     const title = `[${update.game.canonicalName}] ${update.version} - ${update.title}`;
     const desc = update.summary || `${update.game.canonicalName} 공식 최신 패치노트`;
-
-    const embedJson = JSON.stringify({
-      type: 17, // Container
-      accent_color: 2450411,
-      components: [
-        {
-          type: 9, // Section
-          components: [
-            {
-              type: 10, // Text Display
-              content: `# [${update.game.canonicalName}] ${update.version}\n**${update.title}**\n\n${desc}`,
-            },
-          ],
-          accessory: {
-            type: 11, // Thumbnail
-            media: {
-              url: update.game.iconUrl || `${appUrl}/logo.png`,
-            },
-          },
-        },
-        {
-          type: 14, // Separator
-          divider: true,
-          spacing: 1,
-        },
-        {
-          type: 1, // Action Row
-          components: [
-            {
-              type: 2, // Button
-              style: 5, // Link Button
-              label: "패치노트 전문 보기",
-              url: `${appUrl}/updates/${id}`,
-            },
-            {
-              type: 2, // Button
-              style: 5, // Link Button
-              label: `${update.game.canonicalName} 정보`,
-              url: `${appUrl}/games/${update.game.slug}`,
-            },
-          ],
-        },
-      ],
-    });
+    const card = buildUpdateEmbed(update, appUrl);
+    const embedJson = toComponentEmbedJson(card);
 
     return {
       title,
@@ -125,6 +84,9 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
     notFound();
   }
 
+  const discordCard = buildUpdateEmbed(update);
+  const discordJson = toComponentEmbedJson(discordCard);
+
   const dateStr = new Date(update.releaseDate).toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
@@ -133,6 +95,13 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       {/* Top Breadcrumb Navigation */}
       <div className="flex items-center justify-between">
         <Link

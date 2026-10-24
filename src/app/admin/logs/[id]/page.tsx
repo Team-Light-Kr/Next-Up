@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { ShieldAlert, ShieldCheck, ArrowLeft, Clock, User, Globe, FileCode, CheckCircle2 } from "lucide-react";
+import { buildAuditLogEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
 
@@ -18,60 +19,29 @@ export async function generateMetadata({ params }: AdminLogPageProps) {
 
   let logTitle = "NextUps 보안 감사 시스템 로그";
   let logAction = "SYSTEM_AUDIT";
+  let logDetails: any = null;
   try {
     const l = await prisma.adminAuditLog.findUnique({
       where: { id },
-      select: { title: true, action: true },
+      select: { title: true, action: true, details: true },
     });
     if (l?.title) logTitle = l.title;
     if (l?.action) logAction = l.action;
+    if (l?.details) logDetails = l.details;
   } catch {
     // ignore
   }
 
-  const embedJson = JSON.stringify({
-    type: 17, // Container
-    accent_color: 2450411,
-    components: [
-      {
-        type: 9, // Section
-        components: [
-          {
-            type: 10, // Text Display
-            content: `NextUps 보안 감사 • ${logAction}\n# [NextUps 로그] ${logTitle}\n보안 감사 로그가 안전하게 기록되었습니다. (관리자 전용)`,
-          },
-        ],
-        accessory: {
-          type: 11, // Thumbnail
-          media: {
-            url: `${appUrl}/logo.png`,
-          },
-        },
-      },
-      {
-        type: 14, // Separator
-        divider: true,
-        spacing: 1,
-      },
-      {
-        type: 1, // Action Row
-        components: [
-          {
-            type: 2, // Button
-            style: 5, // Link Button
-            label: "관리자 로그 상세 확인",
-            url: `${appUrl}/admin/logs/${id}`,
-          },
-          {
-            type: 2, // Button
-            style: 5, // Link Button
-            label: "관리자 대시보드",
-            url: `${appUrl}/admin/dashboard`,
-          },
-        ],
-      },
-    ],
-  });
+  const card = buildAuditLogEmbed(
+    {
+      id,
+      title: logTitle,
+      action: logAction,
+      details: logDetails,
+    },
+    appUrl
+  );
+  const embedJson = toComponentEmbedJson(card);
 
   return {
     title: `[NextUps 로그] ${logTitle}`,
@@ -81,7 +51,7 @@ export async function generateMetadata({ params }: AdminLogPageProps) {
     },
     alternates: {
       types: {
-        "application/vnd.discord.component-embed+json": `/api/discord-embed/${id}`,
+        "application/vnd.discord.component-embed+json": `${appUrl}/api/discord-embed/${id}`,
       },
     },
     openGraph: {
@@ -163,8 +133,24 @@ export default async function AdminLogDetailPage({ params }: AdminLogPageProps) 
     );
   }
 
+  const discordCard = buildAuditLogEmbed({
+    id: log.id,
+    title: log.title,
+    action: log.action,
+    details: log.details,
+    userEmail: log.user?.email,
+  });
+  const discordJson = toComponentEmbedJson(discordCard);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <div className="flex items-center justify-between">
         <Link
           href="/admin/dashboard"

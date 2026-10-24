@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Download,
   Monitor,
@@ -7,16 +6,30 @@ import {
   Cpu,
   Check,
 } from "lucide-react";
+import { buildDownloadEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const metadata = {
   title: "NextUps 다운로드",
   description:
     "NextUps 공식 Windows 데스크톱 클라이언트 및 Android 모바일 앱을 다운로드하세요.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildDownloadEmbed()),
+  },
 };
 
 export default function DownloadPage() {
+  const discordCard = buildDownloadEmbed();
+  const discordJson = toComponentEmbedJson(discordCard);
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 space-y-12">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       {/* Hero Header */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold">

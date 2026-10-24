@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { getFastGameBySlug } from "@/lib/games-cache";
+import { buildGameEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
 
@@ -58,50 +59,8 @@ export async function generateMetadata({ params }: GameDetailPageProps) {
     const title = `${game.canonicalName} 패치노트 및 업데이트 정보`;
     const latestVersion = game.updates[0]?.version ? ` (최신 v${game.updates[0].version})` : "";
     const desc = game.description || `${game.canonicalName}의 공식 실시간 패치 정보${latestVersion}`;
-
-    const embedJson = JSON.stringify({
-      type: 17, // Container
-      accent_color: 2450411,
-      components: [
-        {
-          type: 9, // Section
-          components: [
-            {
-              type: 10, // Text Display
-              content: `# ${game.canonicalName}${latestVersion}\n${desc}`,
-            },
-          ],
-          accessory: {
-            type: 11, // Thumbnail
-            media: {
-              url: game.iconUrl || `${appUrl}/logo.png`,
-            },
-          },
-        },
-        {
-          type: 14, // Separator
-          divider: true,
-          spacing: 1,
-        },
-        {
-          type: 1, // Action Row
-          components: [
-            {
-              type: 2, // Button
-              style: 5, // Link Button
-              label: "전체 패치 내역 보기",
-              url: `${appUrl}/games/${game.slug}`,
-            },
-            {
-              type: 2, // Button
-              style: 5, // Link Button
-              label: "NextUps 공식 홈",
-              url: appUrl,
-            },
-          ],
-        },
-      ],
-    });
+    const card = buildGameEmbed(game, game.updates[0]?.version, appUrl);
+    const embedJson = toComponentEmbedJson(card);
 
     return {
       title,
@@ -188,9 +147,18 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     notFound();
   }
 
+  const discordCard = buildGameEmbed(game, game.updates?.[0]?.version);
+  const discordJson = toComponentEmbedJson(discordCard);
 
   return (
     <div className="pb-16 space-y-10">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       {/* Game Header Banner */}
       <section className="relative bg-white text-slate-900 overflow-hidden border-b border-slate-200">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
