@@ -127,14 +127,17 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
             className="flex items-center gap-3 group"
           >
             {update.game.iconUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={update.game.iconUrl}
-                alt={update.game.canonicalName}
-                className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-xs"
-              />
+              <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-200 shadow-xs overflow-hidden flex items-center justify-center p-0.5 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={update.game.iconUrl}
+                  alt={update.game.canonicalName}
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
             ) : (
-              <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shrink-0">
                 {update.game.canonicalName.slice(0, 1)}
               </div>
             )}
@@ -208,7 +211,7 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
               <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1.5">
                 {sec.title}
               </h3>
-              <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
+              <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap break-words">
                 {sec.content}
               </p>
             </div>

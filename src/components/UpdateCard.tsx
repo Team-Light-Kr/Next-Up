@@ -54,14 +54,17 @@ export default function UpdateCard({ update }: UpdateCardProps) {
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
           >
             {update.game.iconUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={update.game.iconUrl}
-                alt={update.game.canonicalName}
-                className="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-xs"
-              />
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-200 shadow-xs overflow-hidden flex items-center justify-center p-0.5 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={update.game.iconUrl}
+                  alt={update.game.canonicalName}
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm shrink-0">
                 {update.game.canonicalName.slice(0, 2)}
               </div>
             )}
@@ -96,7 +99,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
           </div>
 
           <Link href={`/updates/${update.id}`}>
-            <h4 className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors line-clamp-1">
+            <h4 className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors break-words">
               {update.title}
             </h4>
           </Link>
@@ -104,7 +107,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
 
         {/* Summary */}
         {update.summary && (
-          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
+          <p className="text-xs text-slate-600 leading-relaxed mb-4 whitespace-pre-wrap break-words">
             {update.summary}
           </p>
         )}

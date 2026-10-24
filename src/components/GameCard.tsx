@@ -57,12 +57,15 @@ export default function GameCard({ game }: GameCardProps) {
         {/* Floating icon */}
         <div className="absolute -bottom-3 left-4">
           {game.iconUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={game.iconUrl}
-              alt={game.canonicalName}
-              className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-md bg-white"
-            />
+            <div className="w-12 h-12 rounded-xl border-2 border-white shadow-md bg-slate-900 overflow-hidden flex items-center justify-center p-0.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={game.iconUrl}
+                alt={game.canonicalName}
+                className="w-full h-full object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
           ) : (
             <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg border-2 border-white shadow-md">
               {game.canonicalName.slice(0, 1)}

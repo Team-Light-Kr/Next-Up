@@ -11,6 +11,25 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     return <p className="text-xs text-slate-400">본문 내용이 없습니다.</p>;
   }
 
+  // Pre-process any unconverted Steam BBCode or Clan Image tokens
+  const STEAM_CDN = "https://clan.cloudflare.steamstatic.com/images";
+  const normalizedContent = content
+    .replace(/\{STEAM_CLAN_IMAGE\}/gi, STEAM_CDN)
+    .replace(/\{STEAM_CLAN_LOC_IMAGE\}/gi, STEAM_CDN)
+    .replace(/\[url=([^\]]+)\]\s*\[img[^\]]*\]\s*([^\[]+?)\s*\[\/img\]\s*\[\/url\]/gi, "\n\n[![패치 이미지]($2)]($1)\n\n")
+    .replace(/\[img[^\]]*\]\s*(.*?)\s*\[\/img\]/gi, "\n\n![패치 이미지]($1)\n\n")
+    .replace(/<img[^>]+src=["'](.*?)["'][^>]*>/gi, "\n\n![패치 이미지]($1)\n\n")
+    .replace(/(?<!\!\[[^\]]*\]\()(https?:\/\/(?:clan\.cloudflare\.steamstatic\.com|clan\.fastly\.steamstatic\.com|steamcdn-a\.akamaihd\.net|shared\.cloudflare\.steamstatic\.com)\/images\/[^\s\)\"\']+)/gi, "\n\n![패치 이미지]($1)\n\n")
+    .replace(/\[h1\]([\s\S]*?)\[\/h1\]/gi, "\n\n# $1\n\n")
+    .replace(/\[h2\]([\s\S]*?)\[\/h2\]/gi, "\n\n## $1\n\n")
+    .replace(/\[h3\]([\s\S]*?)\[\/h3\]/gi, "\n\n### $1\n\n")
+    .replace(/\[b\]([\s\S]*?)\[\/b\]/gi, "**$1**")
+    .replace(/\[i\]([\s\S]*?)\[\/i\]/gi, "*$1*")
+    .replace(/\[\/?(center|left|right|justify|expand|spoiler|sub|sup|previewyoutube)\]/gi, "")
+    .replace(/\[list\]/gi, "\n\n")
+    .replace(/\[\/list\]/gi, "\n\n")
+    .replace(/\[\*\]\s*([^\n\[]+)/gi, "- $1\n");
+
   return (
     <div className="markdown-body text-slate-800 text-left space-y-2">
       <ReactMarkdown
@@ -56,14 +75,13 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
-                alt={alt || "패치 노트 이미지"}
-                className="rounded-xl border border-slate-200 max-h-[560px] max-w-full w-auto object-contain shadow-xs bg-slate-50"
+                alt={alt || "패치 이미지"}
+                className="rounded-xl border border-slate-200 max-h-[640px] max-w-full w-auto object-contain shadow-xs bg-slate-50"
                 loading="lazy"
-                onError={(e) => {
-                  (e.currentTarget as HTMLElement).style.display = "none";
-                }}
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
               />
-              {alt && alt !== "패치 노트 이미지" && alt !== "패치 이미지" && (
+              {alt && alt !== "패치 이미지" && alt !== "패치 노트 이미지" && (
                 <span className="block text-xs text-slate-500 mt-1.5">{alt}</span>
               )}
             </span>
@@ -96,7 +114,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           },
         }}
       >
-        {content}
+        {normalizedContent}
       </ReactMarkdown>
     </div>
   );

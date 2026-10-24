@@ -35,7 +35,7 @@ export function CurrentDate({
       } else if (format === "iso") {
         setDateText(now.toISOString().split("T")[0]);
       } else {
-        // default 'short': e.g. "2026년 10월 24일"
+        // default 'short': e.g. "2026년 10월 25일"
         setDateText(`${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`);
       }
     };
@@ -52,8 +52,8 @@ export function CurrentDate({
       format === "year"
         ? "2026"
         : format === "full"
-        ? "2026년 10월 24일 (토)"
-        : "2026년 10월 24일";
+        ? "2026년 10월 25일 (일)"
+        : "2026년 10월 25일";
     return (
       <span className={className} suppressHydrationWarning>
         {prefix}

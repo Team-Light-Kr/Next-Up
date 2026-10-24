@@ -37,7 +37,7 @@ export async function sendTermsUpdateNotification(targetEmail: string, displayNa
       <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">2. 적용 및 시행 일자</h3>
       <p style="font-size: 13px; color: #334155; line-height: 1.6; margin-bottom: 28px;">
         • <strong>시행 일자:</strong> 2026년 10월 25일 (일요일, 정식 런칭)<br/>
-        • <strong>공지 일자:</strong> 2026년 10월 24일
+        • <strong>공지 일자:</strong> 2026년 10월 25일
       </p>
 
       <div style="text-align: center; margin-bottom: 32px;">

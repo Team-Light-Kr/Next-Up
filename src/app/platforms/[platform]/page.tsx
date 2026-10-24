@@ -62,6 +62,31 @@ const KNOWN_PLATFORMS: Record<string, PlatformMeta> = {
     name: "macOS",
     description: "Mac App Store 및 Apple Silicon 지원 환경의 최신 게임 패치 및 버전 정보를 모아봅니다.",
   },
+  nintendo: {
+    key: "nintendo",
+    name: "Nintendo Switch",
+    description: "닌텐도 스위치(Nintendo Switch) 콘솔 플랫폼의 공식 게임 패치 및 업데이트 정보를 모아봅니다.",
+  },
+  switch: {
+    key: "nintendo",
+    name: "Nintendo Switch",
+    description: "닌텐도 스위치(Nintendo Switch) 콘솔 플랫폼의 공식 게임 패치 및 업데이트 정보를 모아봅니다.",
+  },
+  playstation: {
+    key: "playstation",
+    name: "PlayStation",
+    description: "플레이스테이션(PlayStation 5 / PlayStation 4) 콘솔 플랫폼의 공식 게임 패치 및 업데이트 정보를 모아봅니다.",
+  },
+  ps5: {
+    key: "playstation",
+    name: "PlayStation 5",
+    description: "플레이스테이션 5(PlayStation 5) 전용 및 크로스젠 공식 게임 패치 및 업데이트 정보를 모아봅니다.",
+  },
+  ps4: {
+    key: "playstation",
+    name: "PlayStation 4",
+    description: "플레이스테이션 4(PlayStation 4) 콘솔의 공식 게임 패치 및 업데이트 정보를 모아봅니다.",
+  },
 };
 
 interface PlatformPageProps {
@@ -147,6 +172,11 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
 
   const platformIcons: Record<string, React.ReactNode> = {
     windows: <Monitor className="w-8 h-8 text-blue-500" />,
+    nintendo: <Gamepad2 className="w-8 h-8 text-red-500" />,
+    switch: <Gamepad2 className="w-8 h-8 text-red-500" />,
+    playstation: <Gamepad2 className="w-8 h-8 text-indigo-500" />,
+    ps5: <Gamepad2 className="w-8 h-8 text-indigo-500" />,
+    ps4: <Gamepad2 className="w-8 h-8 text-indigo-500" />,
     android: <Smartphone className="w-8 h-8 text-emerald-500" />,
     ios: <Apple className="w-8 h-8 text-slate-900" />,
     macos: <Laptop className="w-8 h-8 text-purple-500" />,

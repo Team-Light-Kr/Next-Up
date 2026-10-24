@@ -41,7 +41,7 @@ export async function broadcastPrivacyAnnualNotice() {
     select: { id: true, email: true, displayName: true, createdAt: true },
   });
 
-  const todayStr = "2026년 10월 24일";
+  const todayStr = "2026년 10월 25일";
 
   const emailHtml = (displayName: string, personalUrl: string) => `
     <!DOCTYPE html>

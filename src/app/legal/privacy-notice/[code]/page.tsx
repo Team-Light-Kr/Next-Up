@@ -44,7 +44,7 @@ export default async function PersonalizedPrivacyNoticePage({ params }: PageProp
   });
   const discordJson = toComponentEmbedJson(card);
 
-  const todayStr = "2026년 10월 24일";
+  const todayStr = "2026년 10월 25일";
   const maskedEmail = user.email.replace(/(.{2})(.*)(@.*)/, "$1***$3");
 
   return (

@@ -60,7 +60,7 @@ export default function PrivacyAnnualNoticePage() {
             <div className="flex items-center gap-4 text-xs text-slate-500 pt-1 flex-wrap">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                기준일자: 2026년 10월 24일
+                기준일자: 2026년 10월 25일
               </span>
               <span>(현재 시스템 조회일: <CurrentDate format="full" />)</span>
             </div>

@@ -28,10 +28,9 @@ export default function UpdateDetailView({
   sourceName,
   initialTranslations,
 }: UpdateDetailViewProps) {
-  // Mode: "ko" (번역본) or "raw" (원문 전체)
-  const [viewMode, setViewMode] = useState<"translated" | "original">(() => {
-    // If Korean title or no translations yet, default to original
-    return initialTranslations.length > 0 ? "translated" : "original";
+  // Mode: "ko" | "en" | "ja" | "raw"
+  const [viewMode, setViewMode] = useState<"ko" | "en" | "ja" | "raw">(() => {
+    return initialTranslations.some((t) => t.language === "ko") ? "ko" : "raw";
   });
 
   const [translations, setTranslations] = useState<Record<string, { title: string; summary: string | null; body: string }>>(() => {
@@ -46,26 +45,32 @@ export default function UpdateDetailView({
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   // Content to display based on viewMode
-  const hasKoTranslation = !!translations.ko;
-  const displayTitle = viewMode === "translated" && translations.ko ? translations.ko.title : initialTitle;
-  const displaySummary = viewMode === "translated" && translations.ko ? translations.ko.summary : initialSummary;
-  const displayBody = viewMode === "translated" && translations.ko ? translations.ko.body : initialBody;
+  let displayTitle = initialTitle;
+  let displaySummary = initialSummary;
+  let displayBody = initialBody;
 
-  const handleRequestTranslate = async () => {
-    if (translations.ko) {
-      setViewMode("translated");
-      setStatusMsg("한국어 번역본으로 전환되었습니다.");
+  if (viewMode !== "raw" && translations[viewMode]) {
+    displayTitle = translations[viewMode].title;
+    displaySummary = translations[viewMode].summary;
+    displayBody = translations[viewMode].body;
+  }
+
+  const handleTranslateTo = async (targetLang: "ko" | "en" | "ja") => {
+    if (translations[targetLang]) {
+      setViewMode(targetLang);
+      setStatusMsg(null);
       return;
     }
 
     setIsLoading(true);
-    setStatusMsg("DeepL AI로 전체 본문 한국어 번역 중...");
+    const langNames: Record<string, string> = { ko: "한국어", en: "영어", ja: "일본어" };
+    setStatusMsg(`DeepL AI로 전체 본문 ${langNames[targetLang]} 번역 중...`);
 
     try {
       const res = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ updateId, targetLang: "ko" }),
+        body: JSON.stringify({ updateId, targetLang }),
       });
 
       if (!res.ok) {
@@ -75,14 +80,14 @@ export default function UpdateDetailView({
       const data = await res.json();
       setTranslations((prev) => ({
         ...prev,
-        ko: {
+        [targetLang]: {
           title: data.title,
           summary: data.summary,
           body: data.bodyMarkdown,
         },
       }));
-      setViewMode("translated");
-      setStatusMsg("전체 한국어 번역이 완료되었습니다.");
+      setViewMode(targetLang);
+      setStatusMsg(`전체 ${langNames[targetLang]} 번역이 완료되었습니다.`);
     } catch (err) {
       console.error(err);
       setStatusMsg("번역 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
@@ -95,42 +100,66 @@ export default function UpdateDetailView({
     <div className="space-y-6">
       {/* View Mode Switching Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
-        {/* Toggle Mode: Translated vs Original */}
-        <div className="flex items-center gap-2">
+        {/* Toggle Mode: Korean vs English vs Japanese vs Original */}
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold text-slate-500 mr-1 flex items-center gap-1.5">
-            <Languages className="w-4 h-4 text-slate-600" /> 본문 보기:
+            <Languages className="w-4 h-4 text-slate-600" /> 언어 선택:
           </span>
 
-          <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+          <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200 gap-1 flex-wrap">
+            {/* 1. Korean */}
             <button
-              onClick={() => {
-                if (hasKoTranslation) {
-                  setViewMode("translated");
-                  setStatusMsg(null);
-                } else {
-                  handleRequestTranslate();
-                }
-              }}
+              onClick={() => handleTranslateTo("ko")}
+              disabled={isLoading}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === "translated"
+                viewMode === "ko"
                   ? "bg-blue-600 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               <Globe className="w-3.5 h-3.5" />
-              <span>한국어 번역본 전체보기</span>
-              {hasKoTranslation && <Check className="w-3 h-3 text-emerald-300" />}
+              <span>한국어 (KO)</span>
+              {translations.ko && <Check className="w-3 h-3 text-emerald-300" />}
             </button>
 
+            {/* 2. English */}
+            <button
+              onClick={() => handleTranslateTo("en")}
+              disabled={isLoading}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "en"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+              }`}
+            >
+              <span>English (EN)</span>
+              {translations.en && <Check className="w-3 h-3 text-emerald-300" />}
+            </button>
+
+            {/* 3. Japanese */}
+            <button
+              onClick={() => handleTranslateTo("ja")}
+              disabled={isLoading}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "ja"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+              }`}
+            >
+              <span>日本語 (JA)</span>
+              {translations.ja && <Check className="w-3 h-3 text-emerald-300" />}
+            </button>
+
+            {/* 4. Original Raw */}
             <button
               onClick={() => {
-                setViewMode("original");
+                setViewMode("raw");
                 setStatusMsg(null);
               }}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === "original"
+                viewMode === "raw"
                   ? "bg-slate-900 text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -141,25 +170,17 @@ export default function UpdateDetailView({
 
         {/* Action Controls & External Link */}
         <div className="flex items-center gap-3">
-          {statusMsg && (
-            <span className="text-xs text-slate-500 font-medium animate-fade-in">
+          {isLoading && (
+            <span className="text-xs text-blue-600 font-semibold flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
               {statusMsg}
             </span>
           )}
 
-          {!hasKoTranslation && viewMode === "original" && (
-            <button
-              onClick={handleRequestTranslate}
-              disabled={isLoading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
-            >
-              {isLoading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Sparkles className="w-3.5 h-3.5" />
-              )}
-              <span>전체 본문 한국어 번역</span>
-            </button>
+          {!isLoading && statusMsg && (
+            <span className="text-xs text-slate-500 font-medium">
+              {statusMsg}
+            </span>
           )}
 
           {sourceUrl && (
@@ -180,15 +201,28 @@ export default function UpdateDetailView({
       <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold mb-3 border bg-slate-50 text-slate-700 border-slate-200">
-            {viewMode === "translated" ? (
+            {viewMode === "ko" && (
               <>
                 <Globe className="w-3.5 h-3.5 text-blue-600" />
-                <span>한국어 번역 전체 본문</span>
+                <span>한국어 번역 전체 본문 (KO)</span>
               </>
-            ) : (
+            )}
+            {viewMode === "en" && (
+              <>
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
+                <span>English Translated Full Text (EN)</span>
+              </>
+            )}
+            {viewMode === "ja" && (
+              <>
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
+                <span>日本語 翻訳 全体本文 (JA)</span>
+              </>
+            )}
+            {viewMode === "raw" && (
               <>
                 <FileText className="w-3.5 h-3.5 text-slate-600" />
-                <span>개발사 공식 원문 전체 본문</span>
+                <span>개발사 공식 원문 전체 본문 (Original)</span>
               </>
             )}
           </div>

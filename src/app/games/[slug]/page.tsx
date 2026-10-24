@@ -172,14 +172,17 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Game Icon */}
             {game.iconUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={game.iconUrl}
-                alt={game.canonicalName}
-                className="w-24 h-24 md:w-28 md:h-28 rounded-2xl object-cover border border-slate-200 shadow-sm bg-slate-50"
-              />
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border border-slate-200 shadow-sm bg-slate-900 overflow-hidden flex items-center justify-center p-1.5 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={game.iconUrl}
+                  alt={game.canonicalName}
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
             ) : (
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-3xl border border-slate-200 shadow-sm">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-3xl border border-slate-200 shadow-sm shrink-0">
                 {game.canonicalName.slice(0, 1)}
               </div>
             )}
@@ -367,7 +370,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                       </Link>
 
                       {update.summary && (
-                        <p className="text-xs text-slate-600 line-clamp-2">
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
                           {update.summary}
                         </p>
                       )}

@@ -43,16 +43,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Update not found" }, { status: 404 });
     }
 
-    // If target language is already Korean and original is in Korean, return as is
-    if (langCode === "ko") {
-      return NextResponse.json({
-        translated: true,
-        source: "original",
-        title: update.title,
-        summary: update.summary,
-        bodyMarkdown: update.bodyMarkdown,
-      });
-    }
 
     // 3. Map language to DeepL target_lang
     const deeplLangMap: Record<string, string> = {

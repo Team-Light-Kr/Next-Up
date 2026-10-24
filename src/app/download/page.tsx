@@ -185,7 +185,7 @@ export default function DownloadPage() {
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900">v1.0.3 주요 업데이트 내역 (Changelog)</h3>
-              <p className="text-[11px] text-slate-500">배포일자: 2026년 10월 24일</p>
+              <p className="text-[11px] text-slate-500">배포일자: 2026년 10월 25일</p>
             </div>
           </div>
           <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
