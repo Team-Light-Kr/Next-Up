@@ -203,7 +203,7 @@ export default function Navbar() {
                 </Link>
 
                 {/* Admin Only Dashboard Button */}
-                {currentUser.role === "ADMIN" && (
+                {(currentUser.role === "ADMIN" || currentUser.email === "admin@koharu.live") && (
                   <Link
                     href="/admin/dashboard"
                     className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-neutral-900 text-white hover:opacity-90"
@@ -343,7 +343,7 @@ export default function Navbar() {
                 >
                   <Bell className="w-4 h-4" /> 알림함 ({unreadCount})
                 </Link>
-                {currentUser.role === "ADMIN" && (
+                {(currentUser.role === "ADMIN" || currentUser.email === "admin@koharu.live") && (
                   <Link
                     href="/admin/dashboard"
                     onClick={() => setMobileMenuOpen(false)}

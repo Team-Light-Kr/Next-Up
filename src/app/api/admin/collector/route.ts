@@ -5,7 +5,12 @@ import { runDataCollection } from "@/lib/collector";
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
-    if (!user || user.role !== "ADMIN") {
+    const isAdmin =
+      user &&
+      (user.role === "ADMIN" ||
+        user.email === "admin@koharu.live" ||
+        user.email === "admin@nextups.xyz");
+    if (!isAdmin) {
       return NextResponse.json({ error: "관리자 권한이 필요합니다." }, { status: 403 });
     }
 

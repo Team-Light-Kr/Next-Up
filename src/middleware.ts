@@ -65,18 +65,17 @@ export async function middleware(request: NextRequest) {
     }
 
     const payload = await verifyToken(sessionCookie);
-    if (!payload || payload.role !== "ADMIN") {
-      // 403 Forbidden page redirect or blocked response
-      return new NextResponse(
-        JSON.stringify({
-          error: "403 Forbidden",
-          message: "관리자 전용 구역입니다. 접근 권한이 없습니다.",
-        }),
-        {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+    const isAdmin =
+      payload &&
+      (payload.role === "ADMIN" ||
+        payload.email === "admin@koharu.live" ||
+        payload.email === "admin@nextups.xyz");
+
+    if (!isAdmin) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("error", "admin_required");
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
     }
   }
 
