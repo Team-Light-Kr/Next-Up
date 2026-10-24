@@ -45,6 +45,8 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     version: u.version,
     title: u.title,
     releaseDate: u.releaseDate.toISOString(),
+    summary: u.summary,
+    bodyMarkdown: u.bodyMarkdown,
     game: {
       canonicalName: u.game.canonicalName,
       iconUrl: u.game.iconUrl,
@@ -54,20 +56,6 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
       name: u.platform.name,
     },
   }));
-
-  const leftUpdate = left
-    ? await prisma.update.findUnique({
-        where: { id: left },
-        include: { game: true, platform: true },
-      })
-    : null;
-
-  const rightUpdate = right
-    ? await prisma.update.findUnique({
-        where: { id: right },
-        include: { game: true, platform: true },
-      })
-    : null;
 
   const discordJson = toComponentEmbedJson(buildCompareEmbed());
 
@@ -98,71 +86,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         </p>
       </div>
 
-      {/* Selectors Component */}
+      {/* Selectors & Comparison View Component */}
       <CompareSelector
         updates={updatesForSelector}
         initialLeftId={left}
         initialRightId={right}
       />
-
-      {/* Comparison Grid */}
-      {leftUpdate && rightUpdate ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-          {/* Left Column (이전 버전) */}
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-            <div className="border-b border-slate-100 pb-4">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span className="font-semibold text-blue-600">{leftUpdate.game.canonicalName}</span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-100 font-medium">{leftUpdate.platform.name}</span>
-              </div>
-              <h2 className="text-lg font-bold text-slate-900">
-                <span className="text-blue-600 font-mono mr-1.5">v{leftUpdate.version}</span>
-                <span>{leftUpdate.title}</span>
-              </h2>
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1">
-                <Calendar className="w-3 h-3" />
-                <span>배포일: {new Date(leftUpdate.releaseDate).toLocaleDateString("ko-KR")}</span>
-              </div>
-            </div>
-
-            <div className="text-slate-800">
-              <MarkdownRenderer content={leftUpdate.bodyMarkdown || "패치노트 본문이 없습니다."} />
-            </div>
-          </div>
-
-          {/* Right Column (이후 버전) */}
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-            <div className="border-b border-slate-100 pb-4">
-              <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span className="font-semibold text-indigo-600">{rightUpdate.game.canonicalName}</span>
-                <span className="px-2 py-0.5 rounded-md bg-slate-100 font-medium">{rightUpdate.platform.name}</span>
-              </div>
-              <h2 className="text-lg font-bold text-slate-900">
-                <span className="text-indigo-600 font-mono mr-1.5">v{rightUpdate.version}</span>
-                <span>{rightUpdate.title}</span>
-              </h2>
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1">
-                <Calendar className="w-3 h-3" />
-                <span>배포일: {new Date(rightUpdate.releaseDate).toLocaleDateString("ko-KR")}</span>
-              </div>
-            </div>
-
-            <div className="text-slate-800">
-              <MarkdownRenderer content={rightUpdate.bodyMarkdown || "패치노트 본문이 없습니다."} />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="p-12 text-center border border-slate-200 rounded-2xl bg-white shadow-2xs">
-          <GitCompare className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-800">
-            비교할 두 개 버전을 상단에서 선택해 주세요.
-          </p>
-          <p className="text-xs text-slate-400 mt-1">
-            게임별로 묶인 드롭다운 목록에서 원하는 이전 버전과 이후 버전을 선택한 뒤 [비교하기]를 누르면 나란히 표시됩니다.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
