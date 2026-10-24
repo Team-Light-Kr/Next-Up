@@ -12,6 +12,88 @@ interface AdminLogPageProps {
   }>;
 }
 
+export async function generateMetadata({ params }: AdminLogPageProps) {
+  const { id } = await params;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+
+  let logTitle = "NextUps 보안 감사 시스템 로그";
+  let logAction = "SYSTEM_AUDIT";
+  try {
+    const l = await prisma.adminAuditLog.findUnique({
+      where: { id },
+      select: { title: true, action: true },
+    });
+    if (l?.title) logTitle = l.title;
+    if (l?.action) logAction = l.action;
+  } catch {
+    // ignore
+  }
+
+  const embedJson = JSON.stringify({
+    version: 2,
+    accent_color: "#2563eb",
+    components: [
+      {
+        type: "container",
+        components: [
+          {
+            type: "section",
+            components: [
+              {
+                type: "text_display",
+                content: `NextUps 보안 감사 • ${logAction}\n# [NextUps 로그] ${logTitle}\n보안 감사 로그가 안전하게 기록되었습니다. (관리자 전용)`,
+              },
+              {
+                type: "thumbnail",
+                media: {
+                  url: `${appUrl}/logo.png`,
+                },
+              },
+            ],
+          },
+          {
+            type: "separator",
+          },
+          {
+            type: "action_row",
+            components: [
+              {
+                type: "link_button",
+                label: "관리자 로그 상세 확인 ↗",
+                url: `${appUrl}/admin/logs/${id}`,
+              },
+              {
+                type: "link_button",
+                label: "관리자 대시보드 ↗",
+                url: `${appUrl}/admin/dashboard`,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  return {
+    title: `[NextUps 로그] ${logTitle}`,
+    description: `NextUps 보안 감사 시스템 - ${logTitle}`,
+    other: {
+      "discord:component-embed": embedJson,
+    },
+    alternates: {
+      types: {
+        "application/json+discord-component-embed": `/api/discord-embed/${id}`,
+      },
+    },
+    openGraph: {
+      title: `[NextUps 로그] ${logTitle}`,
+      description: `NextUps 보안 감사 로그 확인하기`,
+      url: `${appUrl}/admin/logs/${id}`,
+      images: [`${appUrl}/logo.png`],
+    },
+  };
+}
+
 export default async function AdminLogDetailPage({ params }: AdminLogPageProps) {
   const { id } = await params;
   const currentUser = await getCurrentUser();

@@ -84,47 +84,59 @@ export async function logToDiscord(options: LogEventOptions) {
   // 2. Prepare secret admin-only log URL
   const logUrl = `${APP_URL}/admin/logs/${logId}`;
 
-  // 3. Construct rich Discord Embed & Component V2 (Action Row with Link Button)
+  // 3. Construct rich Discord Component Embed V2 matching 2nd screenshot
   const embedColor = options.color || ACTION_COLORS[options.action] || 0x2563eb;
-
-  const fields: { name: string; value: string; inline?: boolean }[] = [];
-
-  if (options.userEmail) {
-    fields.push({ name: "계정 이메일", value: `\`${options.userEmail}\``, inline: true });
-  }
-  if (options.ipAddress) {
-    fields.push({ name: "IP 주소", value: `\`${options.ipAddress}\``, inline: true });
-  }
-  fields.push({ name: "작업 유형", value: `\`${options.action}\``, inline: true });
-
-  if (options.details) {
-    const detailSummary = Object.entries(options.details)
-      .slice(0, 5)
-      .map(([k, v]) => `• **${k}**: ${typeof v === "object" ? JSON.stringify(v) : v}`)
-      .join("\n");
-    if (detailSummary) {
-      fields.push({ name: "상세 파라미터", value: detailSummary.slice(0, 1024), inline: false });
-    }
-  }
-
-  fields.push({
-    name: "보안 감사 로그 링크",
-    value: `[🔒 관리자 전용 로그 확인하기](${logUrl})\n*(일반 사용자는 접근이 제한됩니다)*`,
-    inline: false,
+  const dateFormatted = new Date().toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
+  const detailLines: string[] = [];
+  if (options.userEmail) {
+    detailLines.push(`• **계정 이메일**: \`${options.userEmail}\``);
+  }
+  if (options.ipAddress) {
+    detailLines.push(`• **접속 IP**: \`${options.ipAddress}\``);
+  }
+  detailLines.push(`• **작업 유형**: \`${options.action}\``);
+
+  if (options.details) {
+    Object.entries(options.details)
+      .slice(0, 5)
+      .forEach(([k, v]) => {
+        detailLines.push(`• **${k}**: ${typeof v === "object" ? JSON.stringify(v) : v}`);
+      });
+  }
+
+  const formattedDescription = [
+    options.description ? `${options.description}\n` : "",
+    "**상세 파라미터**",
+    ...detailLines,
+    "",
+    `🔒 [관리자 전용 감사 로그 확인하기](${logUrl}) *(비인가 접근 차단)*`,
+  ].filter(Boolean).join("\n");
+
   const discordPayload = {
-    username: "NextUps Audit Logger",
+    username: "NextUps Security Logger",
     avatar_url: `${APP_URL}/logo.png`,
+    content: logUrl, // Triggers Discord link preview unrolling for Components V2!
     embeds: [
       {
+        author: {
+          name: `보안 감사 • ${dateFormatted} • NextUps Security`,
+          icon_url: `${APP_URL}/logo.png`,
+          url: logUrl,
+        },
         title: `[NextUps 로그] ${options.title}`,
         url: logUrl,
-        description: options.description || options.title,
+        description: formattedDescription,
         color: embedColor,
-        fields,
+        thumbnail: {
+          url: `${APP_URL}/logo.png`,
+        },
         footer: {
-          text: `NextUps Security System • Log ID: ${logId}`,
+          text: `NextUps 보안 감사 시스템 • Log ID: ${logId}`,
           icon_url: `${APP_URL}/logo.png`,
         },
         timestamp: new Date().toISOString(),
@@ -137,13 +149,13 @@ export async function logToDiscord(options: LogEventOptions) {
           {
             type: 2, // Button
             style: 5, // Link Button
-            label: "관리자 로그 상세 보기 ↗",
+            label: "로그 열람하기 ↗",
             url: logUrl,
           },
           {
             type: 2,
             style: 5,
-            label: "NextUps 관리자 대시보드",
+            label: "관리자 대시보드 ↗",
             url: `${APP_URL}/admin/dashboard`,
           },
         ],
