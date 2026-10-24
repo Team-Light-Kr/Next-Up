@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       where: {
         email: cleanEmail,
         code: code.trim(),
-        purpose: "REGISTER",
+        purpose: { in: ["REGISTER", "LOGIN", "2FA", "VERIFY"] },
         used: false,
         expiresAt: { gt: new Date() },
       },
@@ -42,11 +42,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mark code as used
-    await prisma.verificationCode.update({
-      where: { id: validCode.id },
-      data: { used: true },
-    });
+    // Mark code as used (safe)
+    try {
+      await prisma.verificationCode.update({
+        where: { id: validCode.id },
+        data: { used: true },
+      });
+    } catch {}
+
 
     // Check existing
     const existing = await prisma.user.findUnique({
@@ -86,19 +89,24 @@ export async function POST(request: Request) {
       profileCode: user.profileCode,
     });
 
-    // Dispatch log to Discord Webhook
-    await logToDiscord({
-      action: "USER_REGISTER",
-      title: `신규 회원 가입: ${user.displayName} (${user.email})`,
-      description: `새로운 사용자가 성공적으로 회원가입을 완료했습니다. (권한: ${user.role}, 프로필 코드: ${user.profileCode})`,
-      userId: user.id,
-      userEmail: user.email,
-      details: {
-        profileCode: user.profileCode,
-        role: user.role,
-        hasPassword: true,
-      },
-    });
+    // Dispatch log to Discord Webhook (non-blocking)
+    try {
+      await logToDiscord({
+        action: "USER_REGISTER",
+        title: `신규 회원 가입: ${user.displayName} (${user.email})`,
+        description: `새로운 사용자가 성공적으로 회원가입을 완료했습니다. (권한: ${user.role}, 프로필 코드: ${user.profileCode})`,
+        userId: user.id,
+        userEmail: user.email,
+        details: {
+          profileCode: user.profileCode,
+          role: user.role,
+          hasPassword: true,
+        },
+      });
+    } catch (discordErr) {
+      console.warn("Failed to dispatch Discord registration audit log:", discordErr);
+    }
+
 
     const response = NextResponse.json({
       success: true,

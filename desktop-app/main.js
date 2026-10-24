@@ -6,7 +6,8 @@ const fs = require("fs");
 const os = require("os");
 const { spawn } = require("child_process");
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
+
 const PRODUCTION_URL = "https://www.nextups.xyz";
 const LOCAL_URL = "http://localhost:3000";
 

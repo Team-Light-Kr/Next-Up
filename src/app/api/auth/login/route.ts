@@ -40,15 +40,18 @@ export async function POST(request: Request) {
       }
       const isValidPassword = verifyPassword(password, user.passwordHash);
       if (!isValidPassword) {
-        await logToDiscord({
-          action: "SECURITY_ALERT",
-          title: `로그인 실패 (비밀번호 불일치): ${user.email}`,
-          description: `사용자 계정의 비밀번호 입력이 일치하지 않아 로그인이 차단되었습니다.`,
-          userId: user.id,
-          userEmail: user.email,
-        });
+        try {
+          await logToDiscord({
+            action: "SECURITY_ALERT",
+            title: `로그인 실패 (비밀번호 불일치): ${user.email}`,
+            description: `사용자 계정의 비밀번호 입력이 일치하지 않아 로그인이 차단되었습니다.`,
+            userId: user.id,
+            userEmail: user.email,
+          });
+        } catch {}
         return NextResponse.json({ error: "비밀번호가 일치하지 않습니다." }, { status: 400 });
       }
+
     } else {
       // Legacy user without password - if password provided, save it!
       if (password && password.length >= 6) {
@@ -143,7 +146,7 @@ export async function POST(request: Request) {
           where: {
             email: cleanEmail,
             code: code.trim(),
-            purpose: { in: ["LOGIN", "2FA"] },
+            purpose: { in: ["LOGIN", "2FA", "REGISTER", "VERIFY"] },
             used: false,
             expiresAt: { gt: new Date() },
           },
@@ -157,12 +160,15 @@ export async function POST(request: Request) {
           );
         }
 
-        await prisma.verificationCode.update({
-          where: { id: validCode.id },
-          data: { used: true },
-        });
+        try {
+          await prisma.verificationCode.update({
+            where: { id: validCode.id },
+            data: { used: true },
+          });
+        } catch {}
       }
     }
+
 
     // Check admin escalation for admin@koharu.live
     let userRole = user.role;
@@ -183,19 +189,24 @@ export async function POST(request: Request) {
       profileCode: user.profileCode,
     });
 
-    // Send login audit log to Discord
-    await logToDiscord({
-      action: "USER_LOGIN",
-      title: `로그인 성공: ${user.displayName} (${user.email})`,
-      description: `사용자가 서비스에 성공적으로 로그인했습니다. (역할: ${userRole})`,
-      userId: user.id,
-      userEmail: user.email,
-      details: {
-        profileCode: user.profileCode,
-        role: userRole,
-        hasPassword: Boolean(user.passwordHash || password),
-      },
-    });
+    // Send login audit log to Discord (non-blocking)
+    try {
+      await logToDiscord({
+        action: "USER_LOGIN",
+        title: `로그인 성공: ${user.displayName} (${user.email})`,
+        description: `사용자가 서비스에 성공적으로 로그인했습니다. (역할: ${userRole})`,
+        userId: user.id,
+        userEmail: user.email,
+        details: {
+          profileCode: user.profileCode,
+          role: userRole,
+          hasPassword: Boolean(user.passwordHash || password),
+        },
+      });
+    } catch (discordErr) {
+      console.warn("Failed to dispatch Discord audit log:", discordErr);
+    }
+
 
     const response = NextResponse.json({
       success: true,

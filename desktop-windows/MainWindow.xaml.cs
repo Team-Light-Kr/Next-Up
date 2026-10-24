@@ -12,7 +12,8 @@ namespace NextUps
 {
     public partial class MainWindow : Window
     {
-        private const string CurrentAppVersion = "1.0.0";
+        private const string CurrentAppVersion = "1.0.1";
+
         private const string PrimaryUrl = "http://localhost:3000";
         private const string FallbackUrl = "https://www.nextups.xyz";
         private string? _pendingUpdateUrl = null;

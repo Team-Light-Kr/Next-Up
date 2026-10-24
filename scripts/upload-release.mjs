@@ -5,16 +5,18 @@ import { execSync } from "child_process";
 let TOKEN = process.env.GITHUB_TOKEN;
 if (!TOKEN) {
   try {
-    const creds = execSync('echo "protocol=https\\nhost=github.com" | git credential fill', {
+    const creds = execSync("git credential fill", {
+      input: "protocol=https\nhost=github.com\n\n",
       encoding: "utf-8",
     });
     const match = creds.match(/password=(.*)/);
     if (match) TOKEN = match[1].trim();
   } catch {}
 }
+
 const OWNER = "Team-Light-Kr";
 const REPO = "Next-Up";
-const TAG = "v1.0.0";
+const TAG = "v1.0.1";
 
 
 async function main() {
@@ -40,8 +42,8 @@ async function main() {
       body: JSON.stringify({
         tag_name: TAG,
         target_commitish: "main",
-        name: "NextUps v1.0.0 정식 출시 (Windows & Android)",
-        body: `## 🚀 NextUps v1.0.0 공식 배포\n\n- **Windows 설치 프로그램**: NextUps-Setup-v1.0.0.exe (Chromium 자체 내장, Inno Setup)\n- **Windows 무설치 ZIP**: NextUps-Windows-v1.0.0.zip\n- **Android APK**: NextUps-v1.0.0.apk (모바일 반응형 최적화)`,
+        name: "NextUps v1.0.1 최신 정식 출시 (Windows & Android)",
+        body: `## 🚀 NextUps v1.0.1 공식 최신 릴리즈\n\n- **Windows 설치 프로그램**: NextUps-Setup-v1.0.1.exe (인앱 실시간 프로그레스 다운로더 지원)\n- **Windows 무설치 ZIP**: NextUps-Windows-v1.0.1.zip\n- **Android APK**: NextUps-v1.0.1.apk (모바일 반응형 최적화)`,
         draft: false,
         prerelease: false,
       }),
@@ -61,10 +63,11 @@ async function main() {
   const baseUrl = uploadUrlTemplate.split("{")[0];
 
   const files = [
-    { name: "NextUps-Setup-v1.0.0.exe", type: "application/vnd.microsoft.portable-executable" },
-    { name: "NextUps-Windows-v1.0.0.zip", type: "application/zip" },
-    { name: "NextUps-v1.0.0.apk", type: "application/vnd.android.package-archive" },
+    { name: "NextUps-Setup-v1.0.1.exe", type: "application/vnd.microsoft.portable-executable" },
+    { name: "NextUps-Windows-v1.0.1.zip", type: "application/zip" },
+    { name: "NextUps-v1.0.1.apk", type: "application/vnd.android.package-archive" },
   ];
+
 
   for (const file of files) {
     const filePath = path.join(process.cwd(), "public", "downloads", file.name);

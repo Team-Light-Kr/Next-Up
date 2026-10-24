@@ -1,6 +1,7 @@
 {
   "name": "nextups-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
+
   "description": "NextUps 게임 업데이트 통합 플랫폼 공식 데스크톱 클라이언트 (Chromium 자체 엔진 탑재, WebView2 미사용)",
   "main": "main.js",
   "author": "Team Light",

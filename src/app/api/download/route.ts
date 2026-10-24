@@ -2,24 +2,26 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// GitHub Releases 공식 영구 CDN 다운로드 베이스 URL
+// GitHub Releases 공식 영구 CDN 다운로드 베이스 URL (v1.0.1 최신)
 const GITHUB_RELEASE_BASE =
-  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.0";
+  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.1";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const fileType = searchParams.get("file")?.toLowerCase() || "exe"; // exe, zip, apk
+  const requestedVersion = searchParams.get("v") || "v1.0.1";
 
-  let fileName = "NextUps-Setup-v1.0.0.exe";
+  let fileName = "NextUps-Setup-v1.0.1.exe";
   let contentType = "application/vnd.microsoft.portable-executable";
 
   if (fileType === "zip") {
-    fileName = "NextUps-Windows-v1.0.0.zip";
+    fileName = "NextUps-Windows-v1.0.1.zip";
     contentType = "application/zip";
   } else if (fileType === "apk") {
-    fileName = "NextUps-v1.0.0.apk";
+    fileName = "NextUps-v1.0.1.apk";
     contentType = "application/vnd.android.package-archive";
   }
+
 
   const downloadsDir = path.join(process.cwd(), "public", "downloads");
   const filePath = path.join(downloadsDir, fileName);
