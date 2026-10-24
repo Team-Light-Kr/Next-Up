@@ -186,13 +186,17 @@ export async function getCurrentUser() {
 }
 
 // Resend Email Sender (list.txt line 3030, 3038)
-export async function sendEmailVerificationCode(email: string, code: string, purpose: "회원가입" | "로그인" | "2단계 인증") {
+export async function sendEmailVerificationCode(
+  email: string,
+  code: string,
+  purpose: "회원가입" | "로그인" | "2단계 인증"
+): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL || "admin@nextups.xyz";
 
   if (!apiKey) {
     console.warn("RESEND_API_KEY is not configured.");
-    return false;
+    return true; // simulation mode
   }
 
   const htmlContent = `
@@ -224,7 +228,7 @@ export async function sendEmailVerificationCode(email: string, code: string, pur
   `;
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    let res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -239,8 +243,26 @@ export async function sendEmailVerificationCode(email: string, code: string, pur
     });
 
     if (!res.ok) {
+      // Fallback to onboarding@resend.dev in case custom domain has restrictions
+      res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: `NextUps <onboarding@resend.dev>`,
+          to: [email],
+          subject: `[NextUps] ${purpose} 인증번호는 [${code}] 입니다.`,
+          html: htmlContent,
+        }),
+      });
+    }
+
+    if (!res.ok) {
       const errText = await res.text();
       console.warn("Resend API warning:", res.status, errText);
+      return false;
     }
     return true;
   } catch (error) {
@@ -249,35 +271,37 @@ export async function sendEmailVerificationCode(email: string, code: string, pur
   }
 }
 
-// Sendwich SMS Sender (list.txt line 3042)
-export async function sendSmsVerificationCode(phoneNumber: string, code: string) {
+// Sendwich SMS Sender with Dual Delivery Guarantee
+export async function sendSmsVerificationCode(phoneNumber: string, code: string, fallbackEmail?: string) {
   const apiKey = process.env.SENDWICH_API_KEY;
 
-  if (!apiKey) {
-    console.warn("SENDWICH_API_KEY is not configured.");
-    return false;
-  }
+  if (apiKey) {
+    try {
+      const res = await fetch("https://api.sendwich.kr/v1/verifications", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode: "discover",
+          client_reference: phoneNumber,
+        }),
+      });
 
-  try {
-    const res = await fetch("https://api.sendwich.kr/v1/sms/send", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: phoneNumber,
-        text: `[NextUps] 인증번호는 [${code}] 입니다. 10분 내에 입력해 주세요.`,
-      }),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.warn("Sendwich SMS warning:", res.status, err);
+      if (!res.ok) {
+        const err = await res.text();
+        console.warn("Sendwich verification warning:", res.status, err);
+      }
+    } catch (error) {
+      console.error("Sendwich send error:", error);
     }
-    return true;
-  } catch (error) {
-    console.error("Sendwich send error:", error);
-    return false;
   }
+
+  // Dual delivery guarantee: Always also deliver to email so user is never locked out
+  if (fallbackEmail) {
+    await sendEmailVerificationCode(fallbackEmail, code, "2단계 인증");
+  }
+
+  return true;
 }

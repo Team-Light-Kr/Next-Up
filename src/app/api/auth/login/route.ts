@@ -95,12 +95,12 @@ export async function POST(request: Request) {
               expiresAt: new Date(Date.now() + 10 * 60 * 1000),
             },
           });
-          await sendSmsVerificationCode(user.phoneNumber, smsCode);
+          await sendSmsVerificationCode(user.phoneNumber, smsCode, cleanEmail);
           const masked = user.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1-****-$2");
           return NextResponse.json({
             require2FA: true,
             twoFactorType: "SMS",
-            message: `등록된 휴대폰(${masked})으로 6자리 SMS 인증번호가 발송되었습니다.`,
+            message: `등록된 휴대폰(${masked}) 및 가입 이메일로 6자리 인증번호가 발송되었습니다.`,
           });
         } else if (twoFactorType === "OTP") {
           return NextResponse.json({

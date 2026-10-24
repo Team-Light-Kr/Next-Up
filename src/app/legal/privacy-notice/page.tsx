@@ -158,16 +158,6 @@ export default function PrivacyAnnualNoticePage() {
             </div>
           </div>
 
-          {/* Action Button (Blue Button matching Papago+ Screenshot) */}
-          <div className="pt-2 text-center">
-            <Link
-              href="/legal/privacy"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-all hover:shadow-lg active:scale-98"
-            >
-              <span>개인정보처리방침 바로가기</span>
-              <ArrowLeft className="w-4 h-4 rotate-180" />
-            </Link>
-          </div>
 
           <div className="pt-4 text-xs text-slate-600 leading-relaxed border-t border-slate-200">
             <p>

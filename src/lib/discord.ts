@@ -39,6 +39,7 @@ export interface LogEventOptions {
   ipAddress?: string | null;
   details?: Record<string, any>;
   color?: number; // Discord hex color
+  hideButtons?: boolean;
 }
 
 // Color map for different action types
@@ -142,25 +143,29 @@ export async function logToDiscord(options: LogEventOptions) {
         timestamp: new Date().toISOString(),
       },
     ],
-    components: [
-      {
-        type: 1, // Action Row
-        components: [
-          {
-            type: 2, // Button
-            style: 5, // Link Button
-            label: "로그 열람하기 ↗",
-            url: logUrl,
-          },
-          {
-            type: 2,
-            style: 5,
-            label: "관리자 대시보드 ↗",
-            url: `${APP_URL}/admin/dashboard`,
-          },
-        ],
-      },
-    ],
+    ...(options.hideButtons
+      ? {}
+      : {
+          components: [
+            {
+              type: 1, // Action Row
+              components: [
+                {
+                  type: 2, // Button
+                  style: 5, // Link Button
+                  label: "로그 열람하기 ↗",
+                  url: logUrl,
+                },
+                {
+                  type: 2,
+                  style: 5,
+                  label: "관리자 대시보드 ↗",
+                  url: `${APP_URL}/admin/dashboard`,
+                },
+              ],
+            },
+          ],
+        }),
   };
 
   // 4. Send to Discord Webhook asynchronously

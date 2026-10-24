@@ -96,12 +96,6 @@ export async function broadcastPrivacyAnnualNotice() {
             </tbody>
           </table>
 
-          <div style="text-align: center; margin-bottom: 28px;">
-            <a href="${appUrl}/legal/privacy" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 13px; font-weight: 700; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
-              개인정보처리방침 바로가기 →
-            </a>
-          </div>
-
           <p style="font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 24px;">
             NextUps는 앞으로도 회원 여러분께서 제공하여 주신 소중한 개인정보를 안전하게 관리하기 위해 최선을 다하겠습니다.<br/>
             감사합니다.
@@ -163,6 +157,7 @@ export async function broadcastPrivacyAnnualNotice() {
       legalBasis: "개인정보 보호법 제20조의2 (연 1회 통지)",
       date: todayStr,
     },
+    hideButtons: true,
   });
 
   return {

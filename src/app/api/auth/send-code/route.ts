@@ -64,12 +64,12 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-      await sendSmsVerificationCode(existing.phoneNumber, code);
+      await sendSmsVerificationCode(existing.phoneNumber, code, cleanEmail);
       const maskedPhone = existing.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1-****-$2");
       return NextResponse.json({
         success: true,
         method: "SMS",
-        message: `등록된 휴대전화(${maskedPhone})로 6자리 SMS 인증번호가 발송되었습니다.`,
+        message: `등록된 휴대전화(${maskedPhone}) 및 백업 이메일(${cleanEmail})로 6자리 인증번호가 발송되었습니다.`,
       });
     }
 
