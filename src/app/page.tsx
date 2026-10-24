@@ -149,7 +149,7 @@ export default async function HomePage() {
             </div>
             <div className="h-3 w-px bg-neutral-200" />
             <div>
-              지원 플랫폼 <strong className="font-semibold text-neutral-900">4개 환경</strong>
+              지원 플랫폼 <strong className="font-semibold text-neutral-900">6대 콘솔 & PC 환경</strong>
             </div>
           </div>
         </div>

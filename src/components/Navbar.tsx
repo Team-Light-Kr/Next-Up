@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
@@ -20,13 +20,26 @@ import {
   Activity,
   Download,
   Gamepad2,
+  ChevronDown,
+  Layers,
 } from "lucide-react";
+
+const NAV_PLATFORMS = [
+  { key: "windows", name: "Windows", desc: "Steam, Epic, PC 공식 패치", icon: Monitor, color: "text-blue-600", bg: "bg-blue-50" },
+  { key: "playstation", name: "PlayStation", desc: "PS5, PS4 콘솔 업데이트", icon: Gamepad2, color: "text-indigo-600", bg: "bg-indigo-50" },
+  { key: "nintendo", name: "Nintendo Switch", desc: "스위치 독점 및 멀티 패치", icon: Gamepad2, color: "text-red-600", bg: "bg-red-50" },
+  { key: "android", name: "Android", desc: "Google Play 모바일 패치", icon: Smartphone, color: "text-emerald-600", bg: "bg-emerald-50" },
+  { key: "ios", name: "iOS", desc: "App Store 모바일 패치", icon: Apple, color: "text-neutral-800", bg: "bg-neutral-100" },
+  { key: "macos", name: "macOS", desc: "Mac 및 Apple Silicon 패치", icon: Laptop, color: "text-purple-600", bg: "bg-purple-50" },
+];
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
+  const platformDropdownRef = useRef<HTMLDivElement>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isNativeApp, setIsNativeApp] = useState(false);
@@ -63,7 +76,23 @@ export default function Navbar() {
 
   useEffect(() => {
     checkAuth();
+    setPlatformDropdownOpen(false);
   }, [pathname, checkAuth]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        platformDropdownRef.current &&
+        !platformDropdownRef.current.contains(event.target as Node)
+      ) {
+        setPlatformDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const handleAuthEvent = () => checkAuth();
@@ -143,69 +172,59 @@ export default function Navbar() {
                 </Link>
               )}
 
-              <div className="hidden 2xl:block h-3.5 w-px bg-neutral-200 mx-1 shrink-0" />
+              {/* Platforms Dropdown Menu */}
+              <div className="relative" ref={platformDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setPlatformDropdownOpen(!platformDropdownOpen)}
+                  onMouseEnter={() => setPlatformDropdownOpen(true)}
+                  className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                    platformDropdownOpen
+                      ? "bg-slate-100 text-slate-900"
+                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <span>플랫폼</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${platformDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
 
-              <div className="hidden 2xl:flex items-center gap-1 shrink-0 whitespace-nowrap">
-                <Link
-                  href="/platforms/windows"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/windows")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Monitor className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Windows</span>
-                </Link>
-                <Link
-                  href="/platforms/android"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/android")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Android</span>
-                </Link>
-                <Link
-                  href="/platforms/ios"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/ios")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Apple className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>iOS</span>
-                </Link>
-                <Link
-                  href="/platforms/playstation"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/playstation")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Gamepad2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>PlayStation</span>
-                </Link>
-                <Link
-                  href="/platforms/nintendo"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/nintendo")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Gamepad2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Nintendo</span>
-                </Link>
-                <Link
-                  href="/platforms/macos"
-                  prefetch={true}
-                  onMouseEnter={() => router.prefetch("/platforms/macos")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
-                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-                >
-                  <Laptop className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>macOS</span>
-                </Link>
+                {/* Dropdown Menu Popover */}
+                {platformDropdownOpen && (
+                  <div
+                    onMouseLeave={() => setPlatformDropdownOpen(false)}
+                    className="absolute left-0 mt-1.5 w-72 bg-white rounded-2xl shadow-xl border border-neutral-200/90 py-2.5 px-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                  >
+                    <div className="px-2.5 py-1 text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
+                      지원 플랫폼 패치 허브
+                    </div>
+                    <div className="grid grid-cols-1 gap-1 mt-1">
+                      {NAV_PLATFORMS.map((p) => {
+                        const Icon = p.icon;
+                        return (
+                          <Link
+                            key={p.key}
+                            href={`/platforms/${p.key}`}
+                            onClick={() => setPlatformDropdownOpen(false)}
+                            className="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-neutral-50 transition-colors group"
+                          >
+                            <div className={`w-8 h-8 rounded-lg ${p.bg} flex items-center justify-center shrink-0`}>
+                              <Icon className={`w-4 h-4 ${p.color}`} />
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                              <div className="text-xs font-bold text-neutral-900 group-hover:text-blue-600 transition-colors">
+                                {p.name}
+                              </div>
+                              <div className="text-[10px] text-neutral-400 truncate">
+                                {p.desc}
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </nav>
           </div>
