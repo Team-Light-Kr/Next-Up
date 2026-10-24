@@ -37,7 +37,7 @@ export default function NotificationsPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <Bell className="w-6 h-6 text-blue-600" />
             <span>내 알림함</span>
           </h1>
@@ -49,7 +49,7 @@ export default function NotificationsPage() {
         {notifications.some((n) => !n.read) && (
           <button
             onClick={handleReadAll}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
           >
             <CheckCheck className="w-3.5 h-3.5 text-blue-600" />
             <span>모두 읽음 처리</span>
@@ -77,8 +77,8 @@ export default function NotificationsPage() {
                 key={n.id}
                 className={`p-4 rounded-xl border transition-all flex items-start justify-between gap-4 ${
                   !n.read
-                    ? "bg-blue-50/40 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900 shadow-xs"
-                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-80"
+                    ? "bg-blue-50/40 border-blue-200 shadow-xs"
+                    : "bg-white border-slate-200 opacity-80"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -86,7 +86,7 @@ export default function NotificationsPage() {
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                       !n.read
                         ? "bg-blue-600 text-white"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                        : "bg-slate-100 text-slate-500"
                     }`}
                   >
                     <Gamepad2 className="w-4 h-4" />
@@ -94,14 +94,14 @@ export default function NotificationsPage() {
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      <h3 className="text-sm font-bold text-slate-900">
                         {n.title}
                       </h3>
                       {!n.read && (
                         <span className="w-2 h-2 rounded-full bg-blue-600" />
                       )}
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {n.message}
                     </p>
                     <span className="text-[11px] text-slate-400 flex items-center gap-1 pt-1">
@@ -124,9 +124,9 @@ export default function NotificationsPage() {
           })}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+        <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 p-8">
           <Bell className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+          <h3 className="text-sm font-semibold text-slate-800">
             새로운 알림이 없습니다
           </h3>
           <p className="text-xs text-slate-500 mt-1">

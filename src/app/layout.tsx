@@ -19,7 +19,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Team Light" }],
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
     shortcut: "/favicon.png",
     apple: "/logo.png",
   },
@@ -39,8 +42,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <html lang="ko" className="h-full antialiased light" style={{ colorScheme: "light" }}>
+      <head>
+        <meta name="color-scheme" content="light" />
+        <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="shortcut icon" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+      </head>
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

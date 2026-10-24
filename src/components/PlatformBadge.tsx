@@ -22,39 +22,39 @@ export default function PlatformBadge({
   > = {
     windows: {
       label: "Windows",
-      bg: "bg-blue-50 dark:bg-blue-950/40",
-      text: "text-blue-700 dark:text-blue-400",
-      border: "border-blue-200 dark:border-blue-800",
+      bg: "bg-blue-50",
+      text: "text-blue-700",
+      border: "border-blue-200",
       icon: <Monitor className="w-3.5 h-3.5" />,
     },
     android: {
       label: "Android",
-      bg: "bg-emerald-50 dark:bg-emerald-950/40",
-      text: "text-emerald-700 dark:text-emerald-400",
-      border: "border-emerald-200 dark:border-emerald-800",
+      bg: "bg-emerald-50",
+      text: "text-emerald-700",
+      border: "border-emerald-200",
       icon: <Smartphone className="w-3.5 h-3.5" />,
     },
     ios: {
       label: "iOS",
-      bg: "bg-slate-100 dark:bg-slate-800/60",
-      text: "text-slate-800 dark:text-slate-200",
-      border: "border-slate-300 dark:border-slate-700",
+      bg: "bg-slate-100",
+      text: "text-slate-800",
+      border: "border-slate-300",
       icon: <Apple className="w-3.5 h-3.5" />,
     },
     macos: {
       label: "macOS",
-      bg: "bg-purple-50 dark:bg-purple-950/40",
-      text: "text-purple-700 dark:text-purple-400",
-      border: "border-purple-200 dark:border-purple-800",
+      bg: "bg-purple-50",
+      text: "text-purple-700",
+      border: "border-purple-200",
       icon: <Laptop className="w-3.5 h-3.5" />,
     },
   };
 
   const config = configs[key] || {
     label: name || platformKey,
-    bg: "bg-zinc-100 dark:bg-zinc-800",
-    text: "text-zinc-700 dark:text-zinc-300",
-    border: "border-zinc-300 dark:border-zinc-700",
+    bg: "bg-zinc-100",
+    text: "text-zinc-700",
+    border: "border-zinc-300",
     icon: <Monitor className="w-3.5 h-3.5" />,
   };
 

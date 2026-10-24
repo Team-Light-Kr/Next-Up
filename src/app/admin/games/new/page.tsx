@@ -107,9 +107,9 @@ export default function NewGamePage() {
         </Link>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs space-y-6">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
             <PlusCircle className="w-6 h-6 text-blue-600" />
             <span>신규 게임 등록 (관리자)</span>
           </h1>
@@ -119,7 +119,7 @@ export default function NewGamePage() {
         </div>
 
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -128,7 +128,7 @@ export default function NewGamePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 게임 대표명 (Canonical Name) *
               </label>
               <input
@@ -137,12 +137,12 @@ export default function NewGamePage() {
                 placeholder="예: 원신 (Genshin Impact)"
                 value={formData.canonicalName}
                 onChange={handleNameChange}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 고유 식별자 (Slug / URL 경로) *
               </label>
               <input
@@ -151,14 +151,14 @@ export default function NewGamePage() {
                 placeholder="예: genshin-impact"
                 value={formData.slug}
                 onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 개발사 (Developer)
               </label>
               <input
@@ -166,12 +166,12 @@ export default function NewGamePage() {
                 placeholder="예: HoYoverse, NEXON Games, Riot Games"
                 value={formData.developer}
                 onChange={(e) => setFormData({ ...formData, developer: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 퍼블리셔 (Publisher)
               </label>
               <input
@@ -179,14 +179,14 @@ export default function NewGamePage() {
                 placeholder="예: COGNOSPHERE, NEXON"
                 value={formData.publisher}
                 onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 공식 웹사이트 URL
               </label>
               <input
@@ -194,12 +194,12 @@ export default function NewGamePage() {
                 placeholder="https://..."
                 value={formData.officialWebsiteUrl}
                 onChange={(e) => setFormData({ ...formData, officialWebsiteUrl: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 아이콘 이미지 URL
               </label>
               <input
@@ -207,12 +207,12 @@ export default function NewGamePage() {
                 placeholder="https://..."
                 value={formData.iconUrl}
                 onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 커버 이미지 URL
               </label>
               <input
@@ -220,13 +220,13 @@ export default function NewGamePage() {
                 placeholder="https://..."
                 value={formData.coverImageUrl}
                 onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               장르 (쉼표로 구분)
             </label>
             <input
@@ -234,12 +234,12 @@ export default function NewGamePage() {
               placeholder="오픈월드, 액션 RPG, 서브컬처, FPS, 샌드박스"
               value={formData.genresText}
               onChange={(e) => setFormData({ ...formData, genresText: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               게임 상세 소개 *
             </label>
             <textarea
@@ -248,13 +248,13 @@ export default function NewGamePage() {
               placeholder="게임의 세계관, 주요 시스템 및 개요를 작성합니다."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
             />
           </div>
 
           {/* Platform Settings */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+          <div className="pt-4 border-t border-slate-100 space-y-4">
+            <h3 className="text-sm font-bold text-slate-900">
               지원 플랫폼 및 스토어 설정
             </h3>
 
@@ -266,8 +266,8 @@ export default function NewGamePage() {
                     key={key}
                     className={`p-4 rounded-xl border transition-all ${
                       p.enabled
-                        ? "border-blue-300 dark:border-blue-800 bg-blue-50/20 dark:bg-blue-950/10"
-                        : "border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-800/40 opacity-70"
+                        ? "border-blue-300 bg-blue-50/20"
+                        : "border-slate-200 bg-slate-50/40 opacity-70"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -283,14 +283,14 @@ export default function NewGamePage() {
                           }
                           className="rounded text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="font-bold text-xs uppercase tracking-wider text-slate-900 dark:text-white">
+                        <span className="font-bold text-xs uppercase tracking-wider text-slate-900">
                           {key}
                         </span>
                       </label>
                     </div>
 
                     {p.enabled && (
-                      <div className="space-y-2 mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-700">
+                      <div className="space-y-2 mt-3 pt-2 border-t border-slate-200/60">
                         <input
                           type="text"
                           placeholder="최신 버전 (예: v1.0.0)"
@@ -301,7 +301,7 @@ export default function NewGamePage() {
                               [key]: { ...p, version: e.target.value },
                             })
                           }
-                          className="w-full px-2.5 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono"
+                          className="w-full px-2.5 py-1 text-xs rounded border border-slate-200 bg-white font-mono"
                         />
                         <input
                           type="url"
@@ -313,7 +313,7 @@ export default function NewGamePage() {
                               [key]: { ...p, storeUrl: e.target.value },
                             })
                           }
-                          className="w-full px-2.5 py-1 text-xs rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                          className="w-full px-2.5 py-1 text-xs rounded border border-slate-200 bg-white"
                         />
                       </div>
                     )}
@@ -326,7 +326,7 @@ export default function NewGamePage() {
           <div className="pt-4 flex justify-end gap-3">
             <Link
               href="/games"
-              className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
             >
               취소
             </Link>

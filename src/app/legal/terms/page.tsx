@@ -19,13 +19,13 @@ export default function TermsOfServicePage() {
         <span>홈으로 돌아가기</span>
       </Link>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 shadow-xs space-y-6">
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-3">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-xs space-y-6">
+        <div className="border-b border-slate-200 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-3">
             <FileText className="w-4 h-4" />
             <span>표준 약관 및 법적 규정 준수</span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-slate-900">
             NextUps 서비스 이용약관
           </h1>
           <div className="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
@@ -39,9 +39,9 @@ export default function TermsOfServicePage() {
           </div>
         </div>
 
-        <div className="prose dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300 space-y-6 leading-relaxed">
+        <div className="prose max-w-none text-sm text-slate-700 space-y-6 leading-relaxed">
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제1조 (목적)
             </h2>
             <p>
@@ -50,7 +50,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제2조 (무료 공공 서비스 원칙)
             </h2>
             <p>
@@ -59,19 +59,19 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제3조 (약관의 효력 및 7일 사전 공지 원칙)
             </h2>
             <p>
               1. 본 약관은 서비스를 이용하고자 하는 모든 이용자에게 공시함으로써 효력을 발생합니다.
             </p>
-            <p className="font-semibold text-blue-700 dark:text-blue-400">
+            <p className="font-semibold text-blue-700">
               2. 대한민국 법령에 의거하여 본 약관을 개정할 경우, 개정 약관의 적용일자 및 개정 사유를 명시하여 적용일자 7일 전부터 웹사이트 공지사항 또는 등록된 회원 전자우편을 통해 사전에 공지합니다. 이용자에게 불리한 변경의 경우에는 최소 30일 이상의 사전 유예기간을 둡니다.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제4조 (지식재산권의 존중)
             </h2>
             <p>
@@ -80,7 +80,7 @@ export default function TermsOfServicePage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제5조 (면책 조항)
             </h2>
             <p>

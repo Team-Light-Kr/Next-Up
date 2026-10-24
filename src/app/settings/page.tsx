@@ -103,7 +103,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
           <Settings className="w-6 h-6 text-blue-600" />
           <span>계정 및 보안 설정</span>
         </h1>
@@ -116,8 +116,8 @@ export default function SettingsPage() {
         <div
           className={`p-4 rounded-xl border text-xs flex items-center gap-2 ${
             statusMsg.type === "success"
-              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 text-emerald-700 dark:text-emerald-300"
-              : "bg-red-50 dark:bg-red-950/40 border-red-200 text-red-700 dark:text-red-300"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : "bg-red-50 border-red-200 text-red-700"
           }`}
         >
           {statusMsg.type === "success" ? (
@@ -131,15 +131,15 @@ export default function SettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-8">
         {/* Profile Customization Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-5">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
+          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <User className="w-4 h-4 text-blue-600" />
             <span>프로필 꾸미기</span>
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 닉네임
               </label>
               <input
@@ -147,12 +147,12 @@ export default function SettingsPage() {
                 required
                 value={formData.displayName}
                 onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 아바타 프로필 이미지 URL
               </label>
               <div className="relative">
@@ -161,14 +161,14 @@ export default function SettingsPage() {
                   placeholder="https://images.unsplash.com/..."
                   value={formData.avatarUrl}
                   onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <Image className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 소개글 (Bio)
               </label>
               <textarea
@@ -176,16 +176,16 @@ export default function SettingsPage() {
                 placeholder="자신을 나타내는 소개글을 작성해 보세요."
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
               />
             </div>
           </div>
         </div>
 
         {/* 2-Factor Authentication (2FA) Section (3 options: Email, SMS Sendwich, OTP) */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-5">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <Shield className="w-4 h-4 text-emerald-600" />
               <span>2단계 인증 (2FA) 설정</span>
             </h2>
@@ -199,8 +199,8 @@ export default function SettingsPage() {
             <label
               className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
                 formData.twoFactorType === "EMAIL"
-                  ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 ring-2 ring-blue-500/20"
-                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                  ? "border-blue-500 bg-blue-50/40 text-blue-900 ring-2 ring-blue-500/20"
+                  : "border-slate-200 hover:border-slate-300"
               }`}
             >
               <div>
@@ -224,8 +224,8 @@ export default function SettingsPage() {
             <label
               className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
                 formData.twoFactorType === "SMS"
-                  ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 ring-2 ring-blue-500/20"
-                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                  ? "border-blue-500 bg-blue-50/40 text-blue-900 ring-2 ring-blue-500/20"
+                  : "border-slate-200 hover:border-slate-300"
               }`}
             >
               <div>
@@ -249,8 +249,8 @@ export default function SettingsPage() {
             <label
               className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
                 formData.twoFactorType === "OTP"
-                  ? "border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 ring-2 ring-blue-500/20"
-                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                  ? "border-blue-500 bg-blue-50/40 text-blue-900 ring-2 ring-blue-500/20"
+                  : "border-slate-200 hover:border-slate-300"
               }`}
             >
               <div>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
 
           {formData.twoFactorType === "SMS" && (
             <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 문자 수신 휴대전화 번호
               </label>
               <input
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                 placeholder="010-1234-5678"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-[11px] text-slate-400 mt-1">
                 ※ Sendwich 서비스 연동 번호로 인증 문자가 발송됩니다.
@@ -305,7 +305,7 @@ export default function SettingsPage() {
         <div className="flex justify-end gap-3">
           <Link
             href={`/profile/${user?.profileCode}`}
-            className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
           >
             취소
           </Link>

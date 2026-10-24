@@ -27,10 +27,10 @@ export default function GameCard({ game }: GameCardProps) {
   return (
     <Link
       href={`/games/${game.slug}`}
-      className="group block bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-700 transition-all"
+      className="group block bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-blue-400:border-blue-700 transition-all"
     >
       {/* Cover Banner */}
-      <div className="relative h-32 w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+      <div className="relative h-32 w-full bg-slate-100 overflow-hidden">
         {game.coverImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -50,10 +50,10 @@ export default function GameCard({ game }: GameCardProps) {
             <img
               src={game.iconUrl}
               alt={game.canonicalName}
-              className="w-12 h-12 rounded-xl object-cover border-2 border-white dark:border-slate-900 shadow-md bg-white"
+              className="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-md bg-white"
             />
           ) : (
-            <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg border-2 border-white dark:border-slate-900 shadow-md">
+            <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg border-2 border-white shadow-md">
               {game.canonicalName.slice(0, 1)}
             </div>
           )}
@@ -63,15 +63,15 @@ export default function GameCard({ game }: GameCardProps) {
       {/* Content */}
       <div className="p-4 pt-5">
         <div className="mb-2">
-          <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-blue-600:text-blue-400 transition-colors">
             {game.canonicalName}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500">
             {game.developer || "공식 개발사"}
           </p>
         </div>
 
-        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-3">
+        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3">
           {game.description}
         </p>
 
@@ -80,7 +80,7 @@ export default function GameCard({ game }: GameCardProps) {
           {game.genres.slice(0, 3).map((g) => (
             <span
               key={g}
-              className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+              className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"
             >
               {g}
             </span>
@@ -88,7 +88,7 @@ export default function GameCard({ game }: GameCardProps) {
         </div>
 
         {/* Platform Badges */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex flex-wrap items-center gap-1">
             {game.platforms.map((p) => (
               <PlatformBadge
@@ -100,7 +100,7 @@ export default function GameCard({ game }: GameCardProps) {
             ))}
           </div>
 
-          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-0.5">
+          <span className="text-xs font-semibold text-blue-600 flex items-center gap-0.5">
             상세정보 <ChevronRight className="w-3.5 h-3.5" />
           </span>
         </div>

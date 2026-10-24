@@ -89,12 +89,12 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
               Admin Only
             </span>
             <span className="text-xs text-slate-400">데이터 수집 및 운영 관리</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
             관리자 운영 대시보드
           </h1>
         </div>
@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/admin/games/new"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors"
           >
             <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
             <span>게임 등록</span>
@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+      <div className="flex border-b border-slate-200 space-x-6 text-sm font-semibold">
         <button
           onClick={() => setActiveTab("collector")}
           className={`pb-3 flex items-center gap-2 border-b-2 transition-colors ${
@@ -147,9 +147,9 @@ export default function AdminDashboardPage() {
       {activeTab === "collector" ? (
         <div className="space-y-6">
           {/* Collector Action Box */}
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <RotateCw className="w-5 h-5 text-blue-600" />
                 <span>공식 데이터 실시간 자동 수집기</span>
               </h2>
@@ -216,9 +216,9 @@ export default function AdminDashboardPage() {
         </div>
       ) : (
         /* Reports Management Tab */
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-          <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="p-6 border-b border-slate-200">
+            <h2 className="text-base font-bold text-slate-900">
               사용자 정보 오류 제보 목록
             </h2>
             <p className="text-xs text-slate-500 mt-1">
@@ -227,23 +227,23 @@ export default function AdminDashboardPage() {
           </div>
 
           {reports.length > 0 ? (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="divide-y divide-slate-100">
               {reports.map((r) => {
                 const dateStr = new Date(r.createdAt).toLocaleDateString("ko-KR");
                 return (
                   <div key={r.id} className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                           {r.reportType}
                         </span>
                         <span
                           className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                             r.status === "PENDING"
-                              ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                              ? "bg-amber-100 text-amber-800"
                               : r.status === "RESOLVED"
-                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
-                              : "bg-slate-100 text-slate-600 dark:bg-slate-800"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           {r.status === "PENDING" ? "검토 대기중" : r.status === "RESOLVED" ? "처리 완료" : "반려됨"}
@@ -251,7 +251,7 @@ export default function AdminDashboardPage() {
                         <span className="text-xs text-slate-400">{dateStr}</span>
                       </div>
 
-                      <p className="text-xs text-slate-700 dark:text-slate-200 font-medium leading-relaxed">
+                      <p className="text-xs text-slate-700 font-medium leading-relaxed">
                         {r.content}
                       </p>
 
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                         </button>
                         <button
                           onClick={() => handleUpdateReportStatus(r.id, "REJECTED")}
-                          className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold flex items-center gap-1"
                         >
                           <X className="w-3.5 h-3.5" /> 반려
                         </button>

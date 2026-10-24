@@ -79,9 +79,9 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs space-y-6">
+    <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
           <FileText className="w-6 h-6 text-blue-600" />
           <span>신규 업데이트 및 패치노트 등록</span>
         </h1>
@@ -91,7 +91,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
       </div>
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -100,14 +100,14 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               대상 게임 *
             </label>
             <select
               required
               value={formData.gameId}
               onChange={(e) => setFormData({ ...formData, gameId: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {games.map((g) => (
                 <option key={g.id} value={g.id}>
@@ -118,14 +118,14 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               배포 대상 플랫폼 *
             </label>
             <select
               required
               value={formData.platformKey}
               onChange={(e) => setFormData({ ...formData, platformKey: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
             >
               {platforms.map((p) => (
                 <option key={p.key} value={p.key}>
@@ -138,7 +138,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               버전 명칭 (Version) *
             </label>
             <input
@@ -147,18 +147,18 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               placeholder="예: v5.4.0, 1.21.50"
               value={formData.version}
               onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               업데이트 유형
             </label>
             <select
               value={formData.updateType}
               onChange={(e) => setFormData({ ...formData, updateType: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="MAJOR">주요 업데이트 (MAJOR)</option>
               <option value="MINOR">일반 업데이트 (MINOR)</option>
@@ -169,7 +169,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               배포 일자 *
             </label>
             <input
@@ -177,13 +177,13 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               required
               value={formData.releaseDate}
               onChange={(e) => setFormData({ ...formData, releaseDate: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
             업데이트 제목 *
           </label>
           <input
@@ -192,13 +192,13 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
             placeholder="예: 5.4 버전 정식 업데이트 안내"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               공식 출처 명칭
             </label>
             <input
@@ -206,12 +206,12 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               placeholder="예: 공식 홈페이지, Steam 뉴스, Google Play"
               value={formData.sourceName}
               onChange={(e) => setFormData({ ...formData, sourceName: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               공식 원문 URL
             </label>
             <input
@@ -219,13 +219,13 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               placeholder="https://..."
               value={formData.sourceUrl}
               onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
-              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+          <label className="block text-xs font-semibold text-slate-700 mb-1.5">
             한 줄 핵심 요약 (Summary)
           </label>
           <input
@@ -233,23 +233,23 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
             placeholder="목록 및 피드에 노출될 1~2줄 핵심 요약"
             value={formData.summary}
             onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-            className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Markdown Content Editor with Preview Switch */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <label className="block text-xs font-semibold text-slate-700">
               패치노트 상세 내용 (마크다운 지원) *
             </label>
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-xs">
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs">
               <button
                 type="button"
                 onClick={() => setActiveTab("write")}
                 className={`px-3 py-1 rounded-md font-medium flex items-center gap-1 ${
                   activeTab === "write"
-                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
+                    ? "bg-white text-slate-900 shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
@@ -260,7 +260,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
                 onClick={() => setActiveTab("preview")}
                 className={`px-3 py-1 rounded-md font-medium flex items-center gap-1 ${
                   activeTab === "preview"
-                    ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs"
+                    ? "bg-white text-slate-900 shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
@@ -275,18 +275,18 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               rows={12}
               value={formData.bodyMarkdown}
               onChange={(e) => setFormData({ ...formData, bodyMarkdown: e.target.value })}
-              className="w-full px-4 py-3 text-sm font-mono rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
+              className="w-full px-4 py-3 text-sm font-mono rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed"
             />
           ) : (
-            <div className="p-6 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 min-h-[300px]">
+            <div className="p-6 rounded-lg border border-slate-200 bg-slate-50 min-h-[300px]">
               <MarkdownRenderer content={formData.bodyMarkdown} />
             </div>
           )}
         </div>
 
         {/* Image Attachment Section (Up to 20 images) */}
-        <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-          <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+        <div className="space-y-3 pt-3 border-t border-slate-100">
+          <label className="block text-xs font-semibold text-slate-700">
             패치 이미지 첨부 (최대 20개, 현재 {images.length}/20)
           </label>
           <div className="flex gap-2">
@@ -295,7 +295,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               placeholder="https://... (이미지 주소)"
               value={formData.imageUrlInput}
               onChange={(e) => setFormData({ ...formData, imageUrlInput: e.target.value })}
-              className="flex-1 px-3.5 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
+              className="flex-1 px-3.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50"
             />
             <button
               type="button"
@@ -312,7 +312,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs border border-slate-200 dark:border-slate-700"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-xs border border-slate-200"
                 >
                   <Image className="w-3.5 h-3.5 text-slate-500" />
                   <span className="truncate max-w-[140px]">{img}</span>
@@ -332,7 +332,7 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
         <div className="pt-4 flex justify-end gap-3">
           <Link
             href="/games"
-            className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
           >
             취소
           </Link>

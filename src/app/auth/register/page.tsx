@@ -76,27 +76,27 @@ export default function RegisterPage() {
           <img
             src="/logo.png"
             alt="NextUps"
-            className="w-12 h-12 rounded-xl object-contain shadow-xs"
+            className="w-12 h-12 rounded-xl object-contain shadow-xs border border-slate-200"
           />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           NextUps 회원가입
         </h1>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-slate-600">
           안전한 6자리 이메일 인증으로 비밀번호 없이 간편하게 가입하세요.
         </p>
       </div>
 
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
         {errorMsg && (
-          <div className="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+          <div className="p-3 mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 mb-4 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs flex items-center gap-2">
+          <div className="p-3 mb-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-600" />
             <span>{successMsg}</span>
           </div>
@@ -105,7 +105,7 @@ export default function RegisterPage() {
         {step === "EMAIL" ? (
           <form onSubmit={handleSendCode} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 닉네임
               </label>
               <div className="relative">
@@ -115,14 +115,14 @@ export default function RegisterPage() {
                   placeholder="사용하실 닉네임"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-colors"
                 />
-                <User className="w-4 h-4 absolute left-3 top-2.5 text-neutral-400" />
+                <User className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 이메일 주소
               </label>
               <div className="relative">
@@ -132,16 +132,16 @@ export default function RegisterPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-colors"
                 />
-                <Mail className="w-4 h-4 absolute left-3 top-2.5 text-neutral-400" />
+                <Mail className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading || !email || !displayName}
-              className="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>인증번호 받기</span>
@@ -152,13 +152,13 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="block text-xs font-semibold text-slate-700">
                   이메일로 전송된 6자리 인증번호
                 </label>
                 <button
                   type="button"
                   onClick={() => setStep("EMAIL")}
-                  className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-[11px] text-blue-600 hover:underline cursor-pointer"
                 >
                   이메일 변경
                 </button>
@@ -171,11 +171,11 @@ export default function RegisterPage() {
                   placeholder="123456"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-lg font-mono tracking-widest text-center rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-lg font-mono tracking-widest text-center rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-colors"
                 />
-                <KeyRound className="w-4 h-4 absolute left-3 top-3 text-neutral-400" />
+                <KeyRound className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
               </div>
-              <p className="text-[11px] text-neutral-500 mt-1">
+              <p className="text-[11px] text-slate-500 mt-1">
                 ※ 스팸 메일함으로 수신될 수 있으니 확인해 주세요.
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || code.length < 6}
-              className="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-4 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>가입 완료하고 프로필 생성</span>
@@ -191,9 +191,9 @@ export default function RegisterPage() {
           </form>
         )}
 
-        <div className="pt-4 mt-6 border-t border-neutral-100 dark:border-neutral-800 text-center text-xs text-neutral-500">
+        <div className="pt-4 mt-6 border-t border-slate-100 text-center text-xs text-slate-500">
           이미 계정이 있으신가요?{" "}
-          <Link href="/auth/login" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/auth/login" className="font-semibold text-blue-600 hover:underline">
             로그인하기
           </Link>
         </div>

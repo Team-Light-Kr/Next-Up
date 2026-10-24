@@ -150,11 +150,11 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
       {/* Main Body */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Game Description */}
-        <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+        <section className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs">
+          <h2 className="text-base font-bold text-slate-900 mb-2">
             게임 소개
           </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">
             {game.description}
           </p>
         </section>
@@ -162,7 +162,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
         {/* Platform Status Cards */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-blue-600" />
               <span>지원 플랫폼 및 최신 버전 현황</span>
             </h2>
@@ -175,33 +175,33 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
             {game.platforms.map((gp) => (
               <div
                 key={gp.id}
-                className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between space-y-4"
+                className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between space-y-4"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <PlatformBadge platformKey={gp.platform.key} name={gp.platform.name} size="md" />
-                    <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                    <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                       {gp.availabilityStatus === "AVAILABLE" ? "지원 중" : gp.availabilityStatus}
                     </span>
                   </div>
 
                   <div className="space-y-1">
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                    <div className="text-xs text-slate-500">
                       최신 확인 버전
                     </div>
-                    <div className="text-lg font-mono font-bold text-slate-900 dark:text-white">
+                    <div className="text-lg font-mono font-bold text-slate-900">
                       {gp.latestKnownVersion || "정보 없음"}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   {gp.storeUrl ? (
                     <a
                       href={gp.storeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors w-full justify-center"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100:bg-blue-900/60 transition-colors w-full justify-center"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>스토어 및 공식 설치</span>
@@ -220,17 +220,17 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <History className="w-5 h-5 text-blue-600" />
                 <span>업데이트 및 패치 이력</span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 해당 게임의 플랫폼별 공식 릴리스 타임라인입니다.
               </p>
             </div>
             <Link
               href="/admin/updates/new"
-              className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-xs font-semibold text-blue-600 hover:underline"
             >
               + 패치 등록
             </Link>
@@ -247,12 +247,12 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                 return (
                   <article
                     key={update.id}
-                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs hover:border-blue-400 dark:hover:border-blue-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-blue-400:border-blue-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div className="space-y-2 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <PlatformBadge platformKey={update.platform.key} name={update.platform.name} size="sm" />
-                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800">
                           {update.version}
                         </span>
                         <span className="text-xs text-slate-400 flex items-center gap-1">
@@ -267,13 +267,13 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                       </div>
 
                       <Link href={`/updates/${update.id}`}>
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <h3 className="text-base font-bold text-slate-900 hover:text-blue-600:text-blue-400 transition-colors">
                           {update.title}
                         </h3>
                       </Link>
 
                       {update.summary && (
-                        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
+                        <p className="text-xs text-slate-600 line-clamp-2">
                           {update.summary}
                         </p>
                       )}
@@ -285,7 +285,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                           href={update.sourceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 inline-flex items-center gap-1 font-medium"
+                          className="text-xs text-slate-500 hover:text-slate-800:text-slate-200 inline-flex items-center gap-1 font-medium"
                         >
                           <span>{update.sourceName || "공식 원문"}</span>
                           <ExternalLink className="w-3 h-3" />
@@ -305,9 +305,9 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
               })}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-              <Clock className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <div className="text-center py-12 bg-white rounded-xl border border-slate-200 p-6">
+              <Clock className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-slate-700">
                 아직 등록된 업데이트 기록이 없습니다
               </p>
             </div>

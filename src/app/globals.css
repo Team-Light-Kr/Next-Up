@@ -11,29 +11,23 @@
     --border: #e2e8f0;
     --muted: #64748b;
     --muted-bg: #f1f5f9;
-  }
-
-  .dark {
-    --background: #090d16;
-    --foreground: #f8fafc;
-    --card: #0f172a;
-    --card-foreground: #f8fafc;
-    --primary: #3b82f6;
-    --primary-foreground: #ffffff;
-    --border: #1e293b;
-    --muted: #94a3b8;
-    --muted-bg: #1e293b;
+    color-scheme: light !important;
   }
 }
 
+/* Force light mode globally - disable dark mode overrides completely */
+html, body, :root {
+  color-scheme: light !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
 body {
-  background-color: var(--background);
-  color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
 }
 
-/* Custom Scrollbar */
+/* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -45,14 +39,14 @@ body {
   background: #cbd5e1;
   border-radius: 4px;
 }
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Markdown prose styling */
 .markdown-body {
   line-height: 1.75;
-  color: inherit;
+  color: #1e293b;
 }
 .markdown-body h1,
 .markdown-body h2,
@@ -61,30 +55,32 @@ body {
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: inherit;
+  color: #0f172a;
 }
 .markdown-body h1 { font-size: 1.5rem; }
-.markdown-body h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.markdown-body h2 { font-size: 1.25rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
 .markdown-body h3 { font-size: 1.125rem; }
 .markdown-body p { margin-bottom: 1rem; }
 .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
 .markdown-body li { margin-bottom: 0.25rem; }
 .markdown-body blockquote {
-  border-left: 4px solid var(--primary);
+  border-left: 4px solid #2563eb;
   padding-left: 1rem;
-  color: var(--muted);
+  color: #475569;
   margin-bottom: 1rem;
   font-style: italic;
 }
 .markdown-body code {
-  background-color: var(--muted-bg);
+  background-color: #f1f5f9;
+  color: #0f172a;
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.875em;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 .markdown-body pre {
-  background-color: var(--muted-bg);
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;

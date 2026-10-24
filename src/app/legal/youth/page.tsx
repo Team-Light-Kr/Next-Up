@@ -19,13 +19,13 @@ export default function YouthProtectionPage() {
         <span>홈으로 돌아가기</span>
       </Link>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 shadow-xs space-y-6">
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold mb-3">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-xs space-y-6">
+        <div className="border-b border-slate-200 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-3">
             <ShieldAlert className="w-4 h-4" />
             <span>청소년 보호법 준수</span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-slate-900">
             NextUps 청소년 보호정책
           </h1>
           <div className="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
@@ -39,9 +39,9 @@ export default function YouthProtectionPage() {
           </div>
         </div>
 
-        <div className="prose dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300 space-y-6 leading-relaxed">
+        <div className="prose max-w-none text-sm text-slate-700 space-y-6 leading-relaxed">
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제1조 (목적)
             </h2>
             <p>
@@ -50,7 +50,7 @@ export default function YouthProtectionPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제2조 (유해 정보에 대한 청소년 접근 제한 및 관리)
             </h2>
             <p>
@@ -59,13 +59,13 @@ export default function YouthProtectionPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제3조 (청소년보호 책임자 지정)
             </h2>
             <p>
               NextUps는 청소년 유해 정보의 차단과 관리를 위하여 전담 청소년보호 책임자를 지정하고 있습니다.
             </p>
-            <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-slate-50 text-xs space-y-1">
               <div>• 청소년보호 관리 부서: Team Light 운영위원회</div>
               <div>• 문의 및 유해 게시물 신고: admin@nextups.xyz</div>
             </div>

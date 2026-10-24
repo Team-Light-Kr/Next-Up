@@ -80,16 +80,16 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
   const platformIcons: Record<string, React.ReactNode> = {
     windows: <Monitor className="w-8 h-8 text-blue-500" />,
     android: <Smartphone className="w-8 h-8 text-emerald-500" />,
-    ios: <Apple className="w-8 h-8 text-slate-900 dark:text-slate-100" />,
+    ios: <Apple className="w-8 h-8 text-slate-900" />,
     macos: <Laptop className="w-8 h-8 text-purple-500" />,
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
       {/* Header Banner */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center shadow-xs">
             {platformIcons[platformKey] || <Monitor className="w-8 h-8" />}
           </div>
           <div>
@@ -97,22 +97,22 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
               <PlatformBadge platformKey={platformKey} name={platformData.name} size="md" />
               <span className="text-xs text-slate-500">전용 패치 허브</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
               {platformData.name} 게임 업데이트 정보
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               {platformData.description || `${platformData.name} 환경의 최신 게임 패치 및 버전 정보를 모아봅니다.`}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-4 text-xs font-medium text-slate-600 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200">
           <div>
-            지원 게임: <strong className="text-blue-600 dark:text-blue-400">{platformGames.length}개</strong>
+            지원 게임: <strong className="text-blue-600">{platformGames.length}개</strong>
           </div>
-          <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+          <div className="h-4 w-px bg-slate-200" />
           <div>
-            등록 패치: <strong className="text-blue-600 dark:text-blue-400">{platformUpdates.length}건</strong>
+            등록 패치: <strong className="text-blue-600">{platformUpdates.length}건</strong>
           </div>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
       {/* Platform Updates Feed */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-600" />
             <span>{platformData.name} 최신 업데이트 피드</span>
           </h2>
@@ -136,7 +136,7 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200 p-6">
             <p className="text-sm text-slate-500">
               해당 플랫폼에 등록된 최신 패치가 아직 없습니다.
             </p>
@@ -147,13 +147,13 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
       {/* Supported Games on this Platform */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Gamepad2 className="w-5 h-5 text-blue-600" />
             <span>{platformData.name} 지원 게임 목록</span>
           </h2>
           <Link
             href={`/games?platform=${platformKey}`}
-            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs font-semibold text-blue-600 hover:underline"
           >
             검색 필터로 열기 →
           </Link>

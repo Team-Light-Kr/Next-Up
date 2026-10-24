@@ -46,8 +46,8 @@ export default function FollowButton({ gameSlug, initialFollowing = false }: Fol
       disabled={loading}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
         following
-          ? "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400"
-          : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-300"
+          ? "bg-rose-50 border border-rose-200 text-rose-600"
+          : "bg-white border border-slate-200 text-slate-700 hover:border-slate-300"
       }`}
       title={following ? "관심 게임 해제" : "관심 게임 등록"}
     >

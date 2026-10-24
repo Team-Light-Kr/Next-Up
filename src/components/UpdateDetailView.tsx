@@ -102,10 +102,10 @@ export default function UpdateDetailView({
   return (
     <div className="space-y-6">
       {/* Translation Toolbar Header (Right aligned button with blue~sky gradient) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
         <div className="flex items-center gap-2">
           <Languages className="w-4 h-4 text-slate-500" />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <span className="text-xs font-semibold text-slate-700">
             번역 언어 선택:
           </span>
           <div className="flex flex-wrap items-center gap-1.5">
@@ -117,8 +117,8 @@ export default function UpdateDetailView({
                   onClick={() => handleTranslate(lang.code)}
                   className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
                     isSelected
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs"
-                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                      ? "bg-slate-900 text-white shadow-xs"
+                      : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300"
                   }`}
                 >
                   <span>{lang.flag}</span>
@@ -133,7 +133,7 @@ export default function UpdateDetailView({
         {/* AI 번역 버튼 (파란색~하늘색 그라데이션 조금 투명하게) */}
         <div className="flex items-center gap-3 self-end sm:self-auto">
           {statusMsg && (
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 animate-fade-in">
+            <span className="text-[11px] text-slate-500 animate-fade-in">
               {statusMsg}
             </span>
           )}
@@ -155,13 +155,13 @@ export default function UpdateDetailView({
       </div>
 
       {/* Translated or Original Content Box */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-4">
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
           {currentContent.title}
         </h2>
 
         {currentContent.summary && (
-          <div className="p-4 mb-6 rounded-lg bg-blue-50/60 dark:bg-blue-950/30 border-l-4 border-blue-500 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+          <div className="p-4 mb-6 rounded-lg bg-blue-50/60 border-l-4 border-blue-500 text-slate-700 text-sm leading-relaxed">
             {currentContent.summary}
           </div>
         )}

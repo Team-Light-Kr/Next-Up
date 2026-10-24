@@ -19,13 +19,13 @@ export default function PrivacyPolicyPage() {
         <span>홈으로 돌아가기</span>
       </Link>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 sm:p-10 shadow-xs space-y-6">
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-3">
+      <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-xs space-y-6">
+        <div className="border-b border-slate-200 pb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold mb-3">
             <ShieldCheck className="w-4 h-4" />
             <span>대한민국 개인정보 보호법 준수</span>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-slate-900">
             NextUps 개인정보 처리방침
           </h1>
           <div className="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
@@ -39,9 +39,9 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
 
-        <div className="prose dark:prose-invert max-w-none text-sm text-slate-700 dark:text-slate-300 space-y-6 leading-relaxed">
+        <div className="prose max-w-none text-sm text-slate-700 space-y-6 leading-relaxed">
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제1조 (총칙 및 목적)
             </h2>
             <p>
@@ -50,7 +50,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제2조 (처리하는 개인정보의 항목)
             </h2>
             <p>
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제3조 (개인정보의 처리 및 보유 기간)
             </h2>
             <p>
@@ -73,7 +73,7 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제4조 (개인정보의 제3자 제공 및 위탁)
             </h2>
             <p>
@@ -81,23 +81,23 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
-          <section className="space-y-2 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900">
-            <h2 className="text-lg font-bold text-blue-900 dark:text-blue-300">
+          <section className="space-y-2 p-4 rounded-xl bg-blue-50/50 border border-blue-200">
+            <h2 className="text-lg font-bold text-blue-900">
               제5조 (정책 변경에 대한 7일 사전 공지 의무)
             </h2>
-            <p className="text-slate-700 dark:text-slate-300 font-medium">
+            <p className="text-slate-700 font-medium">
               대한민국 법령 및 관련 규정에 의거하여, 본 개인정보 처리방침의 내용 추가, 삭제 및 수정이 있을 시에는 개정 최소 7일 전부터 서비스 메인 페이지의 공지사항 및 등록된 회원 이메일을 통해 개정 사유와 개정 내용을 사전 고지합니다.
             </p>
           </section>
 
           <section className="space-y-2">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900">
               제6조 (개인정보 보호책임자 및 고충처리)
             </h2>
             <p>
               개인정보 보호 관련 문의, 불만 처리 및 피해구제 등에 관한 사항은 아래 공식 창구로 문의해 주시기 바랍니다.
             </p>
-            <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-xs space-y-1">
+            <div className="p-3 rounded-lg bg-slate-50 text-xs space-y-1">
               <div>• 책임 부서: Team Light 개인정보 보호팀</div>
               <div>• 공식 문의 이메일: admin@nextups.xyz</div>
               <div>• 대표 도메인: https://nextups.xyz</div>
