@@ -145,24 +145,95 @@ namespace NextUps
             }
         }
 
-        private void InstallUpdate_Click(object sender, RoutedEventArgs e)
+        private async void InstallUpdate_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(_pendingUpdateUrl))
+            if (string.IsNullOrEmpty(_pendingUpdateUrl)) return;
+
+            string downloadUrl = _pendingUpdateUrl;
+            if (downloadUrl.EndsWith("/download"))
             {
-                try
+                downloadUrl = $"{FallbackUrl}/api/download?file=exe";
+            }
+
+            try
+            {
+                UpdateDownloadButton.IsEnabled = false;
+                UpdateDownloadButtonText.Text = "다운로드 중...";
+                UpdateProgressGrid.Visibility = Visibility.Visible;
+                UpdateBannerText.Text = "새 버전 설치 프로그램을 안전하게 다운로드하고 있습니다...";
+
+                string tempFile = Path.Combine(Path.GetTempPath(), "NextUps-Setup-Latest.exe");
+
+                using var handler = new HttpClientHandler { AllowAutoRedirect = true };
+                using var client = new HttpClient(handler);
+                client.Timeout = TimeSpan.FromMinutes(10);
+
+                using var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+                response.EnsureSuccessStatusCode();
+
+                long? totalBytes = response.Content.Headers.ContentLength;
+                using var stream = await response.Content.ReadAsStreamAsync();
+                using var fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true);
+
+                var buffer = new byte[81920];
+                long totalRead = 0;
+                int read;
+                var stopwatch = Stopwatch.StartNew();
+
+                while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
-                    Process.Start(new ProcessStartInfo
+                    await fileStream.WriteAsync(buffer, 0, read);
+                    totalRead += read;
+
+                    if (totalBytes.HasValue && totalBytes.Value > 0)
                     {
-                        FileName = _pendingUpdateUrl,
-                        UseShellExecute = true
-                    });
+                        double percent = Math.Round((double)totalRead / totalBytes.Value * 100, 1);
+                        double downloadedMB = totalRead / (1024.0 * 1024.0);
+                        double totalMB = totalBytes.Value / (1024.0 * 1024.0);
+                        double speedMB = downloadedMB / Math.Max(0.1, stopwatch.Elapsed.TotalSeconds);
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            UpdateProgressBar.Value = percent;
+                            UpdateProgressPercent.Text = $"{percent:F0}%";
+                            UpdateBannerText.Text = $"다운로드 진행 중... {downloadedMB:F1}MB / {totalMB:F1}MB ({percent:F0}%) • {speedMB:F1}MB/s";
+                        });
+                    }
                 }
-                catch (Exception ex)
+
+                fileStream.Close();
+
+                Dispatcher.Invoke(() =>
                 {
-                    MessageBox.Show($"업데이트 다운로드 링크 열기 실패: {ex.Message}", "NextUps 업데이트", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
+                    UpdateProgressBar.Value = 100;
+                    UpdateProgressPercent.Text = "100%";
+                    UpdateBannerText.Text = "다운로드 완료! 설치 프로그램을 실행합니다...";
+                });
+
+                await Task.Delay(600);
+
+                // Run the downloaded installer
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = tempFile,
+                    UseShellExecute = true
+                });
+
+                // Exit running app so installer can overwrite files cleanly
+                Application.Current.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    UpdateDownloadButton.IsEnabled = true;
+                    UpdateDownloadButtonText.Text = "다시 시도";
+                    UpdateProgressGrid.Visibility = Visibility.Collapsed;
+                    UpdateBannerText.Text = $"다운로드 실패: {ex.Message}";
+                });
             }
         }
+
 
         private void DismissUpdate_Click(object sender, RoutedEventArgs e)
         {

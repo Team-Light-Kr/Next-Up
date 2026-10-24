@@ -100,29 +100,51 @@
                 </Grid>
             </Border>
 
-            <!-- AUTO UPDATE NOTIFICATION BANNER -->
-            <Border x:Name="UpdateBanner" Grid.Row="1" Background="#2563EB" Visibility="Collapsed" Padding="12,8">
+            <!-- AUTO UPDATE NOTIFICATION BANNER WITH REAL-TIME PROGRESS GRAPH -->
+            <Border x:Name="UpdateBanner" Grid.Row="1" Background="#1D4ED8" Visibility="Collapsed" Padding="14,10">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="🚀 NextUps 새 버전이 출시되었습니다!" Foreground="White" FontWeight="Bold" FontSize="12" Margin="0,0,10,0" />
-                        <TextBlock x:Name="UpdateBannerText" Text="최신 기능과 보안 패치를 지금 즉시 적용하세요." Foreground="#DBEAFE" FontSize="11" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button Click="InstallUpdate_Click" Background="White" Foreground="#2563EB" FontWeight="Bold" FontSize="11" Padding="10,4" Margin="0,0,8,0" Cursor="Hand" BorderThickness="0">
-                            <Border CornerRadius="4">
-                                <TextBlock Text="지금 업데이트 ↗" />
-                            </Border>
-                        </Button>
-                        <Button Click="DismissUpdate_Click" Background="Transparent" Foreground="White" FontSize="11" BorderThickness="0" Cursor="Hand">
-                            <TextBlock Text="✕" />
-                        </Button>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="🚀 NextUps 새 버전이 출시되었습니다!" Foreground="White" FontWeight="Bold" FontSize="12" Margin="0,0,10,0" />
+                            <TextBlock x:Name="UpdateBannerText" Text="최신 기능과 보안 패치를 지금 즉시 적용하세요." Foreground="#DBEAFE" FontSize="11" />
+                        </StackPanel>
+                        <StackPanel x:Name="UpdateActionPanel" Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="UpdateDownloadButton" Click="InstallUpdate_Click" Background="White" Foreground="#1D4ED8" FontWeight="Bold" FontSize="11" Padding="12,5" Margin="0,0,8,0" Cursor="Hand" BorderThickness="0">
+                                <Border CornerRadius="6">
+                                    <TextBlock x:Name="UpdateDownloadButtonText" Text="지금 업데이트 ↗" />
+                                </Border>
+                            </Button>
+                            <Button Click="DismissUpdate_Click" Background="Transparent" Foreground="White" FontSize="12" BorderThickness="0" Cursor="Hand" Padding="4">
+                                <TextBlock Text="✕" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Real-time Download Progress Bar (그래프 바) -->
+                    <Grid x:Name="UpdateProgressGrid" Grid.Row="1" Visibility="Collapsed" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar x:Name="UpdateProgressBar" Height="8" Minimum="0" Maximum="100" Value="0" Background="#1E3A8A" Foreground="#38BDF8" BorderThickness="0" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <ProgressBar.Clip>
+                                <RectangleGeometry Rect="0,0,1000,8" RadiusX="4" RadiusY="4" />
+                            </ProgressBar.Clip>
+                        </ProgressBar>
+                        <TextBlock x:Name="UpdateProgressPercent" Grid.Column="1" Text="0%" Foreground="White" FontWeight="Bold" FontSize="11" VerticalAlignment="Center" />
+                    </Grid>
                 </Grid>
             </Border>
+
 
             <!-- MAIN WEBVIEW2 ENGINE -->
             <Grid Grid.Row="2" Background="#FFFFFF">

@@ -14,25 +14,29 @@ export async function GET(request: Request) {
     version: string;
     releaseDate: string;
     downloadUrl: string;
+    webDownloadUrl?: string;
     mandatory: boolean;
     changelog: string[];
   }> = {
+
     windows: {
       version: "1.0.1",
       releaseDate: "2026-10-24",
-      downloadUrl: `${appUrl}/download`,
+      downloadUrl: `${appUrl}/api/download?file=exe`,
+      webDownloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
         "Microsoft WebView2 완전 제거 및 Chromium 자체 독립 엔진 탑재",
         "커스텀 프레임리스 타이틀바 UI 및 다크 컨트롤 적용",
         "Google 세이프 브라우징 검사 통과 및 ZIP 무설치 패키지 추가",
-        "신규 인앱 자동 업데이트 엔진 테스트 연동 완료",
+        "신규 인앱 자동 업데이트 실시간 프로그레스 다운로더 연동",
       ],
     },
     android: {
       version: "1.0.1",
       releaseDate: "2026-10-24",
-      downloadUrl: `${appUrl}/download`,
+      downloadUrl: `${appUrl}/api/download?file=apk`,
+      webDownloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
         "모바일 반응형 뷰포트 정규화 및 데스크톱 모드 버그 해결",
@@ -41,6 +45,7 @@ export async function GET(request: Request) {
       ],
     },
   };
+
 
   const target = latestVersions[platform] || latestVersions.windows;
   // If version is less than latestVersion or if isTest is true, trigger update!

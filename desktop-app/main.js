@@ -2,10 +2,14 @@ const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
 const http = require("http");
 const https = require("https");
+const fs = require("fs");
+const os = require("os");
+const { spawn } = require("child_process");
 
 const APP_VERSION = "1.0.0";
 const PRODUCTION_URL = "https://www.nextups.xyz";
 const LOCAL_URL = "http://localhost:3000";
+
 
 let mainWindow = null;
 
@@ -155,7 +159,7 @@ function checkForUpdates() {
             })
             .then(({ response }) => {
               if (response === 0 && json.downloadUrl) {
-                shell.openExternal(json.downloadUrl);
+                startInAppUpdateDownload(json.downloadUrl, json.latestVersion);
               }
             });
         }
@@ -164,6 +168,7 @@ function checkForUpdates() {
       }
     });
   };
+
 
   const req = https.get(checkUrl, handleResponse);
   req.on("error", () => {
@@ -174,6 +179,108 @@ function checkForUpdates() {
     fallbackReq.on("error", () => {});
   });
 }
+
+function startInAppUpdateDownload(downloadUrl, latestVersion) {
+  if (!mainWindow) return;
+
+  // Insert real-time progress banner directly into webContents
+  mainWindow.webContents.executeJavaScript(`
+    let b = document.getElementById("nextups-inapp-update-bar");
+    if (!b) {
+      b = document.createElement("div");
+      b.id = "nextups-inapp-update-bar";
+      b.style.cssText = "position:fixed;top:38px;left:0;right:0;z-index:99999;background:#1d4ed8;color:#fff;padding:12px 18px;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;flex-direction:column;gap:8px;";
+      b.innerHTML = \`
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:12px;font-weight:bold;">🚀 NextUps v\${${JSON.stringify(latestVersion)}} 업데이트 다운로드 중...</div>
+          <div id="nextups-update-percent-text" style="font-size:12px;font-weight:800;color:#93c5fd;">0%</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.2);height:8px;border-radius:4px;overflow:hidden;position:relative;">
+          <div id="nextups-update-progress-fill" style="background:#38bdf8;height:100%;width:0%;transition:width 0.2s ease;"></div>
+        </div>
+        <div id="nextups-update-status-detail" style="font-size:11px;color:#dbeafe;">안전한 공식 CDN 서버에서 최신 설치 파일을 받아오는 중...</div>
+      \`;
+      document.body.appendChild(b);
+    }
+  `);
+
+  const tempFilePath = path.join(os.tmpdir(), "NextUps-Setup-Latest.exe");
+  const fileStream = fs.createWriteStream(tempFilePath);
+
+  const fetchUrl = (targetUrl) => {
+    const client = targetUrl.startsWith("https") ? https : http;
+    client.get(targetUrl, (res) => {
+      // Handle redirect (e.g., 302 to GitHub Releases)
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return fetchUrl(res.headers.location);
+      }
+
+      if (res.statusCode !== 200) {
+        mainWindow.webContents.executeJavaScript(`
+          const s = document.getElementById("nextups-update-status-detail");
+          if (s) s.innerText = "다운로드 실패: HTTP " + ${res.statusCode};
+        `);
+        return;
+      }
+
+      const totalBytes = parseInt(res.headers["content-length"] || "0", 10);
+      let downloadedBytes = 0;
+      const startTime = Date.now();
+
+      res.on("data", (chunk) => {
+        downloadedBytes += chunk.length;
+        fileStream.write(chunk);
+
+        if (totalBytes > 0) {
+          const percent = Math.min(100, Math.round((downloadedBytes / totalBytes) * 100));
+          const dlMB = (downloadedBytes / (1024 * 1024)).toFixed(1);
+          const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
+          const elapsedSec = Math.max(0.1, (Date.now() - startTime) / 1000);
+          const speedMB = (dlMB / elapsedSec).toFixed(1);
+
+          mainWindow.webContents.executeJavaScript(`
+            const fill = document.getElementById("nextups-update-progress-fill");
+            const pt = document.getElementById("nextups-update-percent-text");
+            const st = document.getElementById("nextups-update-status-detail");
+            if (fill) fill.style.width = "${percent}%";
+            if (pt) pt.innerText = "${percent}%";
+            if (st) st.innerText = "다운로드 진행 중... ${dlMB}MB / ${totalMB}MB (${percent}%) • ${speedMB} MB/s";
+          `).catch(() => {});
+        }
+      });
+
+      res.on("end", () => {
+        fileStream.end();
+        mainWindow.webContents.executeJavaScript(`
+          const fill = document.getElementById("nextups-update-progress-fill");
+          const pt = document.getElementById("nextups-update-percent-text");
+          const st = document.getElementById("nextups-update-status-detail");
+          if (fill) fill.style.width = "100%";
+          if (pt) pt.innerText = "100%";
+          if (st) st.innerText = "다운로드 완료! 설치 프로그램을 실행합니다...";
+        `).catch(() => {});
+
+        setTimeout(() => {
+          try {
+            spawn(tempFilePath, [], { detached: true, stdio: "ignore" }).unref();
+            app.quit();
+          } catch (launchErr) {
+            console.error("Installer launch error:", launchErr);
+          }
+        }, 800);
+      });
+
+      res.on("error", (err) => {
+        console.error("Download stream error:", err);
+      });
+    }).on("error", (err) => {
+      console.error("Download request error:", err);
+    });
+  };
+
+  fetchUrl(downloadUrl);
+}
+
 
 // IPC Handlers for custom titlebar controls
 ipcMain.on("window-minimize", () => {

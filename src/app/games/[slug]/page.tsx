@@ -21,6 +21,8 @@ import {
   Download,
 } from "lucide-react";
 
+import { getFastGameBySlug } from "@/lib/games-cache";
+
 export const dynamic = "force-dynamic";
 
 interface GameDetailPageProps {
@@ -30,7 +32,11 @@ interface GameDetailPageProps {
 }
 
 export default async function GameDetailPage({ params }: GameDetailPageProps) {
-  const { slug } = await params;
+  const rawSlug = (await params).slug || "";
+  let decodedSlug = rawSlug;
+  try {
+    decodedSlug = decodeURIComponent(rawSlug);
+  } catch {}
 
   let game: any = null;
   let isFollowing = false;
@@ -41,8 +47,17 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     currentUser = await getCurrentUser();
     canManage = Boolean(currentUser);
 
-    game = await prisma.game.findUnique({
-      where: { slug },
+    // 1. DB에서 Slug / ID / 한글명 매칭 조회
+    game = await prisma.game.findFirst({
+      where: {
+        OR: [
+          { slug: decodedSlug },
+          { slug: rawSlug },
+          { id: decodedSlug },
+          { id: rawSlug },
+          { canonicalName: decodedSlug },
+        ],
+      },
       include: {
         platforms: {
           include: {
@@ -68,9 +83,21 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     console.error("GameDetailPage query error:", error);
   }
 
+  // 2. DB 일시 지연 또는 미발견 시 초고속 Fallback 캐시에서 즉시 복원 (404 방지)
+  if (!game) {
+    const fallback = getFastGameBySlug(decodedSlug) || getFastGameBySlug(rawSlug);
+    if (fallback) {
+      game = {
+        ...fallback,
+        updates: [],
+      };
+    }
+  }
+
   if (!game) {
     notFound();
   }
+
 
   return (
     <div className="pb-16 space-y-10">

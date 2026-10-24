@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "NextUps | 멀티플랫폼 게임 업데이트 정보 통합 플랫폼",
+  title: "NextUps",
   description:
     "Windows, Android, iOS, macOS 멀티플랫폼 게임의 최신 패치 노트, 공식 업데이트 이력 및 버전 정보를 빠르고 정확하게 제공합니다.",
   keywords: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   openGraph: {
-    title: "NextUps | 게임 업데이트 정보 통합 플랫폼",
+    title: "NextUps",
     description: "공식 개발사 및 스토어 출처 기반 멀티플랫폼 게임 업데이트 허브",
     url: "https://nextups.xyz",
     siteName: "NextUps",
@@ -44,6 +44,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
 
 export default function RootLayout({
   children,
