@@ -1,16 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
-function getSanitizedDbUrl(): string | undefined {
-  const url = process.env.DATABASE_URL;
-  if (!url) return undefined;
-
-  let cleanUrl = url;
-  // If Supabase pooler is set to port 5432 (Session mode limit 15 clients), switch to port 6543 (Transaction mode)
+// Sanitize process.env.DATABASE_URL immediately at module load time
+if (process.env.DATABASE_URL) {
+  let cleanUrl = process.env.DATABASE_URL;
+  // If Supabase pooler is set to port 5432 (Session mode with 15 client limit), switch to port 6543 (Transaction mode)
   if (cleanUrl.includes("pooler.supabase.com:5432")) {
     cleanUrl = cleanUrl.replace("pooler.supabase.com:5432", "pooler.supabase.com:6543");
   }
 
-  // Ensure pgbouncer=true and connection_limit=1 for Next.js / serverless concurrency
+  // Ensure pgbouncer=true and connection_limit=1 for Next.js / serverless connection management
   if (!cleanUrl.includes("pgbouncer=true")) {
     const separator = cleanUrl.includes("?") ? "&" : "?";
     cleanUrl += `${separator}pgbouncer=true`;
@@ -19,19 +17,17 @@ function getSanitizedDbUrl(): string | undefined {
     cleanUrl += `&connection_limit=1`;
   }
 
-  return cleanUrl;
+  process.env.DATABASE_URL = cleanUrl;
 }
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const dbUrl = getSanitizedDbUrl();
-
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasources: dbUrl ? { db: { url: dbUrl } } : undefined,
+    datasourceUrl: process.env.DATABASE_URL,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 
