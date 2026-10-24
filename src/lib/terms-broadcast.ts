@@ -36,8 +36,8 @@ export async function sendTermsUpdateNotification(targetEmail: string, displayNa
 
       <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">2. 적용 및 시행 일자</h3>
       <p style="font-size: 13px; color: #334155; line-height: 1.6; margin-bottom: 28px;">
-        • <strong>시행 일자:</strong> 2026년 10월 31일 (토요일)<br/>
-        • <strong>공지 일자:</strong> 2026년 10월 24일 (시행 7일 전 사전 공지 준수)
+        • <strong>시행 일자:</strong> 2026년 10월 25일 (일요일, 정식 런칭)<br/>
+        • <strong>공지 일자:</strong> 2026년 10월 24일
       </p>
 
       <div style="text-align: center; margin-bottom: 32px;">
@@ -64,7 +64,7 @@ export async function sendTermsUpdateNotification(targetEmail: string, displayNa
       body: JSON.stringify({
         from: `NextUps 운영팀 <${fromEmail}>`,
         to: [targetEmail],
-        subject: `[NextUps] 서비스 이용약관 및 개인정보처리방침 개정 안내 (2026년 10월 31일 시행)`,
+        subject: `[NextUps] 서비스 정식 런칭 및 이용약관 시행 안내 (2026년 10월 25일 시행)`,
         html: htmlContent,
       }),
     });

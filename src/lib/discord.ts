@@ -110,18 +110,22 @@ export async function logToDiscord(options: LogEventOptions) {
       });
   }
 
+  const divider = "━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+
   const formattedDescription = [
     options.description ? `${options.description}\n` : "",
-    "**상세 파라미터**",
+    divider,
+    "**📋 상세 파라미터 내역**",
     ...detailLines,
-    "",
-    `🔒 [관리자 전용 감사 로그 확인하기](${logUrl}) *(비인가 접근 차단)*`,
+    divider,
+    `🔗 [**패치노트 / 세부정보 바로가기**](${options.details?.sourceUrl || logUrl})`,
+    `🔒 [**관리자 전용 감사 로그 확인하기**](${logUrl}) *(비인가 접근 차단)*`,
   ].filter(Boolean).join("\n");
 
   const discordPayload = {
     username: "NextUps Security Logger",
     avatar_url: `${APP_URL}/logo.png`,
-    content: logUrl, // Triggers Discord link preview unrolling for Components V2!
+    content: "",
     embeds: [
       {
         author: {

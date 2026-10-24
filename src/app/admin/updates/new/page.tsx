@@ -4,20 +4,35 @@ import prisma from "@/lib/prisma";
 import UpdateForm from "./UpdateForm";
 import { ArrowLeft } from "lucide-react";
 
+import { getFastGamesList } from "@/lib/games-cache";
+
 export const dynamic = "force-dynamic";
 
 export default async function NewUpdatePage() {
-  const [games, platforms] = await Promise.all([
-    prisma.game.findMany({
-      where: { status: "ACTIVE" },
-      select: { id: true, canonicalName: true, slug: true },
-      orderBy: { canonicalName: "asc" },
-    }),
-    prisma.platform.findMany({
-      select: { id: true, key: true, name: true },
-      orderBy: { order: "asc" },
-    }),
-  ]);
+  const fastData = await getFastGamesList();
+  
+  let games = fastData.games.map((g) => ({
+    id: g.id,
+    canonicalName: g.canonicalName,
+    slug: g.slug,
+  }));
+
+  let platforms = fastData.platforms;
+
+  if (games.length === 0) {
+    try {
+      const dbGames = await prisma.game.findMany({
+        where: { status: "ACTIVE" },
+        select: { id: true, canonicalName: true, slug: true },
+        orderBy: { canonicalName: "asc" },
+      });
+      if (dbGames.length > 0) {
+        games = dbGames;
+      }
+    } catch (e) {
+      console.warn("DB direct fallback query failed:", e);
+    }
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

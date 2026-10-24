@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { logToDiscord } from "@/lib/discord";
+import { invalidateGamesCache } from "@/lib/games-cache";
 
 export interface CollectorResult {
   jobId: string;
@@ -57,7 +58,14 @@ function convertToMarkdown(rawText: string): string {
  * Intelligent Semantic Version Extractor
  */
 function extractVersion(title: string, content: string): string {
-  // Try finding explicit vX.X.X or X.X.X
+  // 1. Try finding explicit Patch #, Hotfix #, Season #, Update #
+  const namedMatch = title.match(/\b(Patch|Hotfix|Update|Season)\s*#?\s*(\d+(?:\.\d+)*)\b/i);
+  if (namedMatch) {
+    const type = namedMatch[1].charAt(0).toUpperCase() + namedMatch[1].slice(1).toLowerCase();
+    return `${type} ${namedMatch[2]}`;
+  }
+
+  // 2. Try finding explicit semantic version e.g. v2.5, v1.0.3, 2.5.1
   const vRegex = /\b(?:v|ver\.?|version)?\s*(\d+\.\d+(?:\.\d+)?(?:-[a-z0-9.]+)?)\b/i;
   const titleMatch = title.match(vRegex);
   if (titleMatch) {
@@ -65,18 +73,18 @@ function extractVersion(title: string, content: string): string {
     return raw.startsWith("v") ? raw : `v${raw}`;
   }
 
-  // Try build number (e.g. Build 1234567)
+  // 3. Try build number (e.g. Build 1234567)
   const buildMatch = title.match(/build\s*#?(\d+)/i) || content.match(/build\s*#?(\d+)/i);
   if (buildMatch) {
     return `Build ${buildMatch[1]}`;
   }
 
-  // Hotfix / Patch naming
+  // 4. Fallback: Clean official update identifier
   const dateStr = new Date().toISOString().split("T")[0].replace(/-/g, ".");
   if (/hotfix/i.test(title)) return `Hotfix ${dateStr}`;
-  if (/update|patch/i.test(title)) return `Update ${dateStr}`;
+  if (/maintenance|점검/i.test(title)) return `점검 패치`;
 
-  return `v${dateStr}`;
+  return `공식 정기 패치`;
 }
 
 /**
@@ -273,9 +281,9 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
         logs.push(`✨ [신규 타이틀 등록] 데이터베이스에 '${target.canonicalName}' 등록 완료.`);
       }
 
-      // Query Steam News API
+      // Query Steam News API - ONLY official developer announcements, excluding 3rd party news sites
       try {
-        const feedUrl = `https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${target.appId}&count=5&maxlength=4000&format=json`;
+        const feedUrl = `https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid=${target.appId}&count=6&maxlength=4000&format=json&feeds=steam_community_announcements`;
         const res = await fetch(feedUrl, {
           headers: {
             "User-Agent": "NextUps-DataCollector/2.0 (+https://www.nextups.xyz; admin@nextups.xyz)",
@@ -317,10 +325,21 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
 
         // Iterate through news items
         for (const item of newsItems) {
-          const rawTitle = item.title?.trim() || "무제 업데이트";
+          const rawTitle = item.title?.trim() || "공식 업데이트";
           const rawContent = item.contents || "";
           const sourceUrl = item.url || "";
           const releaseDate = item.date ? new Date(item.date * 1000) : new Date();
+
+          // 1. Strict Filter: Ignore 3rd-party media feeds
+          if (item.feedname && item.feedname !== "steam_community_announcements") {
+            continue;
+          }
+
+          // 2. Strict Filter: Ignore foreign Russian/Cyrillic spam
+          if (/[а-яА-ЯёЁ]/.test(rawTitle)) {
+            logs.push(`⏩ [비공식 외래 기사 스킵] [${game.canonicalName}] '${rawTitle}'`);
+            continue;
+          }
 
           // Deduplication Check
           const existingUpdate = await prisma.update.findFirst({
@@ -346,7 +365,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
           const bodyMarkdown = convertToMarkdown(rawContent);
           const summary = bodyMarkdown.split("\n\n")[0]?.slice(0, 250) || "공식 패치 안내입니다.";
 
-          // Create New Verified Update
+          // Create New Verified Update with Official Header Banner
           const newUpdate = await prisma.update.create({
             data: {
               gameId: game.id,
@@ -360,7 +379,8 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
               updateType,
               isVerified: true,
               sourceUrl,
-              sourceName: "Steam 공식 뉴스 피드",
+              sourceName: "Steam 공식 패치노트",
+              images: [target.iconUrl],
             },
           });
 
@@ -441,6 +461,9 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
 
     const durationMs = Date.now() - startTime;
     logs.push(`[${new Date().toISOString()}] 🏁 자동 수집 작업 완료 (총 소요: ${(durationMs / 1000).toFixed(2)}초, 발견: ${itemsFound}건, 신규 등록: ${itemsAdded}건, 중복 제외: ${itemsSkipped}건)`);
+
+    // Invalidate game list cache to reflect new versions immediately
+    invalidateGamesCache();
 
     // Update job log
     await prisma.dataCollectionJob.update({

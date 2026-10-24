@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import PlatformBadge from "@/components/PlatformBadge";
 import FollowButton from "@/components/FollowButton";
 import ReportModal from "@/components/ReportModal";
+import EditGameModal from "@/components/EditGameModal";
 import { getCurrentUser } from "@/lib/auth";
 import {
   ExternalLink,
@@ -33,8 +34,13 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
 
   let game: any = null;
   let isFollowing = false;
+  let currentUser: any = null;
+  let canManage = false;
 
   try {
+    currentUser = await getCurrentUser();
+    canManage = Boolean(currentUser);
+
     game = await prisma.game.findUnique({
       where: { slug },
       include: {
@@ -52,14 +58,11 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
       },
     });
 
-    if (game) {
-      const currentUser = await getCurrentUser();
-      if (currentUser) {
-        const follow = await prisma.gameFollow.findFirst({
-          where: { userId: currentUser.id, gameId: game.id },
-        });
-        isFollowing = Boolean(follow);
-      }
+    if (game && currentUser) {
+      const follow = await prisma.gameFollow.findFirst({
+        where: { userId: currentUser.id, gameId: game.id },
+      });
+      isFollowing = Boolean(follow);
     }
   } catch (error) {
     console.error("GameDetailPage query error:", error);
@@ -135,10 +138,11 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                 )}
               </div>
 
-              {/* Action Buttons: Follow and Report */}
-              <div className="pt-2 flex items-center gap-3">
+              {/* Action Buttons: Follow, Report, and EditGameModal */}
+              <div className="pt-2 flex items-center gap-3 flex-wrap">
                 <FollowButton gameSlug={game.slug} initialFollowing={isFollowing} />
                 <ReportModal gameId={game.id} targetName={game.canonicalName} />
+                <EditGameModal game={game} canManage={canManage} />
               </div>
             </div>
           </div>

@@ -28,6 +28,17 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isNativeApp, setIsNativeApp] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isApp =
+        Boolean((window as any).nextupsDesktop) ||
+        navigator.userAgent.includes("NextUpsApp") ||
+        navigator.userAgent.includes("NextUpsDesktopApp");
+      setIsNativeApp(isApp);
+    }
+  }, []);
 
   const checkAuth = React.useCallback(() => {
     fetch("/api/auth/me", {
@@ -118,16 +129,18 @@ export default function Navbar() {
               >
                 게임
               </Link>
-              <Link
-                href="/download"
-                prefetch={true}
-                onMouseEnter={() => router.prefetch("/download")}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors whitespace-nowrap shrink-0"
-                style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
-              >
-                <Download className="w-3.5 h-3.5 shrink-0" />
-                <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>다운로드</span>
-              </Link>
+              {!isNativeApp && (
+                <Link
+                  href="/download"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/download")}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
+                >
+                  <Download className="w-3.5 h-3.5 shrink-0" />
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>다운로드</span>
+                </Link>
+              )}
 
               <div className="hidden 2xl:block h-3.5 w-px bg-neutral-200 mx-1 shrink-0" />
 
@@ -308,15 +321,17 @@ export default function Navbar() {
             >
               게임 목록
             </Link>
-            <Link
-              href="/download"
-              prefetch={true}
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md text-blue-600 font-bold hover:bg-blue-50 flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              앱 다운로드 (Windows / Android)
-            </Link>
+            {!isNativeApp && (
+              <Link
+                href="/download"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-md text-blue-600 font-bold hover:bg-blue-50 flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                앱 다운로드 (Windows / Android)
+              </Link>
+            )}
 
             <div className="grid grid-cols-2 gap-1 py-1 px-1">
               <Link

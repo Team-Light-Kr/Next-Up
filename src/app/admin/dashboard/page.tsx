@@ -33,7 +33,7 @@ import {
 
 export default function AdminDashboardPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"collector" | "compliance" | "reports" | "audit">("collector");
+  const [activeTab, setActiveTab] = useState<"collector" | "compliance" | "email" | "reports" | "audit">("collector");
   const [stats, setStats] = useState<any>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
@@ -47,6 +47,41 @@ export default function AdminDashboardPage() {
   const [termsEmailStatus, setTermsEmailStatus] = useState<string | null>(null);
   const [sendingPrivacyEmail, setSendingPrivacyEmail] = useState(false);
   const [privacyEmailStatus, setPrivacyEmailStatus] = useState<string | null>(null);
+
+  // Custom email broadcaster states
+  const [emailForm, setEmailForm] = useState({
+    subject: "",
+    message: "",
+    targetType: "ALL",
+    customEmail: "",
+  });
+  const [sendingCustomEmail, setSendingCustomEmail] = useState(false);
+  const [customEmailStatus, setCustomEmailStatus] = useState<string | null>(null);
+
+  const handleSendCustomEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailForm.subject.trim() || !emailForm.message.trim()) {
+      alert("제목과 내용을 모두 입력해 주세요.");
+      return;
+    }
+    setSendingCustomEmail(true);
+    setCustomEmailStatus(null);
+    try {
+      const res = await fetch("/api/admin/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(emailForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "발송 실패");
+      setCustomEmailStatus(`이메일 발송 성공! (총 ${data.total}명 중 ${data.successCount}명 성공)`);
+      setEmailForm({ subject: "", message: "", targetType: "ALL", customEmail: "" });
+    } catch (err: any) {
+      alert(err.message || "발송 실패");
+    } finally {
+      setSendingCustomEmail(false);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -353,6 +388,18 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab("email")}
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+            activeTab === "email"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <Mail className="w-4 h-4 text-pink-500" />
+          <span>회원 맞춤 공지 이메일 발송</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("reports")}
           className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === "reports"
@@ -525,7 +572,7 @@ export default function AdminDashboardPage() {
                   전체 회원에게 안내 이메일로 발송하고 Discord 웹훅에 발송 통계를 기록합니다.
                 </p>
                 <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-                  <div>• 개정 시행일: 2026년 10월 31일</div>
+                  <div>• 개정 시행일: 2026년 10월 25일 (정식 출시)</div>
                   <div>• 주요 변경: 비밀번호 필수화, 보안 감사 로깅 명시</div>
                   <div>• 발송 채널: Resend 이메일 연동</div>
                 </div>
@@ -561,6 +608,128 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* TAB: Custom Email Broadcaster */}
+      {activeTab === "email" && (
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-pink-500" />
+              <span>회원 맞춤 공지 이메일 발송 센터</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              NextUps 공식 템플릿(로고 헤더, 카드 본문, 버튼 링크, 법정 푸터)을 적용하여 전체 회원 또는 특정 회원에게 맞춤 공지를 발송합니다.
+            </p>
+          </div>
+
+          {customEmailStatus && (
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{customEmailStatus}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSendCustomEmail} className="space-y-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  수신 대상 선택 *
+                </label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="targetType"
+                      checked={emailForm.targetType === "ALL"}
+                      onChange={() => setEmailForm({ ...emailForm, targetType: "ALL" })}
+                      className="text-blue-600"
+                    />
+                    <span>전체 가입 회원 일괄 발송</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="targetType"
+                      checked={emailForm.targetType === "CUSTOM"}
+                      onChange={() => setEmailForm({ ...emailForm, targetType: "CUSTOM" })}
+                      className="text-blue-600"
+                    />
+                    <span>특정 회원 직접 지정</span>
+                  </label>
+                </div>
+              </div>
+
+              {emailForm.targetType === "CUSTOM" && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    수신자 이메일 주소 *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="user@example.com"
+                    value={emailForm.customEmail}
+                    onChange={(e) => setEmailForm({ ...emailForm, customEmail: e.target.value })}
+                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                공지 이메일 제목 *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="예: [NextUps] 10월 특별 이벤트 및 시스템 개선 안내"
+                value={emailForm.subject}
+                onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
+                className="w-full px-3.5 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                공지 상세 본문 설명 * (단락 구분을 위해 빈 줄을 넣을 수 있습니다)
+              </label>
+              <textarea
+                required
+                rows={6}
+                placeholder="회원들에게 전달할 상세 안내 공지 내용을 작성하세요..."
+                value={emailForm.message}
+                onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })}
+                className="w-full p-4 text-sm rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 leading-relaxed font-sans"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+              <span className="text-[11px] text-slate-400">
+                발송 시 Resend 공식 연동망을 통해 전송되며 Discord 보안 감사 채널에 통계가 기록됩니다.
+              </span>
+
+              <button
+                type="submit"
+                disabled={sendingCustomEmail}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-pink-600 text-white font-bold text-xs hover:bg-pink-700 transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                {sendingCustomEmail ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>이메일 전송 중...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>공지 이메일 발송하기</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

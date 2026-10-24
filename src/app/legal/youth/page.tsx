@@ -31,7 +31,7 @@ export default function YouthProtectionPage() {
           <div className="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              <span>시행일자: 2026년 10월 31일</span>
+              <span>시행일자: 2026년 10월 25일 (정식 출시)</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-400">
               <span>(현재 시스템 기준일: <CurrentDate format="full" />)</span>
@@ -102,7 +102,7 @@ export default function YouthProtectionPage() {
 
           <section className="space-y-2 pt-2 border-t border-slate-200 text-xs text-slate-500">
             <p>
-              부칙: 본 청소년 보호정책은 2026년 10월 31일부터 전면 시행되며, 종전의 정책은 본 정책으로 대체됩니다.
+              부칙: 본 청소년 보호정책은 2026년 10월 25일부터 전면 시행되며, 종전의 정책은 본 정책으로 대체됩니다.
             </p>
           </section>
         </div>

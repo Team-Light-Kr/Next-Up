@@ -19,9 +19,9 @@ export function generateProfileCode(): string {
   return code;
 }
 
-// Sign and verify session tokens
+// Sign and verify session tokens (Permanent login - 10 years until explicit logout)
 export function signSessionToken(payload: { userId: string; email: string; role: string; profileCode: string }): string {
-  const data = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + 30 * 24 * 60 * 60 * 1000 })).toString("base64url");
+  const data = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + 10 * 365 * 24 * 60 * 60 * 1000 })).toString("base64url");
   const signature = crypto.createHmac("sha256", SECRET).update(data).digest("base64url");
   return `${data}.${signature}`;
 }

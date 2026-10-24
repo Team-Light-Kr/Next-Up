@@ -215,7 +215,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: 10 * 365 * 24 * 60 * 60, // 10 years (Permanent until explicit logout)
     });
 
     return response;

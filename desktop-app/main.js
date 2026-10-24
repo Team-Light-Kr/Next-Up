@@ -26,6 +26,8 @@ function createWindow() {
     },
   });
 
+  mainWindow.webContents.setUserAgent(mainWindow.webContents.getUserAgent() + " NextUpsDesktopApp/1.0.0 (Windows)");
+
   // Inject custom titlebar and auto update banner styles & DOM
   mainWindow.webContents.on("dom-ready", () => {
     mainWindow.webContents.insertCSS(`
