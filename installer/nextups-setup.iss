@@ -1,6 +1,6 @@
 ; Inno Setup 7 Script for NextUps Windows Desktop Client
 #define MyAppName "NextUps"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Team Light"
 #define MyAppURL "https://www.nextups.xyz"
 #define MyAppExeName "NextUps.exe"
@@ -19,7 +19,7 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\public\downloads
 OutputBaseFilename=NextUps-Setup-v{#MyAppVersion}
-SetupIconFile=..\desktop-windows\app.ico
+SetupIconFile=..\desktop-app\icon.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern

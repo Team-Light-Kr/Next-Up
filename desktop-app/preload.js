@@ -6,6 +6,6 @@ contextBridge.exposeInMainWorld("nextupsDesktop", {
   close: () => ipcRenderer.send("window-close"),
   reload: () => ipcRenderer.send("window-reload"),
   checkUpdate: () => ipcRenderer.invoke("check-update"),
-  version: "1.0.0",
-  engine: "Chromium (Standalone, Non-WebView2)",
+  version: "1.0.1",
+  engine: "NextUps Desktop Native Core",
 });

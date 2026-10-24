@@ -20,6 +20,9 @@ function convertToMarkdown(rawText: string): string {
   if (!rawText) return "";
 
   let md = rawText
+    // Expand Steam clan image variables to official CDN
+    .replace(/\{STEAM_CLAN_IMAGE\}/gi, "https://clan.cloudflare.steamstatic.com/images")
+    .replace(/\{STEAM_CLAN_LOC_IMAGE\}/gi, "https://clan.cloudflare.steamstatic.com/images")
     // Remove Steam-specific wrapper tags
     .replace(/\[\/?previewyoutube[^\]]*\]/gi, "")
     // Convert BBCode to Markdown
@@ -31,7 +34,8 @@ function convertToMarkdown(rawText: string): string {
     .replace(/\[u\](.*?)\[\/u\]/gi, "__$1__")
     .replace(/\[strike\](.*?)\[\/strike\]/gi, "~~$1~~")
     .replace(/\[url=(.*?)\](.*?)\[\/url\]/gi, "[$2]($1)")
-    .replace(/\[img\](.*?)\[\/img\]/gi, "![]($1)")
+    .replace(/\[img\](.*?)\[\/img\]/gi, "\n\n![]($1)\n\n")
+    .replace(/<img[^>]+src=["'](.*?)["'][^>]*>/gi, "\n\n![]($1)\n\n")
     .replace(/\[list\]/gi, "\n")
     .replace(/\[\/list\]/gi, "\n")
     .replace(/\[\*\](.*?)(\n|\[)/gi, "- $1$2")
@@ -79,9 +83,9 @@ function extractVersion(title: string, content: string): string {
     return `Build ${buildMatch[1]}`;
   }
 
-  // 4. Fallback: Clean official update identifier
-  const dateStr = new Date().toISOString().split("T")[0].replace(/-/g, ".");
-  if (/hotfix/i.test(title)) return `Hotfix ${dateStr}`;
+  // 4. Default to clean official patch label without forced today's date
+  if (/hotfix/i.test(title)) return `Hotfix`;
+  if (/major|대규모/i.test(title)) return `대규모 업데이트`;
   if (/maintenance|점검/i.test(title)) return `점검 패치`;
 
   return `공식 정기 패치`;

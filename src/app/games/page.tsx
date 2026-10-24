@@ -1,10 +1,19 @@
 import React from "react";
 import Link from "next/link";
 import GameCard from "@/components/GameCard";
-import { Search, Filter, Gamepad2, ArrowUpDown, Zap } from "lucide-react";
-import { getFastGamesList } from "@/lib/games-cache";
+import { Search, Filter, Gamepad2, ArrowUpDown } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { buildGamesListEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "NextUps 게임 디렉터리",
+  description: "멀티플랫폼 게임 업데이트 정보 및 패치노트를 실시간으로 탐색하세요.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildGamesListEmbed()),
+  },
+};
 
 interface GamesPageProps {
   searchParams: Promise<{
@@ -19,17 +28,81 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  // 0.3ms 초고속 인메모리 캐시에서 즉시 로드
-  const {
-    games,
-    platforms,
-    genres: allGenres,
-    servedInMs,
-  } = await getFastGamesList({ q, platform, genre, sort });
+  // 실시간 DB 직접 조회 (소프트/하드 삭제 즉시 반영 보장)
+  const [platforms, allGamesRaw] = await Promise.all([
+    prisma.platform.findMany({
+      orderBy: { order: "asc" },
+      select: { id: true, key: true, name: true, order: true },
+    }),
+    prisma.game.findMany({
+      where: {
+        status: "ACTIVE",
+        ...(q.trim()
+          ? {
+              OR: [
+                { canonicalName: { contains: q.trim(), mode: "insensitive" } },
+                { description: { contains: q.trim(), mode: "insensitive" } },
+                { developer: { contains: q.trim(), mode: "insensitive" } },
+              ],
+            }
+          : {}),
+        ...(platform.trim()
+          ? {
+              platforms: {
+                some: {
+                  platform: {
+                    key: platform.trim().toLowerCase(),
+                  },
+                },
+              },
+            }
+          : {}),
+        ...(genre.trim()
+          ? {
+              genres: {
+                has: genre.trim(),
+              },
+            }
+          : {}),
+      },
+      orderBy:
+        sort === "name"
+          ? { canonicalName: "asc" }
+          : { updatedAt: "desc" },
+      include: {
+        platforms: {
+          include: {
+            platform: {
+              select: {
+                key: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
 
+  // 장르 목록 추출
+  const allGenresList = await prisma.game.findMany({
+    where: { status: "ACTIVE" },
+    select: { genres: true },
+  });
+  const allGenres = Array.from(new Set(allGenresList.flatMap((g) => g.genres || [])));
+
+  const discordJson = toComponentEmbedJson(buildGamesListEmbed(allGamesRaw.length));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
+
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3">
@@ -37,14 +110,9 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
             <Gamepad2 className="w-8 h-8 text-blue-600" />
             <span>게임 탐색 디렉터리</span>
           </h1>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <Zap className="w-3 h-3 text-emerald-600 fill-emerald-500" />
-            초고속 인메모리 서빙 ({servedInMs})
-          </span>
-
         </div>
         <p className="text-sm text-slate-500 mt-1">
-          현재 {games.length}개의 게임 정보와 플랫폼별 패치 내역을 확인할 수 있습니다.
+          현재 {allGamesRaw.length}개의 게임 정보와 플랫폼별 패치 내역을 확인할 수 있습니다.
         </p>
       </div>
 
@@ -172,9 +240,9 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
       </div>
 
       {/* Game Cards Grid */}
-      {games.length > 0 ? (
+      {allGamesRaw.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {games.map((game) => (
+          {allGamesRaw.map((game) => (
             <GameCard key={game.id} game={game} />
           ))}
         </div>

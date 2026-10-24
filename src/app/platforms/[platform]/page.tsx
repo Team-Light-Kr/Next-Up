@@ -13,8 +13,27 @@ import {
   Clock,
   Gamepad2,
 } from "lucide-react";
+import { buildPlatformEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: PlatformPageProps) {
+  const { platform } = await params;
+  const platformKey = platform.toLowerCase();
+  const meta = KNOWN_PLATFORMS[platformKey];
+  const name = meta ? meta.name : platform;
+  const desc = meta ? meta.description : "NextUps 플랫폼별 패치 정보 허브";
+
+  return {
+    title: `${name} 게임 업데이트 정보`,
+    description: desc,
+    other: {
+      "discord:component-embed": toComponentEmbedJson(
+        buildPlatformEmbed({ key: platformKey, name, description: desc })
+      ),
+    },
+  };
+}
 
 interface PlatformMeta {
   key: string;
@@ -133,8 +152,22 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
     macos: <Laptop className="w-8 h-8 text-purple-500" />,
   };
 
+  const discordJson = toComponentEmbedJson(
+    buildPlatformEmbed(
+      { key: platformKey, name: platformName, description: platformDescription },
+      platformGames.length
+    )
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       {/* Header Banner */}
       <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">

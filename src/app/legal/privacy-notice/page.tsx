@@ -2,15 +2,28 @@ import React from "react";
 import Link from "next/link";
 import { ShieldCheck, ArrowLeft, ExternalLink, Calendar, Info } from "lucide-react";
 import { CurrentDate } from "@/components/CurrentDate";
+import { buildPrivacyNoticeEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const metadata = {
-  title: "개인정보 이용·제공 내역 안내 | NextUps",
+  title: "개인정보 이용·제공 내역 안내",
   description: "대한민국 개인정보 보호법 제20조의2에 따른 NextUps 연례 개인정보 이용 및 제공 내역 안내입니다.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildPrivacyNoticeEmbed()),
+  },
 };
 
 export default function PrivacyAnnualNoticePage() {
+  const discordJson = toComponentEmbedJson(buildPrivacyNoticeEmbed());
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"

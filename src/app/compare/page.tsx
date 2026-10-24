@@ -2,8 +2,17 @@ import React from "react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { GitCompare, ArrowLeft, ArrowRight, Layers, Clock } from "lucide-react";
+import { buildCompareEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "패치 버전 비교 도구",
+  description: "서로 다른 두 버전 간의 변경점과 상세 패치 노트를 나란히 비교합니다.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildCompareEmbed()),
+  },
+};
 
 interface ComparePageProps {
   searchParams: Promise<{
@@ -27,8 +36,17 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
   const leftUpdate = left ? await prisma.update.findUnique({ where: { id: left }, include: { game: true, platform: true } }) : null;
   const rightUpdate = right ? await prisma.update.findUnique({ where: { id: right }, include: { game: true, platform: true } }) : null;
 
+  const discordJson = toComponentEmbedJson(buildCompareEmbed());
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors"

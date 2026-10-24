@@ -97,16 +97,8 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     canManage = Boolean(currentUser);
 
     // 1. DB에서 Slug / ID / 한글명 매칭 조회
-    game = await prisma.game.findFirst({
-      where: {
-        OR: [
-          { slug: decodedSlug },
-          { slug: rawSlug },
-          { id: decodedSlug },
-          { id: rawSlug },
-          { canonicalName: decodedSlug },
-        ],
-      },
+    game = await prisma.game.findUnique({
+      where: { slug: decodedSlug },
       include: {
         platforms: {
           include: {
@@ -122,6 +114,32 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
       },
     });
 
+    if (!game) {
+      game = await prisma.game.findFirst({
+        where: {
+          OR: [
+            { slug: rawSlug },
+            { id: decodedSlug },
+            { id: rawSlug },
+            { canonicalName: decodedSlug },
+          ],
+        },
+        include: {
+          platforms: {
+            include: {
+              platform: true,
+            },
+          },
+          updates: {
+            orderBy: { releaseDate: "desc" },
+            include: {
+              platform: true,
+            },
+          },
+        },
+      });
+    }
+
     if (game && currentUser) {
       const follow = await prisma.gameFollow.findFirst({
         where: { userId: currentUser.id, gameId: game.id },
@@ -130,17 +148,6 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     }
   } catch (error) {
     console.error("GameDetailPage query error:", error);
-  }
-
-  // 2. DB 일시 지연 또는 미발견 시 초고속 Fallback 캐시에서 즉시 복원 (404 방지)
-  if (!game) {
-    const fallback = getFastGameBySlug(decodedSlug) || getFastGameBySlug(rawSlug);
-    if (fallback) {
-      game = {
-        ...fallback,
-        updates: [],
-      };
-    }
   }
 
   if (!game) {

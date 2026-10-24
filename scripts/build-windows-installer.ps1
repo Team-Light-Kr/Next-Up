@@ -1,7 +1,7 @@
 # NextUps Windows Installer Build & Digital Signing Script (Non-WebView2, Standalone Chromium)
 $ErrorActionPreference = "Stop"
 
-Write-Host "==> Step 1: Getting or generating Code Signing Certificate..."
+Write-Host "==> Step 1: Getting Code Signing Certificate..."
 $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*NextUps*" } | Select-Object -First 1
 
 if (-not $cert) {
@@ -21,7 +21,7 @@ if (Test-Path $targetExe) {
     throw "Target EXE not found at $targetExe"
 }
 
-Write-Host "`n==> Step 3: Compiling Inno Setup 7 Installer..."
+Write-Host "`n==> Step 3: Compiling Inno Setup 7 Installer (v1.0.1)..."
 $isccPath = "C:\Program Files\Inno Setup 7\ISCC.exe"
 if (-not (Test-Path $isccPath)) {
     throw "ISCC.exe not found at $isccPath"
@@ -29,8 +29,8 @@ if (-not (Test-Path $isccPath)) {
 
 & $isccPath "installer\nextups-setup.iss"
 
-Write-Host "`n==> Step 4: Digitally signing Setup Installer..."
-$installerPath = "public\downloads\NextUps-Setup-v1.0.0.exe"
+Write-Host "`n==> Step 4: Digitally signing Setup Installer (v1.0.1)..."
+$installerPath = "public\downloads\NextUps-Setup-v1.0.1.exe"
 if (Test-Path $installerPath) {
     Set-AuthenticodeSignature -FilePath $installerPath -Certificate $cert -HashAlgorithm SHA256
     $sigInstaller = Get-AuthenticodeSignature $installerPath
@@ -40,12 +40,12 @@ if (Test-Path $installerPath) {
     throw "Installer was not created at $installerPath"
 }
 
-Write-Host "`n==> Step 5: Creating Standalone ZIP Archive (Bypasses Browser Malware False-Positive)..."
-$zipTarget = "public\downloads\NextUps-Windows-v1.0.0.zip"
+Write-Host "`n==> Step 5: Creating Standalone ZIP Archive (v1.0.1)..."
+$zipTarget = "public\downloads\NextUps-Windows-v1.0.1.zip"
 if (Test-Path $zipTarget) {
     Remove-Item -Force $zipTarget
 }
 Compress-Archive -Path "desktop-dist\NextUps-win32-x64\*" -DestinationPath $zipTarget -CompressionLevel Optimal
 Write-Host "ZIP Archive created at $zipTarget (" (Get-Item $zipTarget).Length "bytes)"
 
-Write-Host "`nSUCCESS: Windows Installer & ZIP Package built and signed without WebView2!"
+Write-Host "`nSUCCESS: Windows Installer & ZIP Package built and signed with Authenticode!"

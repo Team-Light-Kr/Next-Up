@@ -107,75 +107,46 @@ export default function UpdateForm({ games: initialGames, platforms: initialPlat
     }
   };
 
-  const handleInlineImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const uploadImageFile = async (file: File): Promise<string | null> => {
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        return data.url;
+      }
+    } catch (e) {
+      console.error("Upload error:", e);
+    }
+    return null;
+  };
+
+  const handleInlineImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-        const maxDim = 1200;
-        if (width > height && width > maxDim) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        } else if (height > maxDim) {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-          insertImageToMarkdown(dataUrl, file.name.replace(/\.[^/.]+$/, ""));
-          setImages((prev) => (prev.length < 20 ? [...prev, dataUrl] : prev));
-        }
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    const url = await uploadImageFile(file);
+    if (url) {
+      insertImageToMarkdown(url, file.name.replace(/\.[^/.]+$/, ""));
+      setImages((prev) => (prev.length < 20 ? [...prev, url] : prev));
+    }
     e.target.value = "";
   };
 
-  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new window.Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          let width = img.width;
-          let height = img.height;
-          const maxDim = 1200;
-          if (width > height && width > maxDim) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else if (height > maxDim) {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-            setImages((prev) => (prev.length < 20 ? [...prev, dataUrl] : prev));
-          }
-        };
-        img.src = event.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    });
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+      const url = await uploadImageFile(file);
+      if (url) {
+        setImages((prev) => (prev.length < 20 ? [...prev, url] : prev));
+      }
+    }
     e.target.value = "";
   };
 

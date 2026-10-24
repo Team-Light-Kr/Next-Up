@@ -2,15 +2,28 @@ import React from "react";
 import Link from "next/link";
 import { ShieldCheck, ChevronLeft, Calendar, Lock, Eye, Server } from "lucide-react";
 import { CurrentDate } from "@/components/CurrentDate";
+import { buildPrivacyEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const metadata = {
-  title: "개인정보 처리방침 | NextUps",
+  title: "개인정보 처리방침",
   description: "NextUps 게임 정보 플랫폼의 정식 개인정보 처리방침 전문입니다.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildPrivacyEmbed()),
+  },
 };
 
 export default function PrivacyPolicyPage() {
+  const discordJson = toComponentEmbedJson(buildPrivacyEmbed());
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"

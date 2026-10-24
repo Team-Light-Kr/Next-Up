@@ -37,168 +37,7 @@ const FALLBACK_PLATFORMS: FastPlatform[] = [
   { id: "cmvjkgnfr0003uy2w2p4n7v8e", key: "macos", name: "macOS", order: 4 },
 ];
 
-export const FALLBACK_GAMES: FastGame[] = [
-  {
-    id: "cmvlz06zl0001l308omz29kdl",
-    slug: "cs2",
-    canonicalName: "카운터 스트라이크 2 (Counter-Strike 2)",
-    description: "카운터 스트라이크 2 (Counter-Strike 2)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",
-    coverImageUrl: null,
-    developer: "Valve",
-    publisher: "Valve",
-    genres: ["FPS", "전술슈팅", "e스포츠", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:40:47.841Z"),
-    updatedAt: new Date("2026-10-24T05:40:47.841Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "v2026.10.24",
-      },
-    ],
-  },
-  {
-    id: "cmvlz0eqe000ml308mxsi0p34",
-    slug: "apex-legends",
-    canonicalName: "에이펙스 레전드 (Apex Legends)",
-    description: "에이펙스 레전드 (Apex Legends)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",
-    coverImageUrl: null,
-    developer: "Respawn Entertainment",
-    publisher: "Electronic Arts",
-    genres: ["배틀로얄", "FPS", "SF", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:40:57.879Z"),
-    updatedAt: new Date("2026-10-24T05:40:57.879Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "Update 2026.10.24",
-      },
-    ],
-  },
-  {
-    id: "cmvlz0nhq001jl308oz2yrhyb",
-    slug: "cyberpunk-2077",
-    canonicalName: "사이버펑크 2077 (Cyberpunk 2077)",
-    description: "사이버펑크 2077 (Cyberpunk 2077)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",
-    coverImageUrl: null,
-    developer: "CD PROJEKT RED",
-    publisher: "CD PROJEKT RED",
-    genres: ["오픈월드", "RPG", "SF", "사이버펑크", "싱글플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:41:09.135Z"),
-    updatedAt: new Date("2026-10-24T05:41:09.135Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "Patch 2.21",
-      },
-    ],
-  },
-  {
-    id: "cmvlz0wrr002gl3084zd3wl9f",
-    slug: "terraria",
-    canonicalName: "테라리아 (Terraria)",
-    description: "테라리아 (Terraria)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/105600/header.jpg",
-    coverImageUrl: null,
-    developer: "Re-Logic",
-    publisher: "Re-Logic",
-    genres: ["샌드박스", "생존", "2D", "어드벤처", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:41:21.160Z"),
-    updatedAt: new Date("2026-10-24T05:41:21.160Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "v1.4.4.9",
-      },
-    ],
-  },
-  {
-    id: "cmvlz15xw003dl3083wd9vgui",
-    slug: "pubg-battlegrounds",
-    canonicalName: "배틀그라운드 (PUBG: BATTLEGROUNDS)",
-    description: "배틀그라운드 (PUBG: BATTLEGROUNDS)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/578080/header.jpg",
-    coverImageUrl: null,
-    developer: "KRAFTON, Inc.",
-    publisher: "KRAFTON, Inc.",
-    genres: ["배틀로얄", "슈팅", "생존", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:41:33.081Z"),
-    updatedAt: new Date("2026-10-24T05:41:33.081Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "Live Update #32.1",
-      },
-    ],
-  },
-  {
-    id: "cmvlz1f4g004al308b2nxiqqr",
-    slug: "baldurs-gate-3",
-    canonicalName: "발더스 게이트 3 (Baldur's Gate 3)",
-    description: "발더스 게이트 3 (Baldur's Gate 3)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1086940/header.jpg",
-    coverImageUrl: null,
-    developer: "Larian Studios",
-    publisher: "Larian Studios",
-    genres: ["RPG", "턴제", "스토리 중심", "판타지", "싱글/멀티"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:41:45.040Z"),
-    updatedAt: new Date("2026-10-24T05:41:45.040Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "Patch #7 Hotfix 29",
-      },
-    ],
-  },
-  {
-    id: "cmvlz1o0w0057l308gnlaq4xw",
-    slug: "dota-2",
-    canonicalName: "도타 2 (Dota 2)",
-    description: "도타 2 (Dota 2)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg",
-    coverImageUrl: null,
-    developer: "Valve",
-    publisher: "Valve",
-    genres: ["MOBA", "전략", "e스포츠", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:41:56.577Z"),
-    updatedAt: new Date("2026-10-24T05:41:56.577Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "Gameplay Patch 7.37d",
-      },
-    ],
-  },
-  {
-    id: "cmvlz1wva0064l3085lty76l6",
-    slug: "palworld",
-    canonicalName: "팰월드 (Palworld)",
-    description: "팰월드 (Palworld)의 공식 최신 업데이트 및 패치노트 정보를 실시간으로 제공합니다.",
-    iconUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1623730/header.jpg",
-    coverImageUrl: null,
-    developer: "Pocketpair",
-    publisher: "Pocketpair",
-    genres: ["오픈월드", "생존", "크래프팅", "크리처 수집", "멀티플레이어"],
-    status: "ACTIVE",
-    createdAt: new Date("2026-10-24T05:42:08.087Z"),
-    updatedAt: new Date("2026-10-24T05:42:08.087Z"),
-    platforms: [
-      {
-        platform: { key: "windows", name: "Windows" },
-        latestKnownVersion: "v0.3.9",
-      },
-    ],
-  },
-];
+export const FALLBACK_GAMES: FastGame[] = [];
 
 interface InMemoryGamesCache {
   games: FastGame[];
@@ -208,7 +47,7 @@ interface InMemoryGamesCache {
   isFetching: boolean;
 }
 
-const CACHE_TTL_MS = 60 * 1000; // 60초 캐시 유지
+const CACHE_TTL_MS = 30 * 1000; // 30초 캐시 유지
 
 const globalForCache = globalThis as unknown as {
   __nextups_games_cache?: InMemoryGamesCache;
@@ -216,10 +55,10 @@ const globalForCache = globalThis as unknown as {
 
 if (!globalForCache.__nextups_games_cache) {
   globalForCache.__nextups_games_cache = {
-    games: [...FALLBACK_GAMES],
+    games: [],
     platforms: FALLBACK_PLATFORMS,
-    genres: Array.from(new Set(FALLBACK_GAMES.flatMap((g) => g.genres))),
-    lastFetched: Date.now(),
+    genres: [],
+    lastFetched: 0,
     isFetching: false,
   };
 }
@@ -260,20 +99,18 @@ async function refreshCacheInBackground(): Promise<void> {
     if (fetchedPlatforms && fetchedPlatforms.length > 0) {
       cache.platforms = fetchedPlatforms;
     }
-    if (fetchedGames && fetchedGames.length > 0) {
-      cache.games = fetchedGames as unknown as FastGame[];
-      cache.genres = Array.from(new Set(fetchedGames.flatMap((g) => g.genres)));
-    }
+    cache.games = (fetchedGames || []) as unknown as FastGame[];
+    cache.genres = Array.from(new Set(cache.games.flatMap((g) => g.genres || [])));
     cache.lastFetched = Date.now();
   } catch (err) {
-    console.error("[GamesCache] Background refresh handled safely:", err);
+    console.error("[GamesCache] Background refresh error:", err);
   } finally {
     cache.isFetching = false;
   }
 }
 
 /**
- * 0.3ms 초고속 인메모리 게임 리스트 및 필터링 검색
+ * 게임 리스트 및 필터링 검색
  */
 export async function getFastGamesList(options?: {
   q?: string;
@@ -284,15 +121,18 @@ export async function getFastGamesList(options?: {
   const startTime = performance.now();
   const now = Date.now();
 
-  // 만료 시 비동기 백그라운드 갱신 트리거 (응답은 기다리지 않고 RAM에서 0.3ms 서빙)
-  if (now - cache.lastFetched > CACHE_TTL_MS) {
-    refreshCacheInBackground().catch(() => {});
+  // 최초 로드이거나 만료 시 갱신
+  if (now - cache.lastFetched > CACHE_TTL_MS || cache.lastFetched === 0) {
+    if (cache.lastFetched === 0) {
+      await refreshCacheInBackground();
+    } else {
+      refreshCacheInBackground().catch(() => {});
+    }
   }
 
   const { q = "", platform = "", genre = "", sort = "latest" } = options || {};
 
-  // 인메모리(RAM) 고속 필터링 (평균 0.05ms ~ 0.3ms 소요)
-  let result = cache.games && cache.games.length > 0 ? cache.games : FALLBACK_GAMES;
+  let result = [...(cache.games || [])];
 
   if (q.trim()) {
     const query = q.trim().toLowerCase();
@@ -316,7 +156,7 @@ export async function getFastGamesList(options?: {
     );
   }
 
-  // 인메모리 정렬
+  // 정렬
   if (sort === "name") {
     result = [...result].sort((a, b) =>
       a.canonicalName.localeCompare(b.canonicalName, "ko")
@@ -341,26 +181,27 @@ export async function getFastGamesList(options?: {
 }
 
 /**
- * 단일 게임 조회 (Slug 또는 ID 기반 캐시 우선 검색)
+ * 단일 게임 조회
  */
 export function getFastGameBySlug(slugOrId: string): FastGame | null {
   if (!slugOrId) return null;
   const target = slugOrId.toLowerCase().trim();
-  const all = cache.games && cache.games.length > 0 ? cache.games : FALLBACK_GAMES;
+  const all = cache.games || [];
   return (
     all.find(
       (g) =>
         g.slug.toLowerCase() === target ||
         g.id.toLowerCase() === target ||
-        g.canonicalName.toLowerCase().includes(target)
+        g.canonicalName.toLowerCase() === target
     ) || null
   );
 }
 
 /**
- * 신규 게임 등록 / 업데이트 시 캐시 즉시 무효화
+ * 신규 게임 등록 / 업데이트 / 삭제 시 캐시 즉시 무효화
  */
 export function invalidateGamesCache() {
   cache.lastFetched = 0;
+  cache.games = [];
   refreshCacheInBackground().catch(() => {});
 }

@@ -13,21 +13,21 @@ export async function POST(
     }
 
     const { slug } = await params;
-    const game = await prisma.game.findUnique({
-      where: { slug },
+    const decodedSlug = decodeURIComponent(slug);
+    const game = await prisma.game.findFirst({
+      where: {
+        OR: [{ slug: decodedSlug }, { slug }, { id: slug }, { canonicalName: decodedSlug }],
+      },
     });
 
     if (!game) {
       return NextResponse.json({ error: "게임을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const existingFollow = await prisma.gameFollow.findUnique({
+    const existingFollow = await prisma.gameFollow.findFirst({
       where: {
-        userId_gameId_platformId: {
-          userId: user.id,
-          gameId: game.id,
-          platformId: null as any,
-        },
+        userId: user.id,
+        gameId: game.id,
       },
     });
 
