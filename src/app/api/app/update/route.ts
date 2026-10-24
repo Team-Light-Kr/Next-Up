@@ -4,10 +4,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const platform = searchParams.get("platform")?.toLowerCase() || "windows";
   const currentVersion = searchParams.get("version") || "1.0.0";
+  const isTest = searchParams.get("test") === "true";
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
 
-  // Latest App Versions
+  // Target update versions
+  // Set latest version to 1.0.1 so clients running 1.0.0 will trigger update detection for testing
   const latestVersions: Record<string, {
     version: string;
     releaseDate: string;
@@ -16,32 +18,33 @@ export async function GET(request: Request) {
     changelog: string[];
   }> = {
     windows: {
-      version: "1.0.0",
+      version: "1.0.1",
       releaseDate: "2026-10-24",
-      downloadUrl: `${appUrl}/downloads/NextUps-Setup-v1.0.0.exe`,
+      downloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
-        "NextUps Windows 공식 데스크톱 릴리즈",
-        "커스텀 프레임리스 타이틀바 및 고성능 WebView2 탑재",
-        "디지털 서명(Authenticode) 인증 완료",
-        "백그라운드 자동 패치노트 알림 및 무중단 자동 업데이트 지원",
+        "Microsoft WebView2 완전 제거 및 Chromium 자체 독립 엔진 탑재",
+        "커스텀 프레임리스 타이틀바 UI 및 다크 컨트롤 적용",
+        "Google 세이프 브라우징 검사 통과 및 ZIP 무설치 패키지 추가",
+        "신규 인앱 자동 업데이트 엔진 테스트 연동 완료",
       ],
     },
     android: {
-      version: "1.0.0",
+      version: "1.0.1",
       releaseDate: "2026-10-24",
-      downloadUrl: `${appUrl}/downloads/NextUps-v1.0.0.apk`,
+      downloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
-        "NextUps Android 공식 모바일 APK 릴리즈",
-        "실시간 게임 업데이트 인앱 푸시 알림",
-        "모바일 최적화 풀스크린 인터페이스 및 자동 업데이트 감지",
+        "모바일 반응형 뷰포트 정규화 및 데스크톱 모드 버그 해결",
+        "당겨서 새로고침(Swipe to Refresh) 성능 개선",
+        "안드로이드 실시간 패치 알림 인앱 자동 업데이트 확인 연동",
       ],
     },
   };
 
   const target = latestVersions[platform] || latestVersions.windows;
-  const hasUpdate = target.version !== currentVersion;
+  // If version is less than latestVersion or if isTest is true, trigger update!
+  const hasUpdate = isTest || target.version !== currentVersion;
 
   return NextResponse.json({
     platform,

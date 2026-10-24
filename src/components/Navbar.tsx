@@ -99,12 +99,12 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-600">
+            <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-600 shrink-0">
               <Link
                 href="/"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/")}
-                className="px-3 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap"
               >
                 홈
               </Link>
@@ -112,7 +112,7 @@ export default function Navbar() {
                 href="/games"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/games")}
-                className="px-3 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap"
               >
                 게임
               </Link>
@@ -120,55 +120,57 @@ export default function Navbar() {
                 href="/download"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/download")}
-                className="px-3 py-1.5 rounded-md text-blue-600 font-bold hover:bg-blue-50 transition-colors flex items-center gap-1.5"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors whitespace-nowrap shrink-0"
               >
-                <Download className="w-3.5 h-3.5" />
-                다운로드
+                <Download className="w-3.5 h-3.5 shrink-0" />
+                <span>다운로드</span>
               </Link>
 
-              <div className="h-3.5 w-px bg-neutral-200 mx-1.5" />
+              <div className="h-3.5 w-px bg-neutral-200 mx-1 shrink-0" />
 
-              <Link
-                href="/platforms/windows"
-                prefetch={true}
-                onMouseEnter={() => router.prefetch("/platforms/windows")}
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Monitor className="w-3.5 h-3.5 text-blue-600" />
-                Windows
-              </Link>
-              <Link
-                href="/platforms/android"
-                prefetch={true}
-                onMouseEnter={() => router.prefetch("/platforms/android")}
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                Android
-              </Link>
-              <Link
-                href="/platforms/ios"
-                prefetch={true}
-                onMouseEnter={() => router.prefetch("/platforms/ios")}
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Apple className="w-3.5 h-3.5 text-neutral-800" />
-                iOS
-              </Link>
-              <Link
-                href="/platforms/macos"
-                prefetch={true}
-                onMouseEnter={() => router.prefetch("/platforms/macos")}
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <Laptop className="w-3.5 h-3.5 text-purple-600" />
-                macOS
-              </Link>
+              <div className="hidden lg:flex items-center gap-1 shrink-0">
+                <Link
+                  href="/platforms/windows"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/windows")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                >
+                  <Monitor className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>Windows</span>
+                </Link>
+                <Link
+                  href="/platforms/android"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/android")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Android</span>
+                </Link>
+                <Link
+                  href="/platforms/ios"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/ios")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                >
+                  <Apple className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
+                  <span>iOS</span>
+                </Link>
+                <Link
+                  href="/platforms/macos"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/macos")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                >
+                  <Laptop className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <span>macOS</span>
+                </Link>
+              </div>
             </nav>
           </div>
 
           {/* Search Bar & User Actions */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
             <form onSubmit={handleSearchSubmit} className="relative">
               <input
                 type="text"

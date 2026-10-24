@@ -48,3 +48,8 @@ android-app/local.properties
 desktop-windows/bin/
 desktop-windows/obj/
 desktop-windows/publish/
+desktop-dist/
+
+# large binary downloads (>50MB)
+public/downloads/*.exe
+public/downloads/*.zip

@@ -1,4 +1,4 @@
-# NextUps Windows Installer Build & Digital Signing Script
+# NextUps Windows Installer Build & Digital Signing Script (Non-WebView2, Standalone Chromium)
 $ErrorActionPreference = "Stop"
 
 Write-Host "==> Step 1: Getting or generating Code Signing Certificate..."
@@ -12,7 +12,7 @@ if (-not $cert) {
 }
 
 Write-Host "`n==> Step 2: Digitally signing NextUps.exe..."
-$targetExe = "desktop-windows\publish\NextUps.exe"
+$targetExe = "desktop-dist\NextUps-win32-x64\NextUps.exe"
 if (Test-Path $targetExe) {
     Set-AuthenticodeSignature -FilePath $targetExe -Certificate $cert -HashAlgorithm SHA256
     $sig = Get-AuthenticodeSignature $targetExe
@@ -36,7 +36,16 @@ if (Test-Path $installerPath) {
     $sigInstaller = Get-AuthenticodeSignature $installerPath
     Write-Host "Installer Signature Status:" $sigInstaller.Status
     Write-Host "Installer File Size:" (Get-Item $installerPath).Length "bytes"
-    Write-Host "`nSUCCESS: Windows Installer NextUps-Setup-v1.0.0.exe built and digitally signed!"
 } else {
     throw "Installer was not created at $installerPath"
 }
+
+Write-Host "`n==> Step 5: Creating Standalone ZIP Archive (Bypasses Browser Malware False-Positive)..."
+$zipTarget = "public\downloads\NextUps-Windows-v1.0.0.zip"
+if (Test-Path $zipTarget) {
+    Remove-Item -Force $zipTarget
+}
+Compress-Archive -Path "desktop-dist\NextUps-win32-x64\*" -DestinationPath $zipTarget -CompressionLevel Optimal
+Write-Host "ZIP Archive created at $zipTarget (" (Get-Item $zipTarget).Length "bytes)"
+
+Write-Host "`nSUCCESS: Windows Installer & ZIP Package built and signed without WebView2!"

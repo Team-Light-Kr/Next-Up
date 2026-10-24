@@ -1,7 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
   title: "NextUps | 멀티플랫폼 게임 업데이트 정보 통합 플랫폼",
@@ -44,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased light" style={{ colorScheme: "light" }}>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
         <meta name="color-scheme" content="light" />
         <meta
           name="discord:component-embed"

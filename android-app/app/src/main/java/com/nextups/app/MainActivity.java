@@ -51,13 +51,13 @@ public class MainActivity extends AppCompatActivity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setDatabaseEnabled(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(true);
+        settings.setLoadWithOverviewMode(false);
+        settings.setUseWideViewPort(false);
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setUserAgentString(settings.getUserAgentString() + " NextUpsApp/1.0.0 (Android)");
+        settings.setUserAgentString(settings.getUserAgentString() + " Mobile NextUpsApp/1.0.0 (Android)");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
