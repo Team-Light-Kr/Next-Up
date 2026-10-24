@@ -1,55 +1,61 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const componentEmbed = {
-    version: 2,
-    accent_color: "#2563eb",
+  const container = {
+    type: 17, // Container
+    accent_color: 2450411, // #2563eb as decimal integer
     components: [
       {
-        type: "container",
+        type: 9, // Section
         components: [
           {
-            type: "section",
-            components: [
-              {
-                type: "text_display",
-                content:
-                  "# NextUps • 게임 업데이트 및 패치 통합 플랫폼\nWindows, Android, iOS, macOS 공식 업데이트 노트를 가장 빠르게 확인하세요.",
-              },
-              {
-                type: "thumbnail",
-                media: {
-                  url: "https://www.nextups.xyz/logo.png",
-                },
-              },
-            ],
+            type: 10, // Text Display
+            content:
+              "# NextUps • 멀티플랫폼 게임 업데이트 통합 플랫폼\nWindows, Android, Steam 공식 최신 패치노트를 가장 빠르고 신속하게 확인하세요.",
+          },
+        ],
+        accessory: {
+          type: 11, // Thumbnail
+          media: {
+            url: "https://www.nextups.xyz/logo.png",
+          },
+        },
+      },
+      {
+        type: 14, // Separator
+        divider: true,
+        spacing: 1,
+      },
+      {
+        type: 1, // Action Row
+        components: [
+          {
+            type: 2, // Button
+            style: 5, // Link Button
+            label: "최신 게임 패치 보기",
+            url: "https://www.nextups.xyz/games",
           },
           {
-            type: "separator",
-          },
-          {
-            type: "action_row",
-            components: [
-              {
-                type: "link_button",
-                label: "최신 게임 패치 보러가기 ↗",
-                url: "https://www.nextups.xyz/games",
-              },
-              {
-                type: "link_button",
-                label: "NextUps 공식 사이트",
-                url: "https://www.nextups.xyz",
-              },
-            ],
+            type: 2, // Button
+            style: 5, // Link Button
+            label: "공식 앱 다운로드",
+            url: "https://www.nextups.xyz/download",
           },
         ],
       },
     ],
   };
 
-  return NextResponse.json(componentEmbed, {
+  const payload = {
+    version: 2,
+    component: container,
+    ...container,
+  };
+
+  return NextResponse.json(payload, {
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/vnd.discord.component-embed+json",
+      "Access-Control-Allow-Origin": "*",
       "Cache-Control": "public, max-age=86400",
     },
   });

@@ -56,11 +56,58 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
         <meta name="color-scheme" content="light" />
-        <meta
-          name="discord:component-embed"
-          content='{"version":2,"accent_color":"#2563eb","components":[{"type":"container","components":[{"type":"section","components":[{"type":"text_display","content":"# NextUps • 게임 업데이트 정보 통합 플랫폼\nWindows, Android, iOS, macOS 최신 공식 패치 노트를 확인하세요."},{"type":"thumbnail","media":{"url":"https://www.nextups.xyz/logo.png"}}]},{"type":"separator"},{"type":"action_row","components":[{"type":"link_button","label":"패치 목록 보기 ↗","url":"https://www.nextups.xyz/games"}]}]}]}'
+        <script
+          id="discord:component-embed"
+          type="application/json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              type: 17,
+              accent_color: 2450411,
+              components: [
+                {
+                  type: 9,
+                  components: [
+                    {
+                      type: 10,
+                      content:
+                        "# NextUps • 멀티플랫폼 게임 업데이트 정보 통합 플랫폼\nWindows, Android, Steam 공식 최신 패치노트를 가장 빠르고 신속하게 확인하세요.",
+                    },
+                  ],
+                  accessory: {
+                    type: 11,
+                    media: {
+                      url: "https://www.nextups.xyz/logo.png",
+                    },
+                  },
+                },
+                {
+                  type: 14,
+                  divider: true,
+                  spacing: 1,
+                },
+                {
+                  type: 1,
+                  components: [
+                    {
+                      type: 2,
+                      style: 5,
+                      label: "최신 게임 패치 보기",
+                      url: "https://www.nextups.xyz/games",
+                    },
+                    {
+                      type: 2,
+                      style: 5,
+                      label: "공식 앱 다운로드",
+                      url: "https://www.nextups.xyz/download",
+                    },
+                  ],
+                },
+              ],
+            }),
+          }}
         />
-        <link rel="alternate" type="application/json+discord-component-embed" href="/discord-embed.json" />
+        <link rel="alternate" type="application/vnd.discord.component-embed+json" href="/discord-embed.json" />
+        <link rel="discord:component-embed" type="application/json" href="/discord-embed.json" />
         <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="shortcut icon" href="/favicon.png" />

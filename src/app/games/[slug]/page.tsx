@@ -31,6 +31,96 @@ interface GameDetailPageProps {
   }>;
 }
 
+export async function generateMetadata({ params }: GameDetailPageProps) {
+  const rawSlug = (await params).slug || "";
+  let decodedSlug = rawSlug;
+  try {
+    decodedSlug = decodeURIComponent(rawSlug);
+  } catch {}
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+
+  try {
+    const game = await prisma.game.findFirst({
+      where: {
+        OR: [{ slug: decodedSlug }, { slug: rawSlug }, { canonicalName: decodedSlug }],
+      },
+      include: {
+        updates: {
+          orderBy: { releaseDate: "desc" },
+          take: 1,
+        },
+      },
+    });
+
+    if (!game) return { title: "NextUps" };
+
+    const title = `${game.canonicalName} 패치노트 및 업데이트 정보`;
+    const latestVersion = game.updates[0]?.version ? ` (최신 v${game.updates[0].version})` : "";
+    const desc = game.description || `${game.canonicalName}의 공식 실시간 패치 정보${latestVersion}`;
+
+    const embedJson = JSON.stringify({
+      type: 17, // Container
+      accent_color: 2450411,
+      components: [
+        {
+          type: 9, // Section
+          components: [
+            {
+              type: 10, // Text Display
+              content: `# ${game.canonicalName}${latestVersion}\n${desc}`,
+            },
+          ],
+          accessory: {
+            type: 11, // Thumbnail
+            media: {
+              url: game.iconUrl || `${appUrl}/logo.png`,
+            },
+          },
+        },
+        {
+          type: 14, // Separator
+          divider: true,
+          spacing: 1,
+        },
+        {
+          type: 1, // Action Row
+          components: [
+            {
+              type: 2, // Button
+              style: 5, // Link Button
+              label: "전체 패치 내역 보기",
+              url: `${appUrl}/games/${game.slug}`,
+            },
+            {
+              type: 2, // Button
+              style: 5, // Link Button
+              label: "NextUps 공식 홈",
+              url: appUrl,
+            },
+          ],
+        },
+      ],
+    });
+
+    return {
+      title,
+      description: desc,
+      other: {
+        "discord:component-embed": embedJson,
+      },
+      openGraph: {
+        title,
+        description: desc,
+        url: `${appUrl}/games/${game.slug}`,
+        images: [game.iconUrl || `${appUrl}/logo.png`],
+      },
+    };
+  } catch {
+    return { title: "NextUps" };
+  }
+}
+
 export default async function GameDetailPage({ params }: GameDetailPageProps) {
   const rawSlug = (await params).slug || "";
   let decodedSlug = rawSlug;

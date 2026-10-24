@@ -30,44 +30,43 @@ export async function generateMetadata({ params }: AdminLogPageProps) {
   }
 
   const embedJson = JSON.stringify({
-    version: 2,
-    accent_color: "#2563eb",
+    type: 17, // Container
+    accent_color: 2450411,
     components: [
       {
-        type: "container",
+        type: 9, // Section
         components: [
           {
-            type: "section",
-            components: [
-              {
-                type: "text_display",
-                content: `NextUps 보안 감사 • ${logAction}\n# [NextUps 로그] ${logTitle}\n보안 감사 로그가 안전하게 기록되었습니다. (관리자 전용)`,
-              },
-              {
-                type: "thumbnail",
-                media: {
-                  url: `${appUrl}/logo.png`,
-                },
-              },
-            ],
+            type: 10, // Text Display
+            content: `NextUps 보안 감사 • ${logAction}\n# [NextUps 로그] ${logTitle}\n보안 감사 로그가 안전하게 기록되었습니다. (관리자 전용)`,
+          },
+        ],
+        accessory: {
+          type: 11, // Thumbnail
+          media: {
+            url: `${appUrl}/logo.png`,
+          },
+        },
+      },
+      {
+        type: 14, // Separator
+        divider: true,
+        spacing: 1,
+      },
+      {
+        type: 1, // Action Row
+        components: [
+          {
+            type: 2, // Button
+            style: 5, // Link Button
+            label: "관리자 로그 상세 확인",
+            url: `${appUrl}/admin/logs/${id}`,
           },
           {
-            type: "separator",
-          },
-          {
-            type: "action_row",
-            components: [
-              {
-                type: "link_button",
-                label: "관리자 로그 상세 확인 ↗",
-                url: `${appUrl}/admin/logs/${id}`,
-              },
-              {
-                type: "link_button",
-                label: "관리자 대시보드 ↗",
-                url: `${appUrl}/admin/dashboard`,
-              },
-            ],
+            type: 2, // Button
+            style: 5, // Link Button
+            label: "관리자 대시보드",
+            url: `${appUrl}/admin/dashboard`,
           },
         ],
       },
@@ -82,7 +81,7 @@ export async function generateMetadata({ params }: AdminLogPageProps) {
     },
     alternates: {
       types: {
-        "application/json+discord-component-embed": `/api/discord-embed/${id}`,
+        "application/vnd.discord.component-embed+json": `/api/discord-embed/${id}`,
       },
     },
     openGraph: {

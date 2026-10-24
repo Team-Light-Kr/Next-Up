@@ -110,17 +110,34 @@ export async function logToDiscord(options: LogEventOptions) {
       });
   }
 
-  const divider = "━━━━━━━━━━━━━━━━━━━━━━━━━━━";
-
   const formattedDescription = [
-    options.description ? `${options.description}\n` : "",
-    divider,
-    "**상세 파라미터 내역**",
-    ...detailLines,
-    divider,
-    `[**패치노트 / 세부정보 바로가기**](${options.details?.sourceUrl || logUrl})`,
-    `[**관리자 전용 감사 로그 확인하기**](${logUrl}) *(비인가 접근 차단)*`,
-  ].filter(Boolean).join("\n");
+    options.description ? options.description : "",
+    detailLines.length > 0 ? `**상세 파라미터 내역**\n${detailLines.join("\n")}` : "",
+  ].filter(Boolean).join("\n\n");
+
+  const actionButtons = [];
+  if (options.details?.sourceUrl) {
+    actionButtons.push({
+      type: 2,
+      style: 5,
+      label: "패치노트 / 세부정보 바로가기",
+      url: options.details.sourceUrl,
+    });
+  }
+  actionButtons.push({
+    type: 2,
+    style: 5,
+    label: "관리자 전용 감사 로그 확인하기",
+    url: logUrl,
+  });
+  if (actionButtons.length < 5) {
+    actionButtons.push({
+      type: 2,
+      style: 5,
+      label: "관리자 대시보드",
+      url: `${APP_URL}/admin/dashboard`,
+    });
+  }
 
   const discordPayload = {
     username: "NextUps Security Logger",
@@ -153,20 +170,7 @@ export async function logToDiscord(options: LogEventOptions) {
           components: [
             {
               type: 1, // Action Row
-              components: [
-                {
-                  type: 2, // Button
-                  style: 5, // Link Button
-                  label: "로그 열람하기 ↗",
-                  url: logUrl,
-                },
-                {
-                  type: 2,
-                  style: 5,
-                  label: "관리자 대시보드 ↗",
-                  url: `${APP_URL}/admin/dashboard`,
-                },
-              ],
+              components: actionButtons,
             },
           ],
         }),

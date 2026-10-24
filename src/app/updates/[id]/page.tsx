@@ -23,6 +23,83 @@ interface UpdatePageProps {
   }>;
 }
 
+export async function generateMetadata({ params }: UpdatePageProps) {
+  const { id } = await params;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+
+  try {
+    const update = await prisma.update.findUnique({
+      where: { id },
+      include: { game: true, platform: true },
+    });
+
+    if (!update) return { title: "NextUps" };
+
+    const title = `[${update.game.canonicalName}] ${update.version} - ${update.title}`;
+    const desc = update.summary || `${update.game.canonicalName} 공식 최신 패치노트`;
+
+    const embedJson = JSON.stringify({
+      type: 17, // Container
+      accent_color: 2450411,
+      components: [
+        {
+          type: 9, // Section
+          components: [
+            {
+              type: 10, // Text Display
+              content: `# [${update.game.canonicalName}] ${update.version}\n**${update.title}**\n\n${desc}`,
+            },
+          ],
+          accessory: {
+            type: 11, // Thumbnail
+            media: {
+              url: update.game.iconUrl || `${appUrl}/logo.png`,
+            },
+          },
+        },
+        {
+          type: 14, // Separator
+          divider: true,
+          spacing: 1,
+        },
+        {
+          type: 1, // Action Row
+          components: [
+            {
+              type: 2, // Button
+              style: 5, // Link Button
+              label: "패치노트 전문 보기",
+              url: `${appUrl}/updates/${id}`,
+            },
+            {
+              type: 2, // Button
+              style: 5, // Link Button
+              label: `${update.game.canonicalName} 정보`,
+              url: `${appUrl}/games/${update.game.slug}`,
+            },
+          ],
+        },
+      ],
+    });
+
+    return {
+      title,
+      description: desc,
+      other: {
+        "discord:component-embed": embedJson,
+      },
+      openGraph: {
+        title,
+        description: desc,
+        url: `${appUrl}/updates/${id}`,
+        images: [update.game.iconUrl || `${appUrl}/logo.png`],
+      },
+    };
+  } catch {
+    return { title: "NextUps" };
+  }
+}
+
 export default async function UpdateDetailPage({ params }: UpdatePageProps) {
   const { id } = await params;
 
