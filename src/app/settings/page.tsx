@@ -17,6 +17,7 @@ import {
   Loader2,
   ChevronLeft,
 } from "lucide-react";
+import ImageUploadInput from "@/components/ImageUploadInput";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -151,21 +152,14 @@ export default function SettingsPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                아바타 프로필 이미지 URL
-              </label>
-              <div className="relative">
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
-                  value={formData.avatarUrl}
-                  onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <Image className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-              </div>
-            </div>
+            <ImageUploadInput
+              label="프로필 아바타 이미지"
+              value={formData.avatarUrl}
+              onChange={(val) => setFormData({ ...formData, avatarUrl: val })}
+              aspect="avatar"
+              helpText="원형으로 표시됩니다 (JPG, PNG, WEBP)"
+              maxDimension={256}
+            />
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">

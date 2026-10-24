@@ -59,8 +59,8 @@ export default function RegisterPage() {
         throw new Error(data.error || "회원가입에 실패했습니다.");
       }
 
-      router.push(`/profile/${data.user.profileCode}`);
-      router.refresh();
+      window.dispatchEvent(new Event("auth-state-changed"));
+      window.location.href = `/profile/${data.user.profileCode}`;
     } catch (err: any) {
       setErrorMsg(err.message);
     } finally {

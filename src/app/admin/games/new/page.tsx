@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PlusCircle, Gamepad2, ArrowLeft, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import ImageUploadInput from "@/components/ImageUploadInput";
 
 export default function NewGamePage() {
   const router = useRouter();
@@ -198,31 +199,23 @@ export default function NewGamePage() {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                아이콘 이미지 URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://..."
-                value={formData.iconUrl}
-                onChange={(e) => setFormData({ ...formData, iconUrl: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <ImageUploadInput
+              label="게임 아이콘 파일"
+              value={formData.iconUrl}
+              onChange={(val) => setFormData({ ...formData, iconUrl: val })}
+              aspect="square"
+              helpText="정사각형 권장 (기기별 앱 아이콘)"
+              maxDimension={256}
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                커버 이미지 URL
-              </label>
-              <input
-                type="url"
-                placeholder="https://..."
-                value={formData.coverImageUrl}
-                onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            <ImageUploadInput
+              label="커버 배경 이미지 파일"
+              value={formData.coverImageUrl}
+              onChange={(val) => setFormData({ ...formData, coverImageUrl: val })}
+              aspect="cover"
+              helpText="와이드 가로형 권장 (상세 헤더 배경)"
+              maxDimension={1200}
+            />
           </div>
 
           <div>

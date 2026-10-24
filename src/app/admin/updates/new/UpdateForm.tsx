@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
-import { PlusCircle, FileText, ArrowLeft, AlertCircle, Loader2, Eye, Edit3, Image } from "lucide-react";
+import { PlusCircle, FileText, ArrowLeft, AlertCircle, Loader2, Eye, Edit3, Image, Upload, X } from "lucide-react";
 
 interface UpdateFormProps {
   games: { id: string; canonicalName: string; slug: string }[];
@@ -13,6 +13,7 @@ interface UpdateFormProps {
 
 export default function UpdateForm({ games, platforms }: UpdateFormProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     gameId: games[0]?.id || "",
     platformKey: "windows",
@@ -30,7 +31,6 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
 
 ### 2. 밸런스 조정 및 버그 수정
 - 안정성이 개선되었습니다.`,
-    imageUrlInput: "",
   });
 
   const [images, setImages] = useState<string[]>([]);
@@ -38,11 +38,41 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleAddImage = () => {
-    if (formData.imageUrlInput.trim() && images.length < 20) {
-      setImages([...images, formData.imageUrlInput.trim()]);
-      setFormData({ ...formData, imageUrlInput: "" });
-    }
+  const handleFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+            setImages((prev) => (prev.length < 20 ? [...prev, dataUrl] : prev));
+          }
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
@@ -286,42 +316,52 @@ export default function UpdateForm({ games, platforms }: UpdateFormProps) {
 
         {/* Image Attachment Section (Up to 20 images) */}
         <div className="space-y-3 pt-3 border-t border-slate-100">
-          <label className="block text-xs font-semibold text-slate-700">
-            패치 이미지 첨부 (최대 20개, 현재 {images.length}/20)
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="url"
-              placeholder="https://... (이미지 주소)"
-              value={formData.imageUrlInput}
-              onChange={(e) => setFormData({ ...formData, imageUrlInput: e.target.value })}
-              className="flex-1 px-3.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50"
-            />
-            <button
-              type="button"
-              onClick={handleAddImage}
-              disabled={images.length >= 20 || !formData.imageUrlInput.trim()}
-              className="px-4 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 disabled:opacity-50"
-            >
-              추가
-            </button>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-semibold text-slate-700">
+              패치 이미지 파일 첨부 (최대 20개, 현재 {images.length}/20)
+            </label>
+            <span className="text-[11px] text-slate-400">PNG, JPG, WEBP 지원</span>
+          </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFilesSelect}
+            multiple
+            accept="image/*"
+            className="hidden"
+          />
+
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-slate-300 rounded-xl p-4 bg-slate-50 hover:bg-slate-100 hover:border-blue-400 transition-colors cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Upload className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-semibold text-slate-700">
+              컴퓨터에서 이미지 파일 선택 (복수 선택 가능)
+            </span>
           </div>
 
           {images.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2">
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-xs border border-slate-200"
+                  className="relative group rounded-lg border border-slate-200 overflow-hidden bg-slate-50 aspect-video shadow-2xs"
                 >
-                  <Image className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="truncate max-w-[140px]">{img}</span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img}
+                    alt={`패치 이미지 ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(idx)}
-                    className="text-red-500 font-bold ml-1 hover:text-red-700"
+                    className="absolute top-1 right-1 p-1 rounded-full bg-slate-900/70 text-white hover:bg-red-600 transition-colors"
+                    title="이미지 삭제"
                   >
-                    ×
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
               ))}

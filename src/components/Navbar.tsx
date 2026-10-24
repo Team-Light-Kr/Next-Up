@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Search,
   Menu,
@@ -22,22 +22,45 @@ import {
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    fetch("/api/auth/me")
+  const checkAuth = React.useCallback(() => {
+    fetch("/api/auth/me", {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+    })
       .then((res) => res.json())
       .then((data) => {
-        if (data.authenticated) {
+        if (data.authenticated && data.user) {
           setCurrentUser(data.user);
           setUnreadCount(data.unreadNotificationCount || 0);
+        } else {
+          setCurrentUser(null);
+          setUnreadCount(0);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setCurrentUser(null);
+      });
   }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [pathname, checkAuth]);
+
+  useEffect(() => {
+    const handleAuthEvent = () => checkAuth();
+    window.addEventListener("auth-state-changed", handleAuthEvent);
+    window.addEventListener("focus", handleAuthEvent);
+    return () => {
+      window.removeEventListener("auth-state-changed", handleAuthEvent);
+      window.removeEventListener("focus", handleAuthEvent);
+    };
+  }, [checkAuth]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,8 +73,8 @@ export default function Navbar() {
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setCurrentUser(null);
-    router.push("/");
-    router.refresh();
+    window.dispatchEvent(new Event("auth-state-changed"));
+    window.location.href = "/";
   };
 
   return (

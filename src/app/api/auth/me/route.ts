@@ -2,19 +2,55 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ authenticated: false, user: null });
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { authenticated: false, user: null },
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
+    }
+
+    let unreadCount = 0;
+    try {
+      unreadCount = await prisma.notification.count({
+        where: { userId: user.id, read: false },
+      });
+    } catch {
+      // ignore notification count error if db connection jitter
+    }
+
+    return NextResponse.json(
+      {
+        authenticated: true,
+        user,
+        unreadNotificationCount: unreadCount,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { authenticated: false, user: null },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
+    );
   }
-
-  const unreadCount = await prisma.notification.count({
-    where: { userId: user.id, read: false },
-  });
-
-  return NextResponse.json({
-    authenticated: true,
-    user,
-    unreadNotificationCount: unreadCount,
-  });
 }
