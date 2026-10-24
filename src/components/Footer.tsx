@@ -32,22 +32,22 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/platforms/windows" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/platforms/windows" className="hover:text-neutral-900">
                   Windows PC
                 </Link>
               </li>
               <li>
-                <Link href="/platforms/android" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/platforms/android" className="hover:text-neutral-900">
                   Android
                 </Link>
               </li>
               <li>
-                <Link href="/platforms/ios" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/platforms/ios" className="hover:text-neutral-900">
                   iOS
                 </Link>
               </li>
               <li>
-                <Link href="/platforms/macos" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/platforms/macos" className="hover:text-neutral-900">
                   macOS
                 </Link>
               </li>
@@ -61,17 +61,17 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/games" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/games" className="hover:text-neutral-900">
                   게임 목록
                 </Link>
               </li>
               <li>
-                <Link href="/games/new" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/games/new" className="hover:text-neutral-900">
                   신규 게임 등록
                 </Link>
               </li>
               <li>
-                <Link href="/compare" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/compare" className="hover:text-neutral-900">
                   버전 비교 도구
                 </Link>
               </li>
@@ -85,17 +85,17 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/legal/privacy" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/legal/privacy" className="hover:text-neutral-900">
                   개인정보 처리방침
                 </Link>
               </li>
               <li>
-                <Link href="/legal/youth" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/legal/youth" className="hover:text-neutral-900">
                   청소년 보호정책
                 </Link>
               </li>
               <li>
-                <Link href="/legal/terms" className="hover:text-neutral-900:text-neutral-100">
+                <Link href="/legal/terms" className="hover:text-neutral-900">
                   서비스 이용약관
                 </Link>
               </li>

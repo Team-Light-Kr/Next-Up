@@ -29,53 +29,49 @@ interface GameDetailPageProps {
 export default async function GameDetailPage({ params }: GameDetailPageProps) {
   const { slug } = await params;
 
-  const game = await prisma.game.findUnique({
-    where: { slug },
-    include: {
-      platforms: {
-        include: {
-          platform: true,
+  let game: any = null;
+  let isFollowing = false;
+
+  try {
+    game = await prisma.game.findUnique({
+      where: { slug },
+      include: {
+        platforms: {
+          include: {
+            platform: true,
+          },
+        },
+        updates: {
+          orderBy: { releaseDate: "desc" },
+          include: {
+            platform: true,
+          },
         },
       },
-      updates: {
-        orderBy: { releaseDate: "desc" },
-        include: {
-          platform: true,
-        },
-      },
-    },
-  });
+    });
+
+    if (game) {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        const follow = await prisma.gameFollow.findFirst({
+          where: { userId: currentUser.id, gameId: game.id },
+        });
+        isFollowing = Boolean(follow);
+      }
+    }
+  } catch (error) {
+    console.error("GameDetailPage query error:", error);
+  }
 
   if (!game) {
     notFound();
   }
 
-  const currentUser = await getCurrentUser();
-  const isFollowing = currentUser
-    ? Boolean(
-        await prisma.gameFollow.findFirst({
-          where: { userId: currentUser.id, gameId: game.id },
-        })
-      )
-    : false;
-
   return (
     <div className="pb-16 space-y-10">
       {/* Game Header Banner */}
-      <section className="relative bg-slate-900 text-white overflow-hidden border-b border-slate-800">
-        <div className="absolute inset-0 opacity-25">
-          {game.coverImageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={game.coverImageUrl}
-              alt={game.canonicalName}
-              className="w-full h-full object-cover filter blur-xs scale-105"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <section className="relative bg-white text-slate-900 overflow-hidden border-b border-slate-200">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Game Icon */}
             {game.iconUrl ? (
@@ -83,34 +79,34 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
               <img
                 src={game.iconUrl}
                 alt={game.canonicalName}
-                className="w-24 h-24 md:w-28 md:h-28 rounded-2xl object-cover border-2 border-white/20 shadow-xl bg-slate-800"
+                className="w-24 h-24 md:w-28 md:h-28 rounded-2xl object-cover border border-slate-200 shadow-sm bg-slate-50"
               />
             ) : (
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-blue-600 flex items-center justify-center font-bold text-3xl border-2 border-white/20 shadow-xl">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-3xl border border-slate-200 shadow-sm">
                 {game.canonicalName.slice(0, 1)}
               </div>
             )}
 
             <div className="space-y-3 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                   공식 등록 타이틀
                 </span>
-                {game.genres.map((g) => (
+                {game.genres.map((g: string) => (
                   <span
                     key={g}
-                    className="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700"
+                    className="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200"
                   >
                     {g}
                   </span>
                 ))}
               </div>
 
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                 {game.canonicalName}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-300">
+              <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-500">
                 {game.developer && (
                   <div className="flex items-center gap-1.5">
                     <Building2 className="w-4 h-4 text-slate-400" />
@@ -128,7 +124,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                     href={game.officialWebsiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 underline font-medium"
+                    className="flex items-center gap-1.5 text-blue-600 hover:underline font-medium"
                   >
                     <Globe className="w-4 h-4" />
                     <span>공식 홈페이지</span>
@@ -172,7 +168,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {game.platforms.map((gp) => (
+            {game.platforms.map((gp: any) => (
               <div
                 key={gp.id}
                 className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between space-y-4"
@@ -201,7 +197,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                       href={gp.storeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100:bg-blue-900/60 transition-colors w-full justify-center"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 transition-colors w-full justify-center"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>스토어 및 공식 설치</span>
@@ -238,7 +234,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
 
           {game.updates.length > 0 ? (
             <div className="space-y-4">
-              {game.updates.map((update) => {
+              {game.updates.map((update: any) => {
                 const dateStr = new Date(update.releaseDate).toLocaleDateString("ko-KR", {
                   year: "numeric",
                   month: "long",
@@ -247,7 +243,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                 return (
                   <article
                     key={update.id}
-                    className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-blue-400:border-blue-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-blue-400 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div className="space-y-2 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -267,7 +263,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                       </div>
 
                       <Link href={`/updates/${update.id}`}>
-                        <h3 className="text-base font-bold text-slate-900 hover:text-blue-600:text-blue-400 transition-colors">
+                        <h3 className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors">
                           {update.title}
                         </h3>
                       </Link>
@@ -285,7 +281,7 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                           href={update.sourceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-slate-500 hover:text-slate-800:text-slate-200 inline-flex items-center gap-1 font-medium"
+                          className="text-xs text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 font-medium"
                         >
                           <span>{update.sourceName || "공식 원문"}</span>
                           <ExternalLink className="w-3 h-3" />

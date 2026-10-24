@@ -15,9 +15,17 @@ import {
   Clock,
 } from "lucide-react";
 
+export const revalidate = 30;
+
 export default async function HomePage() {
-  const [totalGames, totalUpdates, platforms, latestUpdates, recentGames] =
-    await Promise.all([
+  let totalGames = 0;
+  let totalUpdates = 0;
+  let platforms: any[] = [];
+  let latestUpdates: any[] = [];
+  let recentGames: any[] = [];
+
+  try {
+    const [tGames, tUpdates, pForms, lUpdates, rGames] = await Promise.all([
       prisma.game.count(),
       prisma.update.count(),
       prisma.platform.findMany({
@@ -61,6 +69,15 @@ export default async function HomePage() {
       }),
     ]);
 
+    totalGames = tGames;
+    totalUpdates = tUpdates;
+    platforms = pForms;
+    latestUpdates = lUpdates;
+    recentGames = rGames;
+  } catch (error) {
+    console.error("HomePage DB query failed gracefully:", error);
+  }
+
   return (
     <div className="space-y-12 pb-16">
       {/* Clean Header / Hero */}
@@ -89,7 +106,7 @@ export default async function HomePage() {
               </Link>
               <Link
                 href="/games/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-300 text-neutral-700 text-xs font-semibold hover:bg-neutral-50:bg-neutral-800 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-neutral-300 text-neutral-700 text-xs font-semibold hover:bg-neutral-50 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>새 게임 등록</span>
@@ -182,7 +199,7 @@ export default async function HomePage() {
               <Clock className="w-4 h-4" />
               <span>최신 패치 피드</span>
             </h2>
-            <Link href="/games" className="text-xs text-neutral-500 hover:text-neutral-900:text-neutral-200">
+            <Link href="/games" className="text-xs text-neutral-500 hover:text-neutral-900">
               전체 보기 →
             </Link>
           </div>
@@ -221,7 +238,7 @@ export default async function HomePage() {
               <Gamepad2 className="w-4 h-4" />
               <span>최근 등록된 게임</span>
             </h2>
-            <Link href="/games" className="text-xs text-neutral-500 hover:text-neutral-900:text-neutral-200">
+            <Link href="/games" className="text-xs text-neutral-500 hover:text-neutral-900">
               디렉터리 이동 →
             </Link>
           </div>

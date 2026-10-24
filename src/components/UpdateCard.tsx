@@ -45,7 +45,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
   const type = typeConfig[update.updateType] || typeConfig.PATCH;
 
   return (
-    <article className="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-sm hover:shadow-md hover:border-blue-300:border-blue-800 transition-all flex flex-col justify-between">
+    <article className="group bg-white rounded-xl border border-slate-200/90 p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between">
       <div>
         {/* Top Header: Game info & Platform Badge */}
         <div className="flex items-start justify-between gap-3 mb-3">
@@ -66,7 +66,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
               </div>
             )}
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-blue-600:text-blue-400 transition-colors">
+              <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
                 {update.game.canonicalName}
               </h3>
               <p className="text-xs text-slate-500">
@@ -96,7 +96,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
           </div>
 
           <Link href={`/updates/${update.id}`}>
-            <h4 className="text-base font-bold text-slate-900 hover:text-blue-600:text-blue-400 transition-colors line-clamp-1">
+            <h4 className="text-base font-bold text-slate-900 hover:text-blue-600 transition-colors line-clamp-1">
               {update.title}
             </h4>
           </Link>
@@ -123,7 +123,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
               href={update.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800:text-slate-200 font-medium transition-colors"
+              className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 font-medium transition-colors"
               title={update.sourceName || "공식 원문 출처"}
             >
               <span>{update.sourceName || "출처"}</span>

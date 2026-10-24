@@ -24,17 +24,23 @@ interface UpdatePageProps {
 export default async function UpdateDetailPage({ params }: UpdatePageProps) {
   const { id } = await params;
 
-  const update = await prisma.update.findUnique({
-    where: { id },
-    include: {
-      game: true,
-      platform: true,
-      sections: {
-        orderBy: { order: "asc" },
+  let update: any = null;
+
+  try {
+    update = await prisma.update.findUnique({
+      where: { id },
+      include: {
+        game: true,
+        platform: true,
+        sections: {
+          orderBy: { order: "asc" },
+        },
+        translations: true,
       },
-      translations: true,
-    },
-  });
+    });
+  } catch (error) {
+    console.error("UpdateDetailPage query error:", error);
+  }
 
   if (!update) {
     notFound();
@@ -52,7 +58,7 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
       <div className="flex items-center justify-between">
         <Link
           href={`/games/${update.game.slug}`}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600:text-blue-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>{update.game.canonicalName} 상세로 돌아가기</span>
@@ -133,7 +139,7 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
                 href={update.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-medium hover:bg-slate-200:bg-slate-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-medium hover:bg-slate-200 transition-colors"
               >
                 <span>{update.sourceName || "공식 패치 출처 열기"}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -146,7 +152,7 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
       {/* Sections Summary (if structured sections exist) */}
       {update.sections.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {update.sections.map((sec) => (
+          {update.sections.map((sec: any) => (
             <div
               key={sec.id}
               className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs"

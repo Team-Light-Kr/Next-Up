@@ -12,8 +12,47 @@ import {
   Laptop,
   Clock,
   Gamepad2,
-  ExternalLink,
 } from "lucide-react";
+
+export const revalidate = 30; // ISR: cache and serve in < 1ms
+
+export function generateStaticParams() {
+  return [
+    { platform: "windows" },
+    { platform: "android" },
+    { platform: "ios" },
+    { platform: "macos" },
+  ];
+}
+
+interface PlatformMeta {
+  key: string;
+  name: string;
+  description: string;
+}
+
+const KNOWN_PLATFORMS: Record<string, PlatformMeta> = {
+  windows: {
+    key: "windows",
+    name: "Windows",
+    description: "PC Windows 환경 (Steam, Epic Games, 전용 런처 등)의 최신 게임 패치 및 버전 정보를 모아봅니다.",
+  },
+  android: {
+    key: "android",
+    name: "Android",
+    description: "Google Play Store 및 안드로이드 모바일 기기의 최신 게임 패치 및 버전 정보를 모아봅니다.",
+  },
+  ios: {
+    key: "ios",
+    name: "iOS",
+    description: "Apple App Store (iPhone, iPad) 환경의 최신 게임 패치 및 버전 정보를 모아봅니다.",
+  },
+  macos: {
+    key: "macos",
+    name: "macOS",
+    description: "Mac App Store 및 Apple Silicon 지원 환경의 최신 게임 패치 및 버전 정보를 모아봅니다.",
+  },
+};
 
 interface PlatformPageProps {
   params: Promise<{
@@ -25,46 +64,41 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
   const { platform } = await params;
   const platformKey = platform.toLowerCase();
 
-  const platformData = await prisma.platform.findUnique({
-    where: { key: platformKey },
-  });
-
-  if (!platformData) {
+  const meta = KNOWN_PLATFORMS[platformKey];
+  if (!meta) {
     notFound();
   }
 
-  // Fetch updates specifically for this platform
-  const [platformUpdates, platformGames] = await Promise.all([
-    prisma.update.findMany({
-      where: { platformId: platformData.id },
-      orderBy: { releaseDate: "desc" },
-      take: 12,
-      include: {
-        game: {
-          select: {
-            slug: true,
-            canonicalName: true,
-            iconUrl: true,
-            developer: true,
-          },
-        },
-        platform: {
-          select: {
-            key: true,
-            name: true,
-          },
-        },
-      },
-    }),
-    prisma.game.findMany({
-      where: {
-        platforms: {
-          some: { platformId: platformData.id },
-        },
-      },
-      include: {
-        platforms: {
+  let platformName = meta.name;
+  let platformDescription = meta.description;
+  let platformUpdates: any[] = [];
+  let platformGames: any[] = [];
+
+  try {
+    const platformData = await prisma.platform.findUnique({
+      where: { key: platformKey },
+    });
+
+    if (platformData) {
+      platformName = platformData.name || platformName;
+      if (platformData.description) {
+        platformDescription = platformData.description;
+      }
+
+      const [updates, games] = await Promise.all([
+        prisma.update.findMany({
+          where: { platformId: platformData.id },
+          orderBy: { releaseDate: "desc" },
+          take: 12,
           include: {
+            game: {
+              select: {
+                slug: true,
+                canonicalName: true,
+                iconUrl: true,
+                developer: true,
+              },
+            },
             platform: {
               select: {
                 key: true,
@@ -72,10 +106,34 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
               },
             },
           },
-        },
-      },
-    }),
-  ]);
+        }),
+        prisma.game.findMany({
+          where: {
+            platforms: {
+              some: { platformId: platformData.id },
+            },
+          },
+          include: {
+            platforms: {
+              include: {
+                platform: {
+                  select: {
+                    key: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        }),
+      ]);
+
+      platformUpdates = updates;
+      platformGames = games;
+    }
+  } catch (error) {
+    console.error(`Error loading platform data for ${platformKey}:`, error);
+  }
 
   const platformIcons: Record<string, React.ReactNode> = {
     windows: <Monitor className="w-8 h-8 text-blue-500" />,
@@ -94,14 +152,14 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <PlatformBadge platformKey={platformKey} name={platformData.name} size="md" />
+              <PlatformBadge platformKey={platformKey} name={platformName} size="md" />
               <span className="text-xs text-slate-500">전용 패치 허브</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              {platformData.name} 게임 업데이트 정보
+              {platformName} 게임 업데이트 정보
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              {platformData.description || `${platformData.name} 환경의 최신 게임 패치 및 버전 정보를 모아봅니다.`}
+              {platformDescription}
             </p>
           </div>
         </div>
@@ -122,7 +180,7 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-600" />
-            <span>{platformData.name} 최신 업데이트 피드</span>
+            <span>{platformName} 최신 업데이트 피드</span>
           </h2>
           <span className="text-xs text-slate-500">
             총 {platformUpdates.length}건
@@ -149,21 +207,30 @@ export default async function PlatformPage({ params }: PlatformPageProps) {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Gamepad2 className="w-5 h-5 text-blue-600" />
-            <span>{platformData.name} 지원 게임 목록</span>
+            <span>{platformName} 지원 게임 목록</span>
           </h2>
           <Link
             href={`/games?platform=${platformKey}`}
+            prefetch={true}
             className="text-xs font-semibold text-blue-600 hover:underline"
           >
             검색 필터로 열기 →
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {platformGames.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
+        {platformGames.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {platformGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200 p-6">
+            <p className="text-sm text-slate-500">
+              해당 플랫폼에 등록된 게임이 아직 없습니다.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );

@@ -27,7 +27,7 @@ export default function GameCard({ game }: GameCardProps) {
   return (
     <Link
       href={`/games/${game.slug}`}
-      className="group block bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-blue-400:border-blue-700 transition-all"
+      className="group block bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-md hover:border-blue-400 transition-all"
     >
       {/* Cover Banner */}
       <div className="relative h-32 w-full bg-slate-100 overflow-hidden">
@@ -63,7 +63,7 @@ export default function GameCard({ game }: GameCardProps) {
       {/* Content */}
       <div className="p-4 pt-5">
         <div className="mb-2">
-          <h3 className="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-blue-600:text-blue-400 transition-colors">
+          <h3 className="font-bold text-base text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
             {game.canonicalName}
           </h3>
           <p className="text-xs text-slate-500">

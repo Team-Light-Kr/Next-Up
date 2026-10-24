@@ -96,7 +96,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             {isOwner && (
               <Link
                 href="/settings"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50:bg-slate-800 transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <Settings className="w-3.5 h-3.5" />
                 <span>프로필 및 2FA 설정</span>

@@ -92,7 +92,7 @@ export default function MemberNewGamePage() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-6">
       <Link
         href="/games"
-        className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900:text-neutral-200 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         <span>게임 디렉터리로 돌아가기</span>

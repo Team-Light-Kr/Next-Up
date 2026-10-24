@@ -41,7 +41,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 underline font-medium hover:text-blue-800:text-blue-300"
+              className="text-blue-600 underline font-medium hover:text-blue-800"
               {...props}
             >
               {children}

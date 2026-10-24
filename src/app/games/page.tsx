@@ -17,64 +17,82 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  const platforms = await prisma.platform.findMany({
-    orderBy: { order: "asc" },
-  });
+  const FALLBACK_PLATFORMS = [
+    { key: "windows", name: "Windows", order: 1 },
+    { key: "android", name: "Android", order: 2 },
+    { key: "ios", name: "iOS", order: 3 },
+    { key: "macos", name: "macOS", order: 4 },
+  ];
 
-  // Build filter query
-  const where: any = {
-    status: "ACTIVE",
-  };
+  let platforms: any[] = FALLBACK_PLATFORMS;
+  let games: any[] = [];
+  let allGenres: string[] = [];
 
-  if (q.trim()) {
-    where.OR = [
-      { canonicalName: { contains: q.trim(), mode: "insensitive" } },
-      { description: { contains: q.trim(), mode: "insensitive" } },
-      { developer: { contains: q.trim(), mode: "insensitive" } },
-    ];
-  }
+  try {
+    const fetchedPlatforms = await prisma.platform.findMany({
+      orderBy: { order: "asc" },
+    });
+    if (fetchedPlatforms.length > 0) {
+      platforms = fetchedPlatforms;
+    }
 
-  if (genre.trim()) {
-    where.genres = {
-      has: genre.trim(),
+    // Build filter query
+    const where: any = {
+      status: "ACTIVE",
     };
-  }
 
-  if (platform.trim()) {
-    where.platforms = {
-      some: {
-        platform: {
-          key: platform.trim().toLowerCase(),
-        },
-      },
-    };
-  }
+    if (q.trim()) {
+      where.OR = [
+        { canonicalName: { contains: q.trim(), mode: "insensitive" } },
+        { description: { contains: q.trim(), mode: "insensitive" } },
+        { developer: { contains: q.trim(), mode: "insensitive" } },
+      ];
+    }
 
-  const orderBy: any =
-    sort === "name"
-      ? { canonicalName: "asc" }
-      : { updatedAt: "desc" };
+    if (genre.trim()) {
+      where.genres = {
+        has: genre.trim(),
+      };
+    }
 
-  const games = await prisma.game.findMany({
-    where,
-    orderBy,
-    include: {
-      platforms: {
-        include: {
+    if (platform.trim()) {
+      where.platforms = {
+        some: {
           platform: {
-            select: {
-              key: true,
-              name: true,
+            key: platform.trim().toLowerCase(),
+          },
+        },
+      };
+    }
+
+    const orderBy: any =
+      sort === "name"
+        ? { canonicalName: "asc" }
+        : { updatedAt: "desc" };
+
+    games = await prisma.game.findMany({
+      where,
+      orderBy,
+      include: {
+        platforms: {
+          include: {
+            platform: {
+              select: {
+                key: true,
+                name: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  // Extract all distinct genres from existing games
-  const allGames = await prisma.game.findMany({ select: { genres: true } });
-  const allGenres = Array.from(new Set(allGames.flatMap((g) => g.genres)));
+    // Extract all distinct genres from existing games
+    const allGames = await prisma.game.findMany({ select: { genres: true } });
+    allGenres = Array.from(new Set(allGames.flatMap((g) => g.genres)));
+  } catch (error) {
+    console.error("GamesPage DB query failed gracefully:", error);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

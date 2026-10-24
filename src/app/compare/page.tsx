@@ -29,7 +29,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900:text-neutral-200 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         <span>홈으로 돌아가기</span>

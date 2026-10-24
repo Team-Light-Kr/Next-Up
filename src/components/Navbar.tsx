@@ -78,13 +78,17 @@ export default function Navbar() {
             <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-600">
               <Link
                 href="/"
-                className="px-3 py-1.5 rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/")}
+                className="px-3 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 홈
               </Link>
               <Link
                 href="/games"
-                className="px-3 py-1.5 rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/games")}
+                className="px-3 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 게임
               </Link>
@@ -93,28 +97,36 @@ export default function Navbar() {
 
               <Link
                 href="/platforms/windows"
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors flex items-center gap-1.5"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/platforms/windows")}
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Monitor className="w-3.5 h-3.5 text-blue-600" />
                 Windows
               </Link>
               <Link
                 href="/platforms/android"
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors flex items-center gap-1.5"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/platforms/android")}
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
                 Android
               </Link>
               <Link
                 href="/platforms/ios"
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors flex items-center gap-1.5"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/platforms/ios")}
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Apple className="w-3.5 h-3.5 text-neutral-800" />
                 iOS
               </Link>
               <Link
                 href="/platforms/macos"
-                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900:text-neutral-100 hover:bg-neutral-100:bg-neutral-800 transition-colors flex items-center gap-1.5"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/platforms/macos")}
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Laptop className="w-3.5 h-3.5 text-purple-600" />
                 macOS
@@ -140,7 +152,7 @@ export default function Navbar() {
                 {/* Member Game Registration Button */}
                 <Link
                   href="/games/new"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100:bg-neutral-800 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>게임 등록</span>
@@ -149,7 +161,7 @@ export default function Navbar() {
                 {/* Notifications */}
                 <Link
                   href="/notifications"
-                  className="relative p-1.5 rounded-md text-neutral-500 hover:text-neutral-900:text-neutral-100 transition-colors"
+                  className="relative p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 transition-colors"
                   title="알림함"
                 >
                   <Bell className="w-4 h-4" />
@@ -161,7 +173,7 @@ export default function Navbar() {
                 {/* Profile Link */}
                 <Link
                   href={`/profile/${currentUser.profileCode}`}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 text-neutral-800 hover:bg-neutral-200:bg-neutral-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 text-neutral-800 hover:bg-neutral-200 transition-colors"
                 >
                   <User className="w-3.5 h-3.5" />
                   <span>{currentUser.displayName}</span>
@@ -181,7 +193,7 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 text-neutral-400 hover:text-neutral-700:text-neutral-200 transition-colors"
+                  className="p-1.5 text-neutral-400 hover:text-neutral-700 transition-colors"
                   title="로그아웃"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -235,18 +247,55 @@ export default function Navbar() {
           <nav className="flex flex-col space-y-1 text-sm">
             <Link
               href="/"
+              prefetch={true}
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md hover:bg-neutral-100:bg-neutral-800"
+              className="px-3 py-2 rounded-md hover:bg-neutral-100"
             >
               홈
             </Link>
             <Link
               href="/games"
+              prefetch={true}
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-md hover:bg-neutral-100:bg-neutral-800"
+              className="px-3 py-2 rounded-md hover:bg-neutral-100"
             >
               게임 목록
             </Link>
+
+            <div className="grid grid-cols-2 gap-1 py-1 px-1">
+              <Link
+                href="/platforms/windows"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Monitor className="w-3.5 h-3.5 text-blue-600" /> Windows
+              </Link>
+              <Link
+                href="/platforms/android"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600" /> Android
+              </Link>
+              <Link
+                href="/platforms/ios"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Apple className="w-3.5 h-3.5 text-neutral-800" /> iOS
+              </Link>
+              <Link
+                href="/platforms/macos"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Laptop className="w-3.5 h-3.5 text-purple-600" /> macOS
+              </Link>
+            </div>
 
             {currentUser ? (
               <>
