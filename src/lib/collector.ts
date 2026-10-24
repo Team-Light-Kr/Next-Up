@@ -558,7 +558,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
             }).catch(() => {});
           }
 
-          // Discord Webhook
+          // Discord Webhook (Link transmission mode)
           await logToDiscord({
             action: "UPDATE_CREATE",
             title: `[신규 패치 감지] ${game.canonicalName} (${version})`,
@@ -569,6 +569,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
               version,
               updateType,
               sourceUrl,
+              updateId: newUpdate.id,
             },
           }).catch(() => {});
         }

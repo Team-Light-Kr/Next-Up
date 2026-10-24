@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { buildHomeEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -57,23 +56,6 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
         <meta name="color-scheme" content="light" />
-        <script
-          id="discord:component-embed"
-          type="application/vnd.discord.component-embed+json"
-          dangerouslySetInnerHTML={{
-            __html: toComponentEmbedJson(buildHomeEmbed()),
-          }}
-        />
-        <link
-          rel="discord:component-embed"
-          type="application/vnd.discord.component-embed+json"
-          href="https://www.nextups.xyz/discord-embed.json"
-        />
-        <link
-          rel="discord:component-embed"
-          type="application/json"
-          href="https://www.nextups.xyz/discord-embed.json"
-        />
         <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="shortcut icon" href="/favicon.png" />

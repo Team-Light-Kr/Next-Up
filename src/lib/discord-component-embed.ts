@@ -437,7 +437,43 @@ export function buildAuditLogEmbed(
   },
   appUrl = DEFAULT_APP_URL
 ) {
-  const detailSnippet = log.userEmail ? `계정: ${log.userEmail}` : `유형: ${log.action}`;
+  const isPatch = log.action === "UPDATE_CREATE";
+  const gameName = log.details?.game;
+  const version = log.details?.version;
+  const sourceUrl = log.details?.sourceUrl;
+  const updateId = log.details?.updateId;
+
+  let textContent = `NextUps 보안 감사 시스템 • \`${log.action}\`\n# [NextUps 로그] ${log.title}\n`;
+  if (isPatch && gameName) {
+    textContent += `**게임 타이틀**: ${gameName} (${version || "최신"})\n공식 패치노트가 시스템에 실시간 수집 및 등록되었습니다.`;
+  } else {
+    const detailSnippet = log.userEmail ? `계정: ${log.userEmail}` : `유형: ${log.action}`;
+    textContent += `보안 감사 로그가 안전하게 기록되었습니다. (${detailSnippet})`;
+  }
+
+  const buttons: any[] = [];
+  if (updateId) {
+    buttons.push(
+      h(LinkButton, {
+        url: `${appUrl}/updates/${updateId}`,
+        label: "패치노트 전문 보기",
+      })
+    );
+  } else if (sourceUrl) {
+    buttons.push(
+      h(LinkButton, {
+        url: sourceUrl,
+        label: "공식 원본 출처 열기",
+      })
+    );
+  }
+
+  buttons.push(
+    h(LinkButton, {
+      url: `${appUrl}/admin/logs/${log.id}`,
+      label: "보안 감사 로그 확인",
+    })
+  );
 
   return h(
     Container,
@@ -450,10 +486,48 @@ export function buildAuditLogEmbed(
           description: "NextUps Security",
         }),
       },
+      h(TextDisplay, null, textContent)
+    ),
+    h(Separator, { divider: true, spacing: "small" }),
+    (h as any)(ActionRow, null, ...buttons)
+  );
+}
+
+/**
+ * 12. User Profile Page Component Embed (/profile/[code])
+ */
+export function buildProfileEmbed(
+  user: {
+    displayName?: string | null;
+    email?: string | null;
+    profileCode: string;
+    avatarUrl?: string | null;
+    role?: string;
+    createdAt?: Date | string;
+    followsCount?: number;
+  },
+  appUrl = DEFAULT_APP_URL
+) {
+  const name = user.displayName || user.profileCode;
+  const roleText = user.role === "ADMIN" ? "NextUps 최고 관리자" : "NextUps 정회원";
+  const followsText = user.followsCount !== undefined ? ` • 관심 게임 ${user.followsCount}개 구독` : "";
+  const avatar = user.avatarUrl || `${appUrl}/logo.png`;
+
+  return h(
+    Container,
+    { accentColor: 0x2563eb },
+    h(
+      Section,
+      {
+        accessory: h(Thumbnail, {
+          url: avatar,
+          description: `${name} Profile`,
+        }),
+      },
       h(
         TextDisplay,
         null,
-        `NextUps 보안 감사 시스템 • \`${log.action}\`\n# [NextUps 로그] ${log.title}\n보안 감사 로그가 안전하게 기록되었습니다. (${detailSnippet})`
+        `# [${name}님의 프로필](${appUrl}/profile/${user.profileCode})\n**${roleText}**${followsText}\nNextUps에서 실시간 멀티플랫폼 게임 업데이트 및 맞춤 패치 알림을 받아보고 있습니다.`
       )
     ),
     h(Separator, { divider: true, spacing: "small" }),
@@ -461,12 +535,174 @@ export function buildAuditLogEmbed(
       ActionRow,
       null,
       h(LinkButton, {
-        url: `${appUrl}/admin/logs/${log.id}`,
-        label: "관리자 로그 상세 확인",
+        url: `${appUrl}/profile/${user.profileCode}`,
+        label: "프로필 전체보기",
       }),
       h(LinkButton, {
-        url: `${appUrl}/admin/dashboard`,
-        label: "관리자 대시보드",
+        url: `${appUrl}/games`,
+        label: "게임 목록 탐색",
+      })
+    )
+  );
+}
+
+/**
+ * 13. Youth Protection Page Component Embed (/legal/youth)
+ */
+export function buildYouthEmbed(appUrl = DEFAULT_APP_URL) {
+  return h(
+    Container,
+    { accentColor: 0x2563eb },
+    h(
+      Section,
+      {
+        accessory: h(Thumbnail, {
+          url: `${appUrl}/logo.png`,
+          description: "NextUps Youth Protection",
+        }),
+      },
+      h(
+        TextDisplay,
+        null,
+        `# [NextUps 청소년 보호정책](${appUrl}/legal/youth)\n**청소년이 유해정보로부터 안전한 클린 플랫폼 환경 조성**\n청소년 보호법 및 정보통신망법에 의거한 보호 조치 및 실시간 모니터링 기준을 안내합니다.`
+      )
+    ),
+    h(Separator, { divider: true, spacing: "small" }),
+    h(
+      ActionRow,
+      null,
+      h(LinkButton, {
+        url: `${appUrl}/legal/youth`,
+        label: "청소년 보호정책 전문",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/legal/terms`,
+        label: "서비스 이용약관",
+      })
+    )
+  );
+}
+
+/**
+ * 14. Personal Privacy Notice Receipt Embed (/legal/privacy-notice/[code])
+ */
+export function buildPrivacyNoticeUserEmbed(
+  user: {
+    displayName?: string | null;
+    profileCode: string;
+    createdAt?: Date | string;
+  },
+  appUrl = DEFAULT_APP_URL
+) {
+  const name = user.displayName || user.profileCode;
+  return h(
+    Container,
+    { accentColor: 0x2563eb },
+    h(
+      Section,
+      {
+        accessory: h(Thumbnail, {
+          url: `${appUrl}/logo.png`,
+          description: "NextUps Privacy Agreement Receipt",
+        }),
+      },
+      h(
+        TextDisplay,
+        null,
+        `# [개인정보 이용·제공 내역 열람 증명](${appUrl}/legal/privacy-notice/${user.profileCode})\n**회원: ${name} (식별코드: ${user.profileCode})**\n개인정보 보호법 제20조의2에 따른 법정 개인정보 이용·제공 내역 공식 열람 증명서입니다.`
+      )
+    ),
+    h(Separator, { divider: true, spacing: "small" }),
+    h(
+      ActionRow,
+      null,
+      h(LinkButton, {
+        url: `${appUrl}/legal/privacy-notice/${user.profileCode}`,
+        label: "열람 증명서 확인",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/profile/${user.profileCode}`,
+        label: "내 프로필로 이동",
+      })
+    )
+  );
+}
+
+/**
+ * 15. Notifications Page Component Embed (/notifications)
+ */
+export function buildNotificationsEmbed(appUrl = DEFAULT_APP_URL) {
+  return h(
+    Container,
+    { accentColor: 0x2563eb },
+    h(
+      Section,
+      {
+        accessory: h(Thumbnail, {
+          url: `${appUrl}/logo.png`,
+          description: "NextUps Notifications",
+        }),
+      },
+      h(
+        TextDisplay,
+        null,
+        `# [NextUps 알림 센터](${appUrl}/notifications)\n**구독 중인 관심 게임의 최신 패치 및 시스템 알림**\n실시간으로 도착한 게임 업데이트와 중요 변경 사항을 확인하세요.`
+      )
+    ),
+    h(Separator, { divider: true, spacing: "small" }),
+    h(
+      ActionRow,
+      null,
+      h(LinkButton, {
+        url: `${appUrl}/notifications`,
+        label: "알림함 확인하기",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/games`,
+        label: "관심 게임 둘러보기",
+      })
+    )
+  );
+}
+
+/**
+ * 16. Generic Page Component Embed
+ */
+export function buildGenericEmbed(
+  title: string,
+  description: string,
+  path: string,
+  buttonLabel = "자세히 보기",
+  appUrl = DEFAULT_APP_URL
+) {
+  return h(
+    Container,
+    { accentColor: 0x2563eb },
+    h(
+      Section,
+      {
+        accessory: h(Thumbnail, {
+          url: `${appUrl}/logo.png`,
+          description: "NextUps",
+        }),
+      },
+      h(
+        TextDisplay,
+        null,
+        `# [${title}](${appUrl}${path})\n${description}`
+      )
+    ),
+    h(Separator, { divider: true, spacing: "small" }),
+    h(
+      ActionRow,
+      null,
+      h(LinkButton, {
+        url: `${appUrl}${path}`,
+        label: buttonLabel,
+      }),
+      h(LinkButton, {
+        url: appUrl,
+        label: "NextUps 홈",
       })
     )
   );

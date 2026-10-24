@@ -6,12 +6,71 @@ import { getCurrentUser } from "@/lib/auth";
 import GameCard from "@/components/GameCard";
 import { User, ShieldCheck, Heart, Settings, Calendar, ExternalLink, Share2 } from "lucide-react";
 
+import { buildProfileEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
+
 export const dynamic = "force-dynamic";
 
 interface ProfilePageProps {
   params: Promise<{
     code: string;
   }>;
+}
+
+export async function generateMetadata({ params }: ProfilePageProps) {
+  const { code } = await params;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+
+  try {
+    const profileUser = await prisma.user.findUnique({
+      where: { profileCode: code },
+      include: {
+        _count: {
+          select: { follows: true },
+        },
+      },
+    });
+
+    if (profileUser) {
+      const card = buildProfileEmbed(
+        {
+          displayName: profileUser.displayName,
+          email: profileUser.email,
+          profileCode: profileUser.profileCode,
+          avatarUrl: profileUser.avatarUrl,
+          role: profileUser.role,
+          createdAt: profileUser.createdAt,
+          followsCount: profileUser._count.follows,
+        },
+        appUrl
+      );
+      const embedJson = toComponentEmbedJson(card);
+
+      return {
+        title: `${profileUser.displayName}님의 프로필 | NextUps`,
+        description: `${profileUser.displayName}님의 게임 구독 내역과 프로필 정보를 확인하세요.`,
+        other: {
+          "discord:component-embed": embedJson,
+        },
+        alternates: {
+          types: {
+            "application/vnd.discord.component-embed+json": `${appUrl}/api/discord-embed?path=/profile/${code}`,
+          },
+        },
+        openGraph: {
+          title: `${profileUser.displayName}님의 프로필`,
+          description: `관심 게임 ${profileUser._count.follows}개 구독 중`,
+          images: [profileUser.avatarUrl || `${appUrl}/logo.png`],
+        },
+      };
+    }
+  } catch {
+    // fallback
+  }
+
+  return {
+    title: "회원 프로필 | NextUps",
+    description: "NextUps 회원 프로필 정보입니다.",
+  };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
@@ -48,8 +107,26 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     month: "long",
   });
 
+  const profileCard = buildProfileEmbed({
+    displayName: profileUser.displayName,
+    email: profileUser.email,
+    profileCode: profileUser.profileCode,
+    avatarUrl: profileUser.avatarUrl,
+    role: profileUser.role,
+    createdAt: profileUser.createdAt,
+    followsCount: profileUser.follows.length,
+  });
+  const profileJson = toComponentEmbedJson(profileCard);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: profileJson,
+        }}
+      />
       {/* Profile Header Banner */}
       <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400" />

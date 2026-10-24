@@ -33,7 +33,7 @@ import {
 
 export default function AdminDashboardPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"collector" | "compliance" | "email" | "reports" | "audit">("collector");
+  const [activeTab, setActiveTab] = useState<"collector" | "email" | "reports" | "audit">("collector");
   const [stats, setStats] = useState<any>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
@@ -41,12 +41,6 @@ export default function AdminDashboardPage() {
   const [runningCollector, setRunningCollector] = useState(false);
   const [collectorResult, setCollectorResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
-  // Compliance broadcast states
-  const [sendingTermsEmail, setSendingTermsEmail] = useState(false);
-  const [termsEmailStatus, setTermsEmailStatus] = useState<string | null>(null);
-  const [sendingPrivacyEmail, setSendingPrivacyEmail] = useState(false);
-  const [privacyEmailStatus, setPrivacyEmailStatus] = useState<string | null>(null);
 
   // Custom email broadcaster states
   const [emailForm, setEmailForm] = useState({
@@ -116,47 +110,6 @@ export default function AdminDashboardPage() {
     fetchDashboardData();
   }, []);
 
-  const handleBroadcastTerms = async () => {
-    if (!confirm("전체 등록 회원에게 이용약관 및 개인정보처리방침 개정 안내 이메일을 발송하시겠습니까?")) {
-      return;
-    }
-    setSendingTermsEmail(true);
-    setTermsEmailStatus(null);
-    try {
-      const res = await fetch("/api/admin/broadcast-terms", {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "발송 실패");
-      setTermsEmailStatus(`전체 회원 ${data.sentCount}명 중 ${data.successCount}명에게 약관 개정 안내 메일 발송 완료!`);
-      fetchDashboardData();
-    } catch (err: any) {
-      alert(err.message || "발송 중 오류가 발생했습니다.");
-    } finally {
-      setSendingTermsEmail(false);
-    }
-  };
-
-  const handleBroadcastPrivacyHistory = async () => {
-    if (!confirm("대한민국 개인정보보호법 제20조의2에 따라, 전체 회원에게 연 1회 개인정보 이용·제공 내역 안내 메일을 발송하시겠습니까?")) {
-      return;
-    }
-    setSendingPrivacyEmail(true);
-    setPrivacyEmailStatus(null);
-    try {
-      const res = await fetch("/api/admin/broadcast-privacy-history", {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "발송 실패");
-      setPrivacyEmailStatus(`개인정보보호법 제20조의2 법정 의무 통지 완료: 전체 ${data.totalCount}명 대상 (성공 ${data.successCount}건)`);
-      fetchDashboardData();
-    } catch (err: any) {
-      alert(err.message || "발송 중 오류가 발생했습니다.");
-    } finally {
-      setSendingPrivacyEmail(false);
-    }
-  };
 
   const handleRunCollector = async () => {
     setRunningCollector(true);
@@ -375,17 +328,6 @@ export default function AdminDashboardPage() {
           <span>실시간 데이터 자동 수집 센터</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab("compliance")}
-          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
-            activeTab === "compliance"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <ShieldCheck className="w-4 h-4 text-indigo-600" />
-          <span>법정 공지 및 회원 안내 허브</span>
-        </button>
 
         <button
           onClick={() => setActiveTab("email")}
@@ -502,114 +444,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 2: Legal Compliance & Broadcast Hub */}
-      {activeTab === "compliance" && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card 1: Article 20-2 Annual Privacy Notice */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-5 flex flex-col justify-between">
-              <div className="space-y-2.5">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>대한민국 법정 의무 • 연 1회</span>
-                </div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  개인정보 이용·제공 내역 연례 통지 관리
-                </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  「개인정보 보호법」 제20조의2에 따라, 플랫폼의 전체 이용 회원을 대상으로 1년마다 
-                  개인정보 이용·제공 내역을 이메일로 정기 고지합니다. (Papago Plus, HoYoverse, NEIS+ 동일 규격)
-                </p>
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-                  <div>• 법령 근거: 「개인정보 보호법」 제20조의2</div>
-                  <div>• 발송 주기: 연 1회 (정기 의무)</div>
-                  <div>• 발송 대상: 등록된 전체 활성 회원</div>
-                </div>
-              </div>
-
-              {privacyEmailStatus && (
-                <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs font-medium">
-                  {privacyEmailStatus}
-                </div>
-              )}
-
-              <div className="pt-2 flex items-center gap-3">
-                <Link
-                  href="/legal/privacy-notice"
-                  target="_blank"
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5"
-                >
-                  <Eye className="w-3.5 h-3.5 text-blue-600" />
-                  <span>공식 서식 미리보기</span>
-                </Link>
-                <button
-                  onClick={handleBroadcastPrivacyHistory}
-                  disabled={sendingPrivacyEmail}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                >
-                  {sendingPrivacyEmail ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Send className="w-3.5 h-3.5" />
-                  )}
-                  <span>연례 통지 메일 발송 실행</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Terms of Service Revision Broadcast */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-5 flex flex-col justify-between">
-              <div className="space-y-2.5">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 text-xs font-bold">
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>사전 공지 의무 • 시행 7일 전</span>
-                </div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  이용약관 및 개인정보처리방침 개정 공지
-                </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  비밀번호 필수화, Discord 실시간 보안 감사 로깅 고지 등 개편된 약관 전문을 
-                  전체 회원에게 안내 이메일로 발송하고 Discord 웹훅에 발송 통계를 기록합니다.
-                </p>
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-                  <div>• 개정 시행일: 2026년 10월 25일 (정식 출시)</div>
-                  <div>• 주요 변경: 비밀번호 필수화, 보안 감사 로깅 명시</div>
-                  <div>• 발송 채널: Resend 이메일 연동</div>
-                </div>
-              </div>
-
-              {termsEmailStatus && (
-                <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-medium">
-                  {termsEmailStatus}
-                </div>
-              )}
-
-              <div className="pt-2 flex items-center gap-3">
-                <Link
-                  href="/legal/terms"
-                  target="_blank"
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5"
-                >
-                  <Eye className="w-3.5 h-3.5 text-blue-600" />
-                  <span>개정 약관 검토</span>
-                </Link>
-                <button
-                  onClick={handleBroadcastTerms}
-                  disabled={sendingTermsEmail}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                >
-                  {sendingTermsEmail ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Send className="w-3.5 h-3.5" />
-                  )}
-                  <span>약관 개정 안내 메일 발송</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* TAB: Custom Email Broadcaster */}
       {activeTab === "email" && (

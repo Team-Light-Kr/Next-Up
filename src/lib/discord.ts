@@ -40,6 +40,7 @@ export interface LogEventOptions {
   details?: Record<string, any>;
   color?: number; // Discord hex color
   hideButtons?: boolean;
+  targetUrl?: string;
 }
 
 // Color map for different action types
@@ -84,96 +85,13 @@ export async function logToDiscord(options: LogEventOptions) {
 
   // 2. Prepare secret admin-only log URL
   const logUrl = `${APP_URL}/admin/logs/${logId}`;
+  const targetUrl = options.targetUrl || logUrl;
 
-  // 3. Construct rich Discord Component Embed V2 matching 2nd screenshot
-  const embedColor = options.color || ACTION_COLORS[options.action] || 0x2563eb;
-  const dateFormatted = new Date().toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const detailLines: string[] = [];
-  if (options.userEmail) {
-    detailLines.push(`• **계정 이메일**: \`${options.userEmail}\``);
-  }
-  if (options.ipAddress) {
-    detailLines.push(`• **접속 IP**: \`${options.ipAddress}\``);
-  }
-  detailLines.push(`• **작업 유형**: \`${options.action}\``);
-
-  if (options.details) {
-    Object.entries(options.details)
-      .slice(0, 5)
-      .forEach(([k, v]) => {
-        detailLines.push(`• **${k}**: ${typeof v === "object" ? JSON.stringify(v) : v}`);
-      });
-  }
-
-  const formattedDescription = [
-    options.description ? options.description : "",
-    detailLines.length > 0 ? `**상세 파라미터 내역**\n${detailLines.join("\n")}` : "",
-  ].filter(Boolean).join("\n\n");
-
-  const actionButtons = [];
-  if (options.details?.sourceUrl) {
-    actionButtons.push({
-      type: 2,
-      style: 5,
-      label: "패치노트 / 세부정보 바로가기",
-      url: options.details.sourceUrl,
-    });
-  }
-  actionButtons.push({
-    type: 2,
-    style: 5,
-    label: "관리자 전용 감사 로그 확인하기",
-    url: logUrl,
-  });
-  if (actionButtons.length < 5) {
-    actionButtons.push({
-      type: 2,
-      style: 5,
-      label: "관리자 대시보드",
-      url: `${APP_URL}/admin/dashboard`,
-    });
-  }
-
+  // 3. Send using Link Transmission Format so Discord unfurls Component Embed V2!
   const discordPayload = {
     username: "NextUps Security Logger",
     avatar_url: `${APP_URL}/logo.png`,
-    content: "",
-    embeds: [
-      {
-        author: {
-          name: `보안 감사 • ${dateFormatted} • NextUps Security`,
-          icon_url: `${APP_URL}/logo.png`,
-          url: logUrl,
-        },
-        title: `[NextUps 로그] ${options.title}`,
-        url: logUrl,
-        description: formattedDescription,
-        color: embedColor,
-        thumbnail: {
-          url: `${APP_URL}/logo.png`,
-        },
-        footer: {
-          text: `NextUps 보안 감사 시스템 • Log ID: ${logId}`,
-          icon_url: `${APP_URL}/logo.png`,
-        },
-        timestamp: new Date().toISOString(),
-      },
-    ],
-    ...(options.hideButtons
-      ? {}
-      : {
-          components: [
-            {
-              type: 1, // Action Row
-              components: actionButtons,
-            },
-          ],
-        }),
+    content: targetUrl,
   };
 
   // 4. Send to Discord Webhook asynchronously
@@ -185,18 +103,7 @@ export async function logToDiscord(options: LogEventOptions) {
     });
 
     if (!res.ok) {
-      // If components v2 fail due to webhook permissions, fallback to embeds only
-      const text = await res.text();
-      console.warn("Discord webhook with components warning, trying fallback:", res.status, text);
-      await fetch(DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: "NextUps Audit Logger",
-          avatar_url: `${APP_URL}/logo.png`,
-          embeds: discordPayload.embeds,
-        }),
-      });
+      console.warn("Discord webhook notification returned status:", res.status);
     }
   } catch (error) {
     console.error("Failed to send Discord log webhook:", error);

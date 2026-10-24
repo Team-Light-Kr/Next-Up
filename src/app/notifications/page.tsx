@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, CheckCheck, Clock, Gamepad2, ChevronRight, Loader2 } from "lucide-react";
 
+import { buildNotificationsEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
+
 export default function NotificationsPage() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -33,8 +35,17 @@ export default function NotificationsPage() {
     }
   };
 
+  const discordJson = toComponentEmbedJson(buildNotificationsEmbed());
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">

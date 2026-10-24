@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ShieldCheck, CheckCircle2, Lock, ArrowLeft, ExternalLink, Calendar, User } from "lucide-react";
 import { findUserByPrivacyToken } from "@/lib/privacy-annual-broadcast";
+import { buildPrivacyNoticeUserEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -10,10 +11,21 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps) {
   const { code } = await params;
+  const user = await findUserByPrivacyToken(code);
+  const card = buildPrivacyNoticeUserEmbed({
+    displayName: user?.displayName,
+    profileCode: code,
+    createdAt: user?.createdAt,
+  });
+  const embedJson = toComponentEmbedJson(card);
+
   return {
     title: `회원 전용 개인정보 이용·제공 내역 안내 (${code.slice(0, 6)}***) | NextUps`,
     description: "대한민국 개인정보 보호법 제20조의2에 따른 NextUps 연례 개인정보 이용 및 제공 내역 맞춤 안내입니다.",
     robots: { index: false, follow: false },
+    other: {
+      "discord:component-embed": embedJson,
+    },
   };
 }
 
@@ -25,11 +37,25 @@ export default async function PersonalizedPrivacyNoticePage({ params }: PageProp
     notFound();
   }
 
+  const card = buildPrivacyNoticeUserEmbed({
+    displayName: user.displayName,
+    profileCode: code,
+    createdAt: user.createdAt,
+  });
+  const discordJson = toComponentEmbedJson(card);
+
   const todayStr = "2026년 10월 24일";
   const maskedEmail = user.email.replace(/(.{2})(.*)(@.*)/, "$1***$3");
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <div className="mb-6">
         <Link
           href="/"

@@ -15,7 +15,22 @@ import {
   Clock,
 } from "lucide-react";
 
+import { buildHomeEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
+
 export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "NextUps - 멀티플랫폼 게임 업데이트 정보 통합 플랫폼",
+  description: "Windows, Android, iOS 공식 최신 패치노트와 버전 정보를 실시간으로 확인하세요.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildHomeEmbed()),
+  },
+  alternates: {
+    types: {
+      "application/vnd.discord.component-embed+json": "https://www.nextups.xyz/discord-embed.json",
+    },
+  },
+};
 
 export default async function HomePage() {
   let totalGames = 0;
@@ -78,8 +93,17 @@ export default async function HomePage() {
     console.error("HomePage DB query failed gracefully:", error);
   }
 
+  const homeEmbedJson = toComponentEmbedJson(buildHomeEmbed());
+
   return (
     <div className="space-y-12 pb-16">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: homeEmbedJson,
+        }}
+      />
       {/* Clean Header / Hero */}
       <section className="border-b border-neutral-200 bg-white py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

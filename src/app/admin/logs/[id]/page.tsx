@@ -67,6 +67,36 @@ export default async function AdminLogDetailPage({ params }: AdminLogPageProps) 
   const { id } = await params;
   const currentUser = await getCurrentUser();
 
+  // Fetch log from database
+  let log: any = null;
+  try {
+    log = await prisma.adminAuditLog.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+            profileCode: true,
+            role: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching audit log:", error);
+  }
+
+  const discordCard = buildAuditLogEmbed({
+    id: log?.id || id,
+    title: log?.title || "NextUps 보안 감사 시스템 로그",
+    action: log?.action || "SYSTEM_AUDIT",
+    details: log?.details,
+    userEmail: log?.user?.email,
+  });
+  const discordJson = toComponentEmbedJson(discordCard);
+
   // Strict Admin Verification (admin@koharu.live or role === "ADMIN")
   const isAdmin =
     currentUser &&
@@ -75,6 +105,13 @@ export default async function AdminLogDetailPage({ params }: AdminLogPageProps) 
   if (!isAdmin) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
+        <script
+          id="discord:component-embed"
+          type="application/vnd.discord.component-embed+json"
+          dangerouslySetInnerHTML={{
+            __html: discordJson,
+          }}
+        />
         <div className="max-w-md w-full bg-white border border-red-200 rounded-2xl p-8 shadow-xs text-center space-y-4">
           <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 border border-red-200 flex items-center justify-center mx-auto">
             <ShieldAlert className="w-7 h-7" />
@@ -97,30 +134,16 @@ export default async function AdminLogDetailPage({ params }: AdminLogPageProps) 
     );
   }
 
-  // Fetch log from database
-  let log: any = null;
-  try {
-    log = await prisma.adminAuditLog.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            displayName: true,
-            profileCode: true,
-            role: true,
-          },
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching audit log:", error);
-  }
-
   if (!log) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-4">
+        <script
+          id="discord:component-embed"
+          type="application/vnd.discord.component-embed+json"
+          dangerouslySetInnerHTML={{
+            __html: discordJson,
+          }}
+        />
         <h1 className="text-2xl font-bold text-slate-900">로그를 찾을 수 없습니다</h1>
         <p className="text-xs text-slate-500">해당 ID({id})의 감사 로그가 데이터베이스에 존재하지 않습니다.</p>
         <Link
@@ -132,15 +155,6 @@ export default async function AdminLogDetailPage({ params }: AdminLogPageProps) 
       </div>
     );
   }
-
-  const discordCard = buildAuditLogEmbed({
-    id: log.id,
-    title: log.title,
-    action: log.action,
-    details: log.details,
-    userEmail: log.user?.email,
-  });
-  const discordJson = toComponentEmbedJson(discordCard);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-8">

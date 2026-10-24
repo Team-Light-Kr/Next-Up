@@ -3,14 +3,28 @@ import Link from "next/link";
 import { ShieldAlert, ChevronLeft, Calendar } from "lucide-react";
 import { CurrentDate } from "@/components/CurrentDate";
 
+import { buildYouthEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
+
 export const metadata = {
   title: "청소년 보호정책 | NextUps",
   description: "NextUps 서비스의 청소년 보호정책 안내입니다.",
+  other: {
+    "discord:component-embed": toComponentEmbedJson(buildYouthEmbed()),
+  },
 };
 
 export default function YouthProtectionPage() {
+  const discordJson = toComponentEmbedJson(buildYouthEmbed());
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <script
+        id="discord:component-embed"
+        type="application/vnd.discord.component-embed+json"
+        dangerouslySetInnerHTML={{
+          __html: discordJson,
+        }}
+      />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition-colors"
