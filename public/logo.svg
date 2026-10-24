@@ -1,0 +1,13 @@
+<svg width="512" height="512" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark Rounded Container -->
+  <rect width="48" height="48" rx="11" fill="#0b1120"/>
+
+  <!-- Left White N Stroke -->
+  <path d="M14 34V14L24 26V14" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right Blue N Stroke -->
+  <path d="M24 34V22L34 34V15" stroke="#3b82f6" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right Blue Upward Arrowhead -->
+  <path d="M34 9.5L29 16.5H39L34 9.5Z" fill="#3b82f6" stroke="#3b82f6" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

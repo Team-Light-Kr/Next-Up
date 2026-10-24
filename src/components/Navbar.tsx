@@ -1,0 +1,313 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Search,
+  Menu,
+  X,
+  Plus,
+  Monitor,
+  Smartphone,
+  Apple,
+  Laptop,
+  Bell,
+  User,
+  LogOut,
+  Settings,
+  Shield,
+  Activity,
+} from "lucide-react";
+
+export default function Navbar() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setCurrentUser(data.user);
+          setUnreadCount(data.unreadNotificationCount || 0);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/games?q=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileMenuOpen(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setCurrentUser(null);
+    router.push("/");
+    router.refresh();
+  };
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-15">
+          {/* Brand Logo */}
+          <div className="flex items-center gap-7">
+            <Link href="/" className="flex items-center gap-2.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="NextUps"
+                className="w-8 h-8 rounded-lg shadow-xs"
+              />
+              <div className="flex flex-col">
+                <span className="font-bold text-base tracking-tight text-neutral-900 dark:text-neutral-100">
+                  NextUps
+                </span>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-600 dark:text-neutral-400">
+              <Link
+                href="/"
+                className="px-3 py-1.5 rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                홈
+              </Link>
+              <Link
+                href="/games"
+                className="px-3 py-1.5 rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                게임
+              </Link>
+
+              <div className="h-3.5 w-px bg-neutral-200 dark:bg-neutral-700 mx-1.5" />
+
+              <Link
+                href="/platforms/windows"
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              >
+                <Monitor className="w-3.5 h-3.5 text-blue-600" />
+                Windows
+              </Link>
+              <Link
+                href="/platforms/android"
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                Android
+              </Link>
+              <Link
+                href="/platforms/ios"
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              >
+                <Apple className="w-3.5 h-3.5 text-neutral-800 dark:text-neutral-200" />
+                iOS
+              </Link>
+              <Link
+                href="/platforms/macos"
+                className="px-2.5 py-1 text-xs rounded-md hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
+              >
+                <Laptop className="w-3.5 h-3.5 text-purple-600" />
+                macOS
+              </Link>
+            </nav>
+          </div>
+
+          {/* Search Bar & User Actions */}
+          <div className="hidden sm:flex items-center gap-3">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                placeholder="게임 또는 패치 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-48 lg:w-56 pl-8 pr-3 py-1.5 text-xs rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+              />
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-neutral-400" />
+            </form>
+
+            {currentUser ? (
+              <div className="flex items-center gap-2">
+                {/* Member Game Registration Button */}
+                <Link
+                  href="/games/new"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>게임 등록</span>
+                </Link>
+
+                {/* Notifications */}
+                <Link
+                  href="/notifications"
+                  className="relative p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                  title="알림함"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-600" />
+                  )}
+                </Link>
+
+                {/* Profile Link */}
+                <Link
+                  href={`/profile/${currentUser.profileCode}`}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>{currentUser.displayName}</span>
+                </Link>
+
+                {/* Admin Only Dashboard Button */}
+                {currentUser.role === "ADMIN" && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 hover:opacity-90"
+                    title="관리자 전용 대시보드"
+                  >
+                    <Activity className="w-3 h-3 text-emerald-400 dark:text-emerald-600" />
+                    <span>어드민</span>
+                  </Link>
+                )}
+
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
+                  title="로그아웃"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/auth/login"
+                  className="px-3 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 transition-colors"
+                >
+                  로그인
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 hover:opacity-90 transition-opacity"
+                >
+                  회원가입
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-neutral-600 dark:text-neutral-300 focus:outline-none"
+              aria-label="메뉴 열기"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-4 py-4 space-y-3">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <input
+              type="text"
+              placeholder="게임 또는 패치 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 text-xs rounded-md border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
+            />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-3 text-neutral-400" />
+          </form>
+
+          <nav className="flex flex-col space-y-1 text-sm">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              홈
+            </Link>
+            <Link
+              href="/games"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              게임 목록
+            </Link>
+
+            {currentUser ? (
+              <>
+                <Link
+                  href="/games/new"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 text-blue-600 font-semibold flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" /> 신규 게임 등록
+                </Link>
+                <Link
+                  href={`/profile/${currentUser.profileCode}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 flex items-center gap-1.5"
+                >
+                  <User className="w-4 h-4" /> 프로필 ({currentUser.displayName})
+                </Link>
+                <Link
+                  href="/notifications"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 flex items-center gap-1.5"
+                >
+                  <Bell className="w-4 h-4" /> 알림함 ({unreadCount})
+                </Link>
+                {currentUser.role === "ADMIN" && (
+                  <Link
+                    href="/admin/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2 text-emerald-600 font-semibold flex items-center gap-1.5"
+                  >
+                    <Activity className="w-4 h-4" /> 관리자 대시보드
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2 text-red-600 flex items-center gap-1.5"
+                >
+                  <LogOut className="w-4 h-4" /> 로그아웃
+                </button>
+              </>
+            ) : (
+              <div className="pt-2 flex gap-2">
+                <Link
+                  href="/auth/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 py-2 text-center text-xs font-medium rounded-md border border-neutral-200"
+                >
+                  로그인
+                </Link>
+                <Link
+                  href="/auth/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 py-2 text-center text-xs font-semibold rounded-md bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900"
+                >
+                  회원가입
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}

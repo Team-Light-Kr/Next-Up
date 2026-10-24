@@ -1,0 +1,174 @@
+import crypto from "crypto";
+import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
+
+const SECRET = process.env.AUTH_SECRET || "nextup-super-secure-secret-key-2025-team-light";
+
+// Generate random 6-digit number string
+export function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Generate random 8-letter english profile code (as specified in list.txt line 3049)
+export function generateProfileCode(): string {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let code = "";
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// Sign and verify session tokens
+export function signSessionToken(payload: { userId: string; email: string; role: string; profileCode: string }): string {
+  const data = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + 30 * 24 * 60 * 60 * 1000 })).toString("base64url");
+  const signature = crypto.createHmac("sha256", SECRET).update(data).digest("base64url");
+  return `${data}.${signature}`;
+}
+
+export function verifySessionToken(token: string): { userId: string; email: string; role: string; profileCode: string } | null {
+  try {
+    const [data, signature] = token.split(".");
+    if (!data || !signature) return null;
+
+    const expectedSig = crypto.createHmac("sha256", SECRET).update(data).digest("base64url");
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+      return null;
+    }
+
+    const payload = JSON.parse(Buffer.from(data, "base64url").toString("utf-8"));
+    if (payload.exp && payload.exp < Date.now()) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+// Get current user from server context (cookies)
+export async function getCurrentUser() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nextup_session")?.value;
+  if (!token) return null;
+
+  const session = verifySessionToken(token);
+  if (!session) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      role: true,
+      profileCode: true,
+      bio: true,
+      avatarUrl: true,
+      twoFactorType: true,
+      phoneNumber: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+
+  return user;
+}
+
+// Resend Email Sender (list.txt line 3030, 3038)
+export async function sendEmailVerificationCode(email: string, code: string, purpose: "회원가입" | "로그인" | "2단계 인증") {
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "admin@nextups.xyz";
+
+  if (!apiKey) {
+    console.warn("RESEND_API_KEY is not configured.");
+    return false;
+  }
+
+  const htmlContent = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+      <div style="margin-bottom: 24px;">
+        <h1 style="color: #2563eb; margin: 0; font-size: 24px; font-weight: 800;">NextUps</h1>
+        <p style="color: #64748b; font-size: 13px; margin-top: 4px;">멀티플랫폼 게임 업데이트 정보 통합 플랫폼</p>
+      </div>
+
+      <h2 style="color: #0f172a; font-size: 18px; font-weight: 700; margin-bottom: 12px;">NextUps ${purpose} 인증번호 안내</h2>
+      <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+        NextUps 서비스를 이용해 주셔서 감사합니다. 아래 6자리 인증번호를 입력창에 입력해 주세요.<br/>
+        인증번호는 <strong>10분 동안 유효</strong>합니다.
+      </p>
+
+      <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+        <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #1e293b;">${code}</span>
+      </div>
+
+      <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin-bottom: 28px;">
+        본인이 요청하지 않은 경우 이 메일을 무시하시거나 관리자에게 문의해 주세요.
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin-bottom: 16px;" />
+      <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
+        ※ 본 메일은 발신 전용 메일이므로 회신 시 확인되지 않습니다. (admin@nextups.xyz)
+      </p>
+    </div>
+  `;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: `NextUps <${fromEmail}>`,
+        to: [email],
+        subject: `[NextUps] ${purpose} 인증번호는 [${code}] 입니다.`,
+        html: htmlContent,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.warn("Resend API warning:", res.status, errText);
+    }
+    return true;
+  } catch (error) {
+    console.error("Resend send error:", error);
+    return false;
+  }
+}
+
+// Sendwich SMS Sender (list.txt line 3042)
+export async function sendSmsVerificationCode(phoneNumber: string, code: string) {
+  const apiKey = process.env.SENDWICH_API_KEY;
+
+  if (!apiKey) {
+    console.warn("SENDWICH_API_KEY is not configured.");
+    return false;
+  }
+
+  try {
+    const res = await fetch("https://api.sendwich.kr/v1/sms/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: phoneNumber,
+        text: `[NextUps] 인증번호는 [${code}] 입니다. 10분 내에 입력해 주세요.`,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.warn("Sendwich SMS warning:", res.status, err);
+    }
+    return true;
+  } catch (error) {
+    console.error("Sendwich send error:", error);
+    return false;
+  }
+}

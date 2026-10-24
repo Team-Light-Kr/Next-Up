@@ -1,0 +1,116 @@
+import React from "react";
+import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
+import { CurrentDate } from "@/components/CurrentDate";
+
+export default function Footer() {
+  return (
+    <footer className="mt-auto border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          {/* Brand */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="NextUps" className="w-6 h-6 rounded-md" />
+              <span className="font-bold text-base text-neutral-900 dark:text-neutral-100">
+                NextUps
+              </span>
+            </div>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Windows, Android, iOS, macOS 멀티플랫폼 게임 업데이트 및 패치 정보를 통합 제공하는 비영리 공공 플랫폼입니다.
+            </p>
+            <div className="text-xs text-neutral-500">
+              Team Light 운영
+            </div>
+          </div>
+
+          {/* Platforms */}
+          <div>
+            <h4 className="text-xs font-semibold text-neutral-900 dark:text-neutral-200 uppercase tracking-wider mb-3">
+              플랫폼
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/platforms/windows" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  Windows PC
+                </Link>
+              </li>
+              <li>
+                <Link href="/platforms/android" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  Android
+                </Link>
+              </li>
+              <li>
+                <Link href="/platforms/ios" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  iOS
+                </Link>
+              </li>
+              <li>
+                <Link href="/platforms/macos" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  macOS
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <h4 className="text-xs font-semibold text-neutral-900 dark:text-neutral-200 uppercase tracking-wider mb-3">
+              서비스
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/games" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  게임 목록
+                </Link>
+              </li>
+              <li>
+                <Link href="/games/new" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  신규 게임 등록
+                </Link>
+              </li>
+              <li>
+                <Link href="/compare" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  버전 비교 도구
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Policy */}
+          <div>
+            <h4 className="text-xs font-semibold text-neutral-900 dark:text-neutral-200 uppercase tracking-wider mb-3">
+              운영 및 약관
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/legal/privacy" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  개인정보 처리방침
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/youth" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  청소년 보호정책
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal/terms" className="hover:text-neutral-900 dark:hover:text-neutral-100">
+                  서비스 이용약관
+                </Link>
+              </li>
+              <li className="pt-1 text-[11px] text-neutral-400">
+                ※ 모든 정책 개정 시 최소 7일 전 사전 공지됩니다.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-neutral-100 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
+          <p>© <CurrentDate format="year" /> Team Light. All rights reserved. (nextups.xyz)</p>
+          <p>비영리 무료 공공 서비스</p>
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -1,0 +1,254 @@
+// Prisma schema for NextUp (Game Update Aggregator Platform)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  displayName   String
+  role          String    @default("USER") // USER, ADMIN
+  profileCode   String    @unique // Random 8-character code for /profile/[code]
+  bio           String?   @db.Text
+  avatarUrl     String?
+  twoFactorType String    @default("NONE") // NONE, EMAIL, SMS, OTP
+  phoneNumber   String?
+  status        String    @default("ACTIVE") // ACTIVE, SUSPENDED, DELETED
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  follows       GameFollow[]
+  reports       Report[]
+  auditLogs     AdminAuditLog[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([profileCode])
+}
+
+model Platform {
+  id          String   @id @default(cuid())
+  key         String   @unique // ios, macos, android, windows
+  name        String   // iOS, macOS, Android, Windows
+  description String?
+  icon        String?  // icon identifier
+  enabled     Boolean  @default(true)
+  order       Int      @default(0)
+
+  gamePlatforms GamePlatform[]
+  updates       Update[]
+  gameFollows   GameFollow[]
+
+  @@index([key])
+}
+
+model Game {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  canonicalName      String
+  localizedNames     Json?    // e.g. {"ko": "...", "en": "...", "ja": "...", "zh": "..."}
+  description        String   @db.Text
+  iconUrl            String?
+  coverImageUrl      String?
+  officialWebsiteUrl String?
+  developer          String?
+  publisher          String?
+  genres             String[] @default([])
+  status             String   @default("ACTIVE") // ACTIVE, ARCHIVED
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  platforms          GamePlatform[]
+  updates            Update[]
+  follows            GameFollow[]
+  reports            Report[]
+  notifications      Notification[]
+
+  @@index([slug])
+  @@index([canonicalName])
+}
+
+model GamePlatform {
+  id                 String    @id @default(cuid())
+  gameId             String
+  platformId         String
+  availabilityStatus String    @default("AVAILABLE") // AVAILABLE, COMING_SOON, DISCONTINUED
+  latestKnownVersion String?
+  lastCheckedAt      DateTime?
+  storeUrl           String?
+  releaseChannel     String    @default("STABLE") // STABLE, BETA, PREVIEW
+  metadata           Json?
+
+  game               Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  platform           Platform  @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  updates            Update[]
+
+  @@unique([gameId, platformId])
+  @@index([gameId])
+  @@index([platformId])
+}
+
+model Update {
+  id             String    @id @default(cuid())
+  gameId         String
+  platformId     String
+  gamePlatformId String?
+  version        String
+  title          String
+  releaseDate    DateTime  @default(now())
+  discoveredAt   DateTime  @default(now())
+  summary        String?   @db.Text
+  bodyMarkdown   String    @db.Text
+  updateType     String    @default("PATCH") // MAJOR, MINOR, PATCH, HOTFIX, NOTICE
+  isVerified     Boolean   @default(true)
+  sourceUrl      String?
+  sourceName     String?   // Official Website, App Store, Steam, Google Play, etc.
+  sourceType     String?   @default("OFFICIAL_STORE") // OFFICIAL_SITE, OFFICIAL_STORE, DEV_BLOG
+  images         String[]  @default([]) // up to 20 images
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  game           Game          @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  platform       Platform      @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  gamePlatform   GamePlatform? @relation(fields: [gamePlatformId], references: [id], onDelete: SetNull)
+  sections       UpdateSection[]
+  translations   UpdateTranslation[]
+  reports        Report[]
+  notifications  Notification[]
+
+  @@index([gameId])
+  @@index([platformId])
+  @@index([version])
+  @@index([releaseDate])
+}
+
+model UpdateSection {
+  id        String   @id @default(cuid())
+  updateId  String
+  title     String   // e.g. "주요 변경점", "버그 수정", "알려진 문제"
+  content   String   @db.Text
+  order     Int      @default(0)
+
+  update    Update   @relation(fields: [updateId], references: [id], onDelete: Cascade)
+
+  @@index([updateId])
+}
+
+model UpdateTranslation {
+  id           String   @id @default(cuid())
+  updateId     String
+  language     String   // "en", "ko", "ja", "zh"
+  title        String
+  summary      String?  @db.Text
+  bodyMarkdown String   @db.Text
+  translatedBy String   @default("AI_DEEPL") // "AI_DEEPL" or "USER"
+  createdAt    DateTime @default(now())
+
+  update       Update   @relation(fields: [updateId], references: [id], onDelete: Cascade)
+
+  @@unique([updateId, language])
+  @@index([updateId])
+  @@index([language])
+}
+
+model GameFollow {
+  id         String    @id @default(cuid())
+  userId     String
+  gameId     String
+  platformId String?
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game       Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  platform   Platform? @relation(fields: [platformId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId, platformId])
+  @@index([userId])
+  @@index([gameId])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  gameId     String?
+  updateId   String?
+  userId     String?
+  reportType String   // INCORRECT_VERSION, BROKEN_LINK, TYPO, OTHER
+  content    String   @db.Text
+  status     String   @default("PENDING") // PENDING, RESOLVED, REJECTED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  game       Game?    @relation(fields: [gameId], references: [id], onDelete: SetNull)
+  update     Update?  @relation(fields: [updateId], references: [id], onDelete: SetNull)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String   // CREATE_GAME, UPDATE_GAME, CREATE_UPDATE, DELETE_UPDATE, etc.
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String   // 6 digits
+  purpose   String   @default("REGISTER") // REGISTER, LOGIN, 2FA
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String?
+  updateId  String?
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game      Game?    @relation(fields: [gameId], references: [id], onDelete: SetNull)
+  update    Update?  @relation(fields: [updateId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model DataCollectionJob {
+  id           String    @id @default(cuid())
+  status       String    @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  source       String    // STEAM_API, OFFICIAL_FEED, RSS
+  itemsFound   Int       @default(0)
+  itemsAdded   Int       @default(0)
+  itemsSkipped Int       @default(0)
+  errorMessage String?   @db.Text
+  logs         Json?
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+
+  @@index([status])
+  @@index([startedAt])
+}
