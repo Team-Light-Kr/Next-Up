@@ -13,6 +13,17 @@ export const metadata = {
   other: {
     "discord:component-embed": toComponentEmbedJson(buildGamesListEmbed()),
   },
+  alternates: {
+    types: {
+      "application/vnd.discord.component-embed+json": "https://www.nextups.xyz/api/discord-embed?path=/games",
+    },
+  },
+  openGraph: {
+    title: "NextUps 게임 디렉터리",
+    description: "멀티플랫폼 게임 업데이트 정보 및 패치노트를 실시간으로 탐색하세요.",
+    url: "https://www.nextups.xyz/games",
+    images: ["https://www.nextups.xyz/logo.png"],
+  },
 };
 
 interface GamesPageProps {

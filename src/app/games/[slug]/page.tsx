@@ -32,6 +32,13 @@ interface GameDetailPageProps {
   }>;
 }
 
+const SLUG_ALIASES: Record<string, string> = {
+  "spiderman-2": "marvel-spider-man-2",
+  "pokemon-sv": "pokemon-scarlet-violet",
+  "god-of-war": "god-of-war-ragnarok",
+  "zelda": "zelda-totk",
+};
+
 export async function generateMetadata({ params }: GameDetailPageProps) {
   const rawSlug = (await params).slug || "";
   let decodedSlug = rawSlug;
@@ -39,12 +46,19 @@ export async function generateMetadata({ params }: GameDetailPageProps) {
     decodedSlug = decodeURIComponent(rawSlug);
   } catch {}
 
+  const normalizedSlug = SLUG_ALIASES[decodedSlug] || decodedSlug;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
 
   try {
     const game = await prisma.game.findFirst({
       where: {
-        OR: [{ slug: decodedSlug }, { slug: rawSlug }, { canonicalName: decodedSlug }],
+        OR: [
+          { slug: normalizedSlug },
+          { slug: decodedSlug },
+          { slug: rawSlug },
+          { canonicalName: decodedSlug },
+          { canonicalName: { contains: decodedSlug, mode: "insensitive" } },
+        ],
       },
       include: {
         updates: {
@@ -62,17 +76,28 @@ export async function generateMetadata({ params }: GameDetailPageProps) {
     const card = buildGameEmbed(game, game.updates[0]?.version, appUrl);
     const embedJson = toComponentEmbedJson(card);
 
+    const fullIconUrl = game.iconUrl
+      ? game.iconUrl.startsWith("http")
+        ? game.iconUrl
+        : `${appUrl}${game.iconUrl}`
+      : `${appUrl}/logo.png`;
+
     return {
       title,
       description: desc,
       other: {
         "discord:component-embed": embedJson,
       },
+      alternates: {
+        types: {
+          "application/vnd.discord.component-embed+json": `${appUrl}/api/discord-embed?path=/games/${encodeURIComponent(game.slug)}`,
+        },
+      },
       openGraph: {
         title,
         description: desc,
         url: `${appUrl}/games/${game.slug}`,
-        images: [game.iconUrl || `${appUrl}/logo.png`],
+        images: [fullIconUrl],
       },
     };
   } catch {
@@ -96,34 +121,21 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
     currentUser = await getCurrentUser();
     canManage = Boolean(currentUser);
 
-    // 1. DB에서 Slug / ID / 한글명 매칭 조회
-    game = await prisma.game.findUnique({
-      where: { slug: decodedSlug },
-      include: {
-        platforms: {
-          include: {
-            platform: true,
-          },
-        },
-        updates: {
-          orderBy: { releaseDate: "desc" },
-          include: {
-            platform: true,
-          },
-        },
-      },
-    });
+    const normalizedSlug = SLUG_ALIASES[decodedSlug] || decodedSlug;
 
-    if (!game) {
-      game = await prisma.game.findFirst({
-        where: {
-          OR: [
-            { slug: rawSlug },
-            { id: decodedSlug },
-            { id: rawSlug },
-            { canonicalName: decodedSlug },
-          ],
-        },
+    // 1. DB에서 Slug / ID / 한글명 매칭 조회
+    game = await prisma.game.findFirst({
+      where: {
+        OR: [
+          { slug: normalizedSlug },
+          { slug: decodedSlug },
+          { slug: rawSlug },
+          { id: decodedSlug },
+          { id: rawSlug },
+          { canonicalName: decodedSlug },
+          { canonicalName: { contains: decodedSlug, mode: "insensitive" } },
+        ],
+      },
         include: {
           platforms: {
             include: {
@@ -138,7 +150,6 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
           },
         },
       });
-    }
 
     if (game && currentUser) {
       const follow = await prisma.gameFollow.findFirst({

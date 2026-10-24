@@ -36,10 +36,22 @@ export async function GET(request: NextRequest) {
       const count = await prisma.game.count({ where: { status: "ACTIVE" } });
       card = buildGamesListEmbed(count, appUrl);
     } else if (path.startsWith("/games/")) {
-      const slug = decodeURIComponent(path.replace("/games/", ""));
+      const rawSlug = decodeURIComponent(path.replace("/games/", ""));
+      const SLUG_ALIASES: Record<string, string> = {
+        "spiderman-2": "marvel-spider-man-2",
+        "pokemon-sv": "pokemon-scarlet-violet",
+        "god-of-war": "god-of-war-ragnarok",
+        "zelda": "zelda-totk",
+      };
+      const slug = SLUG_ALIASES[rawSlug] || rawSlug;
       const game = await prisma.game.findFirst({
         where: {
-          OR: [{ slug }, { canonicalName: slug }],
+          OR: [
+            { slug },
+            { slug: rawSlug },
+            { canonicalName: slug },
+            { canonicalName: { contains: rawSlug, mode: "insensitive" } },
+          ],
         },
         include: {
           updates: {

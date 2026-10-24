@@ -10,6 +10,17 @@ export const metadata = {
   other: {
     "discord:component-embed": toComponentEmbedJson(buildTermsEmbed()),
   },
+  alternates: {
+    types: {
+      "application/vnd.discord.component-embed+json": "https://www.nextups.xyz/api/discord-embed?path=/legal/terms",
+    },
+  },
+  openGraph: {
+    title: "NextUps 서비스 이용약관",
+    description: "NextUps 게임 정보 플랫폼의 정식 서비스 이용약관 전문입니다.",
+    url: "https://www.nextups.xyz/legal/terms",
+    images: ["https://www.nextups.xyz/logo.png"],
+  },
 };
 
 export default function TermsOfServicePage() {

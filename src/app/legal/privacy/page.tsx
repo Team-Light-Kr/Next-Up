@@ -10,6 +10,17 @@ export const metadata = {
   other: {
     "discord:component-embed": toComponentEmbedJson(buildPrivacyEmbed()),
   },
+  alternates: {
+    types: {
+      "application/vnd.discord.component-embed+json": "https://www.nextups.xyz/api/discord-embed?path=/legal/privacy",
+    },
+  },
+  openGraph: {
+    title: "NextUps 개인정보 처리방침",
+    description: "NextUps 게임 정보 플랫폼의 정식 개인정보 처리방침 전문입니다.",
+    url: "https://www.nextups.xyz/legal/privacy",
+    images: ["https://www.nextups.xyz/logo.png"],
+  },
 };
 
 export default function PrivacyPolicyPage() {

@@ -24,13 +24,26 @@ export async function generateMetadata({ params }: PlatformPageProps) {
   const name = meta ? meta.name : platform;
   const desc = meta ? meta.description : "NextUps 플랫폼별 패치 정보 허브";
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+
   return {
     title: `${name} 게임 업데이트 정보`,
     description: desc,
     other: {
       "discord:component-embed": toComponentEmbedJson(
-        buildPlatformEmbed({ key: platformKey, name, description: desc })
+        buildPlatformEmbed({ key: platformKey, name, description: desc }, undefined, appUrl)
       ),
+    },
+    alternates: {
+      types: {
+        "application/vnd.discord.component-embed+json": `${appUrl}/api/discord-embed?path=/platforms/${platformKey}`,
+      },
+    },
+    openGraph: {
+      title: `${name} 게임 업데이트 정보`,
+      description: desc,
+      url: `${appUrl}/platforms/${platformKey}`,
+      images: [`${appUrl}/logo.png`],
     },
   };
 }

@@ -41,17 +41,28 @@ export async function generateMetadata({ params }: UpdatePageProps) {
     const card = buildUpdateEmbed(update, appUrl);
     const embedJson = toComponentEmbedJson(card);
 
+    const fullIcon = update.game.iconUrl
+      ? update.game.iconUrl.startsWith("http")
+        ? update.game.iconUrl
+        : `${appUrl}${update.game.iconUrl}`
+      : `${appUrl}/logo.png`;
+
     return {
       title,
       description: desc,
       other: {
         "discord:component-embed": embedJson,
       },
+      alternates: {
+        types: {
+          "application/vnd.discord.component-embed+json": `${appUrl}/api/discord-embed?path=/updates/${id}`,
+        },
+      },
       openGraph: {
         title,
         description: desc,
         url: `${appUrl}/updates/${id}`,
-        images: [update.game.iconUrl || `${appUrl}/logo.png`],
+        images: [fullIcon],
       },
     };
   } catch {

@@ -198,25 +198,54 @@ async function translateIfNeeded(title: string, text: string): Promise<string | 
 }
 
 /**
+ * Fetch official Steam 1:1 square community icon
+ */
+async function fetchSteamSquareIcon(appId: number): Promise<string | null> {
+  try {
+    const url = `https://api.steampowered.com/ICommunityService/GetApps/v1/?appids[0]=${appId}`;
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const iconHash = json?.response?.apps?.[0]?.icon;
+    if (iconHash) {
+      return `https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${appId}/${iconHash}.jpg`;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+/**
  * Fetch official Steam store details (banner, website, developer, tags)
  */
 async function fetchSteamStoreDetails(appId: number) {
   try {
-    const url = `https://store.steampowered.com/api/appdetails?appids=${appId}&l=korean&cc=KR`;
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
+    const [storeRes, squareIcon] = await Promise.all([
+      fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}&l=korean&cc=KR`, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        signal: AbortSignal.timeout(6000),
+      }),
+      fetchSteamSquareIcon(appId),
+    ]);
+
+    if (!storeRes.ok) return null;
+    const json = await storeRes.json();
     const appData = json?.[appId]?.data;
     if (!appData) return null;
 
+    // Use 1:1 square community icon first, then fallback to high-quality app icon
+    const resolvedIcon =
+      squareIcon ||
+      `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/capsule_sm_120.jpg`;
+
     return {
-      headerImage: appData.header_image || null, // Banner image
-      capsuleImage: appData.capsule_image || null, // Icon / Logo
+      headerImage: appData.header_image || null, // Banner image (16:9)
+      squareIcon: resolvedIcon, // True 1:1 square game icon
       website: appData.website || null, // Official website
       developers: appData.developers || [],
       publishers: appData.publishers || [],
@@ -651,7 +680,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
           : await prisma.game.findUnique({ where: { slug: target.slug } });
 
         const bannerUrl = storeDetails?.headerImage || `https://cdn.cloudflare.steamstatic.com/steam/apps/${target.appId}/header.jpg`;
-        const logoUrl = storeDetails?.capsuleImage || bannerUrl;
+        const logoUrl = storeDetails?.squareIcon || `https://cdn.cloudflare.steamstatic.com/steam/apps/${target.appId}/capsule_sm_120.jpg`;
         const officialWebsite = storeDetails?.website || `https://store.steampowered.com/app/${target.appId}`;
         const devName = storeDetails?.developers?.join(", ") || "공식 개발사";
         const pubName = storeDetails?.publishers?.join(", ") || devName;
@@ -672,18 +701,21 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
               status: "ACTIVE",
             },
           });
-          logs.push(`[신규 등록] '${target.canonicalName}' 배너(${bannerUrl}) 및 공식 웹사이트(${officialWebsite}) 등록 완료.`);
+          logs.push(`[신규 등록] '${target.canonicalName}' 정사각 아이콘 및 배너 등록 완료.`);
         } else {
-          // Update game banner / website if missing
-          const needsUpdate = !game.coverImageUrl || !game.officialWebsiteUrl;
-          if (needsUpdate) {
+          // If existing game has low-res or invalid icon, update with high-res square icon
+          const hasBadIcon = !game.iconUrl || game.iconUrl.includes("unsplash") || game.iconUrl.includes("capsule_231x87");
+          const hasBadBanner = !game.coverImageUrl || game.coverImageUrl.includes("unsplash");
+          if (hasBadIcon || hasBadBanner || !game.officialWebsiteUrl) {
             game = await prisma.game.update({
               where: { id: game.id },
               data: {
-                coverImageUrl: game.coverImageUrl || bannerUrl,
+                iconUrl: hasBadIcon && logoUrl ? logoUrl : game.iconUrl,
+                coverImageUrl: hasBadBanner && bannerUrl ? bannerUrl : game.coverImageUrl,
                 officialWebsiteUrl: game.officialWebsiteUrl || officialWebsite,
               },
             });
+            logs.push(`[메타데이터 갱신] '${target.canonicalName}' 고화질 정사각 아이콘 및 배너 보정 완료.`);
           }
         }
 

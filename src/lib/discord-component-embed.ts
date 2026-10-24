@@ -14,6 +14,14 @@ import {
 
 const DEFAULT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
 
+export function toFullUrl(pathOrUrl?: string | null, appUrl = DEFAULT_APP_URL): string {
+  if (!pathOrUrl) return `${appUrl}/logo.png`;
+  if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
+    return pathOrUrl;
+  }
+  return `${appUrl}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`;
+}
+
 /**
  * 1. Root / Home Page Component Embed (/)
  */
@@ -113,7 +121,7 @@ export function buildGameEmbed(
       Section,
       {
         accessory: h(Thumbnail, {
-          url: game.iconUrl || `${appUrl}/logo.png`,
+          url: toFullUrl(game.iconUrl, appUrl),
           description: game.canonicalName,
         }),
       },
@@ -165,7 +173,7 @@ export function buildUpdateEmbed(
       Section,
       {
         accessory: h(Thumbnail, {
-          url: update.game.iconUrl || `${appUrl}/logo.png`,
+          url: toFullUrl(update.game.iconUrl, appUrl),
           description: update.game.canonicalName,
         }),
       },
