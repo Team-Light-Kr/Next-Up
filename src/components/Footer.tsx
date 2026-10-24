@@ -99,11 +99,6 @@ export default function Footer() {
                   서비스 이용약관
                 </Link>
               </li>
-              <li>
-                <Link href="/legal/privacy-notice" className="hover:text-blue-600 font-medium text-blue-600/90">
-                  개인정보 이용·제공 내역 (법정)
-                </Link>
-              </li>
               <li className="pt-1 text-[11px] text-neutral-400">
                 ※ 모든 정책 개정 시 최소 7일 전 사전 공지됩니다.
               </li>

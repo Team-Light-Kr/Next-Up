@@ -18,6 +18,7 @@ import {
   Settings,
   Shield,
   Activity,
+  Download,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -114,6 +115,15 @@ export default function Navbar() {
                 className="px-3 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 게임
+              </Link>
+              <Link
+                href="/download"
+                prefetch={true}
+                onMouseEnter={() => router.prefetch("/download")}
+                className="px-3 py-1.5 rounded-md text-blue-600 font-bold hover:bg-blue-50 transition-colors flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                다운로드
               </Link>
 
               <div className="h-3.5 w-px bg-neutral-200 mx-1.5" />
@@ -283,6 +293,15 @@ export default function Navbar() {
               className="px-3 py-2 rounded-md hover:bg-neutral-100"
             >
               게임 목록
+            </Link>
+            <Link
+              href="/download"
+              prefetch={true}
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-md text-blue-600 font-bold hover:bg-blue-50 flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              앱 다운로드 (Windows / Android)
             </Link>
 
             <div className="grid grid-cols-2 gap-1 py-1 px-1">

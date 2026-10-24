@@ -201,7 +201,8 @@ export async function sendEmailVerificationCode(
 
   const htmlContent = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
-      <div style="margin-bottom: 24px;">
+      <div style="margin-bottom: 24px; text-align: center;">
+        <img src="${process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz"}/logo.png" alt="NextUps" width="56" height="56" style="width: 56px; height: 56px; margin-bottom: 8px; border-radius: 12px; display: inline-block;" />
         <h1 style="color: #2563eb; margin: 0; font-size: 24px; font-weight: 800;">NextUps</h1>
         <p style="color: #64748b; font-size: 13px; margin-top: 4px;">멀티플랫폼 게임 업데이트 정보 통합 플랫폼</p>
       </div>
