@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     await logToDiscord({
       action: "REPORT_CREATED",
-      title: `🚨 정보 오류 제보 접수: [${reportType}]`,
+      title: `정보 오류 제보 접수: [${reportType}]`,
       color: 0xf59e0b, // Amber
       userId: user?.id,
       userEmail: user?.email,
@@ -88,7 +88,7 @@ export async function PATCH(request: Request) {
 
     await logToDiscord({
       action: "REPORT_STATUS_UPDATED",
-      title: `⚙️ 제보 처리 상태 갱신: ${reportId} -> ${status}`,
+      title: `제보 처리 상태 갱신: ${reportId} -> ${status}`,
       color: status === "RESOLVED" ? 0x10b981 : 0xef4444,
       userId: user?.id,
       userEmail: user?.email,

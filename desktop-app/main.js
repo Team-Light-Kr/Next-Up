@@ -115,10 +115,10 @@ function createWindow() {
             <span class="brand-badge">Chromium v\${window.nextupsDesktop ? window.nextupsDesktop.version : "1.0.0"}</span>
           </div>
           <div class="window-controls">
-            <button class="win-btn" title="새로고침 (F5)" onclick="window.nextupsDesktop.reload()">↻</button>
-            <button class="win-btn" title="최소화" onclick="window.nextupsDesktop.minimize()">─</button>
-            <button class="win-btn" title="최대화 / 복원" onclick="window.nextupsDesktop.maximize()">□</button>
-            <button class="win-btn close" title="닫기" onclick="window.nextupsDesktop.close()">✕</button>
+            <button class="win-btn" title="새로고침 (F5)" onclick="window.nextupsDesktop.reload()">&#x21bb;</button>
+            <button class="win-btn" title="최소화" onclick="window.nextupsDesktop.minimize()">&#x2500;</button>
+            <button class="win-btn" title="최대화 / 복원" onclick="window.nextupsDesktop.maximize()">&#x25a1;</button>
+            <button class="win-btn close" title="닫기" onclick="window.nextupsDesktop.close()">&times;</button>
           </div>
         \`;
         document.body.prepend(bar);
@@ -151,7 +151,7 @@ function checkForUpdates() {
           dialog
             .showMessageBox(mainWindow, {
               type: "info",
-              title: "🚀 NextUps 새 버전 업데이트 안내",
+              title: "NextUps 새 버전 업데이트 안내",
               message: `새로운 버전 v${json.latestVersion}이 준비되었습니다!`,
               detail: `현재 버전: v${APP_VERSION}\n최신 버전: v${json.latestVersion}\n\n[주요 변경사항]\n${json.changelog.map((c) => "• " + c).join("\n")}`,
               buttons: ["지금 업데이트 다운로드", "나중에 알림"],
@@ -193,7 +193,7 @@ function startInAppUpdateDownload(downloadUrl, latestVersion) {
       b.style.cssText = "position:fixed;top:38px;left:0;right:0;z-index:99999;background:#1d4ed8;color:#fff;padding:12px 18px;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:flex;flex-direction:column;gap:8px;";
       b.innerHTML = \`
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="font-size:12px;font-weight:bold;">🚀 NextUps v\${${JSON.stringify(latestVersion)}} 업데이트 다운로드 중...</div>
+          <div style="font-size:12px;font-weight:bold;">NextUps v\${${JSON.stringify(latestVersion)}} 업데이트 다운로드 중...</div>
           <div id="nextups-update-percent-text" style="font-size:12px;font-weight:800;color:#93c5fd;">0%</div>
         </div>
         <div style="background:rgba(255,255,255,0.2);height:8px;border-radius:4px;overflow:hidden;position:relative;">

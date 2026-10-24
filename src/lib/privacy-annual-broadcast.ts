@@ -126,7 +126,7 @@ export async function broadcastPrivacyAnnualNotice() {
           <!-- Personalized Random Link Box -->
           <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; text-align: center;">
             <p style="font-size: 12px; font-weight: 700; color: #1e293b; margin: 0 0 6px 0;">
-              🔒 회원님 전용 개인정보 이용·제공 내역 고유 열람 링크 (보안 난수 코드 생성)
+              회원님 전용 개인정보 이용·제공 내역 고유 열람 링크 (보안 난수 코드 생성)
             </p>
             <p style="font-size: 11px; color: #64748b; margin: 0 0 10px 0;">
               회원님만을 위해 암호화된 고유 코드로 생성된 페이지에서 본 내역을 웹으로 상시 열람하실 수 있습니다.

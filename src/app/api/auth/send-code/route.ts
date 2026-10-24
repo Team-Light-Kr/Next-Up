@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateVerificationCode, sendEmailVerificationCode, sendSmsVerificationCode } from "@/lib/auth";
+import { createSendwichVerification } from "@/lib/sendwich";
+
 
 export async function POST(request: Request) {
   try {
-    const { email, purpose = "REGISTER" } = await request.json();
+    const { email, purpose = "REGISTER", channel } = await request.json();
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "유효한 이메일 주소를 입력해 주세요." }, { status: 400 });
@@ -57,24 +59,37 @@ export async function POST(request: Request) {
       },
     });
 
-    if ((purpose === "LOGIN" || purpose === "2FA") && userTwoFactor === "SMS") {
-      if (!existing?.phoneNumber) {
-        return NextResponse.json(
-          { error: "문자(SMS) 2단계 인증이 설정되어 있으나 등록된 전화번호가 없습니다. 관리자에게 문의해 주세요." },
-          { status: 400 }
-        );
-      }
-      await sendSmsVerificationCode(existing.phoneNumber, code, cleanEmail);
-      const maskedPhone = existing.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1-****-$2");
+    const purposeLabel = purpose === "REGISTER" ? "회원가입" : purpose === "LOGIN" ? "로그인" : "2단계 인증";
+
+    if (channel === "SMS" || ((purpose === "LOGIN" || purpose === "2FA") && userTwoFactor === "SMS")) {
+      const sendwich = await createSendwichVerification({
+        expectedPhone: existing?.phoneNumber || undefined,
+        clientReference: cleanEmail,
+      });
+
+      // 백업 이메일로도 6자리 코드 동시 발송 (문자 전송이 어려운 환경 대비)
+      try {
+        await sendEmailVerificationCode(cleanEmail, code, purposeLabel);
+      } catch {}
+
       return NextResponse.json({
         success: true,
         method: "SMS",
-        message: `등록된 휴대전화(${maskedPhone}) 및 백업 이메일(${cleanEmail})로 6자리 인증번호가 발송되었습니다.`,
+        sendwich: sendwich
+          ? {
+              id: sendwich.id,
+              destination: sendwich.destination,
+              smsText: sendwich.sms_text,
+              verificationUrl: sendwich.verification_url,
+            }
+          : null,
+        message: sendwich
+          ? `샌드위치 수신 번호 [${sendwich.destination}] 로 문구 [${sendwich.sms_text}] 를 문자로 전송해 주세요.`
+          : `가입 이메일(${cleanEmail})로 6자리 인증번호가 발송되었습니다.`,
       });
     }
 
     // Default or EMAIL 2FA
-    const purposeLabel = purpose === "REGISTER" ? "회원가입" : purpose === "LOGIN" ? "로그인" : "2단계 인증";
     await sendEmailVerificationCode(cleanEmail, code, purposeLabel);
 
     return NextResponse.json({

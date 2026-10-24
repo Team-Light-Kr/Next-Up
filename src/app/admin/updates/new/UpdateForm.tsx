@@ -274,7 +274,7 @@ export default function UpdateForm({ games: initialGames, platforms: initialPlat
                 >
                   {games.map((g) => (
                     <option key={g.id} value={g.id} className="py-1">
-                      🎮 {g.canonicalName}
+                      {g.canonicalName}
                     </option>
                   ))}
                 </select>
@@ -418,7 +418,7 @@ export default function UpdateForm({ games: initialGames, platforms: initialPlat
                 title="본문 커서 위치에 이미지 바로 삽입"
               >
                 <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
-                <span>📷 본문 이미지 삽입</span>
+                <span>본문 이미지 삽입</span>
               </button>
               <input
                 ref={inlineImageInputRef}

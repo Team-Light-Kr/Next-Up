@@ -144,7 +144,7 @@ async function translateIfNeeded(title: string, text: string): Promise<string | 
 export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): Promise<CollectorResult> {
   const startTime = Date.now();
   const logs: string[] = [];
-  logs.push(`[${new Date().toISOString()}] 🚀 실시간 공식 게임 데이터 자동 수집 파이프라인 가동 (소스: ${source})`);
+  logs.push(`[${new Date().toISOString()}] 실시간 공식 게임 데이터 자동 수집 파이프라인 가동 (소스: ${source})`);
 
   const job = await prisma.dataCollectionJob.create({
     data: {
@@ -258,7 +258,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
 
     // 3. Process Each Game in Target Matrix
     for (const target of targetCatalog) {
-      logs.push(`🔍 [${target.canonicalName}] Steam Web API 공식 패치 채널 조회 중...`);
+      logs.push(`[${target.canonicalName}] Steam Web API 공식 패치 채널 조회 중...`);
 
       // Ensure Game Exists or Create it!
       let game = await prisma.game.findUnique({
@@ -278,7 +278,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
             status: "ACTIVE",
           },
         });
-        logs.push(`✨ [신규 타이틀 등록] 데이터베이스에 '${target.canonicalName}' 등록 완료.`);
+        logs.push(`[신규 타이틀 등록] 데이터베이스에 '${target.canonicalName}' 등록 완료.`);
       }
 
       // Query Steam News API - ONLY official developer announcements, excluding 3rd party news sites
@@ -291,7 +291,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
         });
 
         if (!res.ok) {
-          logs.push(`⚠️ [수집 경고] ${target.canonicalName} API 응답 코드: ${res.status}`);
+          logs.push(`[수집 경고] ${target.canonicalName} API 응답 코드: ${res.status}`);
           continue;
         }
 
@@ -401,7 +401,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
             updateType,
           });
 
-          logs.push(`🎉 [신규 패치 발행] [${game.canonicalName}] ${version} - '${rawTitle}' (유형: ${updateType})`);
+          logs.push(`[신규 패치 발행] [${game.canonicalName}] ${version} - '${rawTitle}' (유형: ${updateType})`);
 
           // 4. Translate via DeepL if non-Korean
           const translatedContent = await translateIfNeeded(rawTitle, bodyMarkdown);
@@ -416,7 +416,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
                 translatedBy: "AI_DEEPL",
               },
             }).catch(() => {});
-            logs.push(`🌐 [DeepL 번역 완료] [${game.canonicalName}] 한국어 패치 번역본 적재.`);
+            logs.push(`[DeepL 번역 완료] [${game.canonicalName}] 한국어 패치 번역본 적재.`);
           }
 
           // 5. Notify all users who follow this game
@@ -435,13 +435,13 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
                 message: `'${rawTitle}' 패치노트가 공식 등록되었습니다. 지금 확인해 보세요!`,
               })),
             });
-            logs.push(`🔔 [팔로워 알림 발송] ${followers.length}명의 이용자에게 웹 알림 전송 완료.`);
+            logs.push(`[팔로워 알림 발송] ${followers.length}명의 이용자에게 웹 알림 전송 완료.`);
           }
 
           // 6. Send Rich Discord Webhook Alert
           await logToDiscord({
             action: "UPDATE_CREATE",
-            title: `⚡ [신규 패치 실시간 감지] ${game.canonicalName} (${version})`,
+            title: `[신규 패치 실시간 감지] ${game.canonicalName} (${version})`,
             description: `공식 게임 출처에서 새로운 업데이트가 실시간 감지되어 정식 등록되었습니다.\n\n**${rawTitle}**\n${summary}`,
             color: 0x06b6d4, // Cyan
             details: {
@@ -455,12 +455,12 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
           });
         }
       } catch (feedErr: any) {
-        logs.push(`❌ [${target.canonicalName}] 수집 파이프라인 에러: ${feedErr.message}`);
+        logs.push(`[${target.canonicalName}] 수집 파이프라인 에러: ${feedErr.message}`);
       }
     }
 
     const durationMs = Date.now() - startTime;
-    logs.push(`[${new Date().toISOString()}] 🏁 자동 수집 작업 완료 (총 소요: ${(durationMs / 1000).toFixed(2)}초, 발견: ${itemsFound}건, 신규 등록: ${itemsAdded}건, 중복 제외: ${itemsSkipped}건)`);
+    logs.push(`[${new Date().toISOString()}] 자동 수집 작업 완료 (총 소요: ${(durationMs / 1000).toFixed(2)}초, 발견: ${itemsFound}건, 신규 등록: ${itemsAdded}건, 중복 제외: ${itemsSkipped}건)`);
 
     // Invalidate game list cache to reflect new versions immediately
     invalidateGamesCache();
@@ -490,7 +490,7 @@ export async function runDataCollection(source: string = "AUTO_MULTI_SOURCE"): P
     };
   } catch (error: any) {
     const durationMs = Date.now() - startTime;
-    logs.push(`💥 [치명적 오류] 수집기 실행 실패: ${error.message}`);
+    logs.push(`[치명적 오류] 수집기 실행 실패: ${error.message}`);
 
     await prisma.dataCollectionJob.update({
       where: { id: job.id },

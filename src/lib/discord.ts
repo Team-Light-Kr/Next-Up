@@ -115,11 +115,11 @@ export async function logToDiscord(options: LogEventOptions) {
   const formattedDescription = [
     options.description ? `${options.description}\n` : "",
     divider,
-    "**📋 상세 파라미터 내역**",
+    "**상세 파라미터 내역**",
     ...detailLines,
     divider,
-    `🔗 [**패치노트 / 세부정보 바로가기**](${options.details?.sourceUrl || logUrl})`,
-    `🔒 [**관리자 전용 감사 로그 확인하기**](${logUrl}) *(비인가 접근 차단)*`,
+    `[**패치노트 / 세부정보 바로가기**](${options.details?.sourceUrl || logUrl})`,
+    `[**관리자 전용 감사 로그 확인하기**](${logUrl}) *(비인가 접근 차단)*`,
   ].filter(Boolean).join("\n");
 
   const discordPayload = {

@@ -11,6 +11,8 @@ import {
   verifyTotpCode,
 } from "@/lib/auth";
 import { logToDiscord } from "@/lib/discord";
+import { createSendwichVerification, checkSendwichStatus } from "@/lib/sendwich";
+
 
 export async function POST(request: Request) {
   try {
@@ -83,29 +85,45 @@ export async function POST(request: Request) {
       // If 2FA is enabled but code is not provided yet, initiate challenge
       if (!code) {
         if (twoFactorType === "SMS") {
-          if (!user.phoneNumber) {
-            return NextResponse.json(
-              { error: "SMS 2단계 인증이 활성화되어 있으나 등록된 전화번호가 없습니다." },
-              { status: 400 }
-            );
-          }
           const smsCode = generateVerificationCode();
-          await prisma.verificationCode.create({
-            data: {
-              email: cleanEmail,
-              code: smsCode,
-              purpose: "2FA",
-              expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-            },
+          try {
+            await prisma.verificationCode.create({
+              data: {
+                email: cleanEmail,
+                code: smsCode,
+                purpose: "2FA",
+                expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+              },
+            });
+          } catch {}
+
+          const sendwich = await createSendwichVerification({
+            expectedPhone: user.phoneNumber || undefined,
+            clientReference: cleanEmail,
           });
-          await sendSmsVerificationCode(user.phoneNumber, smsCode, cleanEmail);
-          const masked = user.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1-****-$2");
+
+          // 백업 이메일로도 6자리 코드 동시 발송
+          try {
+            await sendEmailVerificationCode(cleanEmail, smsCode, "2단계 인증");
+          } catch {}
+
           return NextResponse.json({
             require2FA: true,
             twoFactorType: "SMS",
-            message: `등록된 휴대폰(${masked}) 및 가입 이메일로 6자리 인증번호가 발송되었습니다.`,
+            sendwich: sendwich
+              ? {
+                  id: sendwich.id,
+                  destination: sendwich.destination,
+                  smsText: sendwich.sms_text,
+                  verificationUrl: sendwich.verification_url,
+                }
+              : null,
+            message: sendwich
+              ? `샌드위치 수신 번호 [${sendwich.destination}] 로 문구 [${sendwich.sms_text}] 를 문자로 전송해 주세요. (가입 이메일로도 6자리 코드가 발송되었습니다)`
+              : `가입 이메일(${cleanEmail})로 6자리 2단계 인증 코드가 발송되었습니다.`,
           });
-        } else if (twoFactorType === "OTP") {
+        }
+ else if (twoFactorType === "OTP") {
           return NextResponse.json({
             require2FA: true,
             twoFactorType: "OTP",
@@ -141,33 +159,48 @@ export async function POST(request: Request) {
           );
         }
       } else {
-        // SMS or EMAIL code verification
-        const validCode = await prisma.verificationCode.findFirst({
-          where: {
-            email: cleanEmail,
-            code: code.trim(),
-            purpose: { in: ["LOGIN", "2FA", "REGISTER", "VERIFY"] },
-            used: false,
-            expiresAt: { gt: new Date() },
-          },
-          orderBy: { createdAt: "desc" },
-        });
+        // SMS or EMAIL code verification (Supports both 6-digit codes and Sendwich verification IDs)
+        let isCodeValid = false;
 
-        if (!validCode) {
+        if (code.trim().startsWith("vrf_")) {
+          const swStatus = await checkSendwichStatus(code.trim());
+          if (swStatus.verified) {
+            isCodeValid = true;
+          }
+        }
+
+        if (!isCodeValid) {
+          const validCode = await prisma.verificationCode.findFirst({
+            where: {
+              email: cleanEmail,
+              code: code.trim(),
+              purpose: { in: ["LOGIN", "2FA", "REGISTER", "VERIFY"] },
+              used: false,
+              expiresAt: { gt: new Date() },
+            },
+            orderBy: { createdAt: "desc" },
+          });
+
+          if (validCode) {
+            isCodeValid = true;
+            try {
+              await prisma.verificationCode.update({
+                where: { id: validCode.id },
+                data: { used: true },
+              });
+            } catch {}
+          }
+        }
+
+        if (!isCodeValid) {
           return NextResponse.json(
-            { error: "인증번호가 일치하지 않거나 만료되었습니다." },
+            { error: "인증번호가 일치하지 않거나 문자 인증이 아직 완료되지 않았습니다." },
             { status: 400 }
           );
         }
-
-        try {
-          await prisma.verificationCode.update({
-            where: { id: validCode.id },
-            data: { used: true },
-          });
-        } catch {}
       }
     }
+
 
 
     // Check admin escalation for admin@koharu.live

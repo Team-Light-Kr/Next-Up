@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
     await logToDiscord({
       action: "ADMIN_GAME_CREATED",
-      title: `🎮 관리자 게임 공식 등록: ${game.canonicalName}`,
+      title: `관리자 게임 공식 등록: ${game.canonicalName}`,
       color: 0x2563eb,
       userId: currentUser.id,
       userEmail: currentUser.email,

@@ -105,7 +105,7 @@ export async function POST(request: Request) {
 
     await logToDiscord({
       action: "ADMIN_UPDATE_CREATED",
-      title: `⚡ 신규 패치노트 발행: [${update.version}] ${update.title}`,
+      title: `신규 패치노트 발행: [${update.version}] ${update.title}`,
       color: 0x3b82f6,
       userId: currentUser.id,
       userEmail: currentUser.email,

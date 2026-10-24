@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { generateProfileCode, signSessionToken, hashPassword } from "@/lib/auth";
 import { logToDiscord } from "@/lib/discord";
+import { checkSendwichStatus } from "@/lib/sendwich";
+
 
 export async function POST(request: Request) {
   try {
@@ -23,32 +25,46 @@ export async function POST(request: Request) {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // Verify code
-    const validCode = await prisma.verificationCode.findFirst({
-      where: {
-        email: cleanEmail,
-        code: code.trim(),
-        purpose: { in: ["REGISTER", "LOGIN", "2FA", "VERIFY"] },
-        used: false,
-        expiresAt: { gt: new Date() },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    // Verify code (Supports 6-digit verification code & Sendwich verification IDs)
+    let isCodeValid = false;
 
-    if (!validCode) {
+    if (code.trim().startsWith("vrf_")) {
+      const swStatus = await checkSendwichStatus(code.trim());
+      if (swStatus.verified) {
+        isCodeValid = true;
+      }
+    }
+
+    if (!isCodeValid) {
+      const validCode = await prisma.verificationCode.findFirst({
+        where: {
+          email: cleanEmail,
+          code: code.trim(),
+          purpose: { in: ["REGISTER", "LOGIN", "2FA", "VERIFY"] },
+          used: false,
+          expiresAt: { gt: new Date() },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (validCode) {
+        isCodeValid = true;
+        try {
+          await prisma.verificationCode.update({
+            where: { id: validCode.id },
+            data: { used: true },
+          });
+        } catch {}
+      }
+    }
+
+    if (!isCodeValid) {
       return NextResponse.json(
-        { error: "인증번호가 일치하지 않거나 만료되었습니다." },
+        { error: "인증번호가 일치하지 않거나 문자 인증이 아직 완료되지 않았습니다." },
         { status: 400 }
       );
     }
 
-    // Mark code as used (safe)
-    try {
-      await prisma.verificationCode.update({
-        where: { id: validCode.id },
-        data: { used: true },
-      });
-    } catch {}
 
 
     // Check existing

@@ -94,7 +94,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
-                            <TextBlock Text="✕" FontSize="11" Foreground="#475569" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Path Data="M 0 0 L 8 8 M 8 0 L 0 8" Stroke="#475569" StrokeThickness="1.2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -114,17 +114,17 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="🚀 NextUps 새 버전이 출시되었습니다!" Foreground="White" FontWeight="Bold" FontSize="12" Margin="0,0,10,0" />
+                            <TextBlock Text="NextUps 새 버전이 출시되었습니다!" Foreground="White" FontWeight="Bold" FontSize="12" Margin="0,0,10,0" />
                             <TextBlock x:Name="UpdateBannerText" Text="최신 기능과 보안 패치를 지금 즉시 적용하세요." Foreground="#DBEAFE" FontSize="11" />
                         </StackPanel>
                         <StackPanel x:Name="UpdateActionPanel" Grid.Column="1" Orientation="Horizontal">
                             <Button x:Name="UpdateDownloadButton" Click="InstallUpdate_Click" Background="White" Foreground="#1D4ED8" FontWeight="Bold" FontSize="11" Padding="12,5" Margin="0,0,8,0" Cursor="Hand" BorderThickness="0">
                                 <Border CornerRadius="6">
-                                    <TextBlock x:Name="UpdateDownloadButtonText" Text="지금 업데이트 ↗" />
+                                    <TextBlock x:Name="UpdateDownloadButtonText" Text="지금 업데이트" />
                                 </Border>
                             </Button>
                             <Button Click="DismissUpdate_Click" Background="Transparent" Foreground="White" FontSize="12" BorderThickness="0" Cursor="Hand" Padding="4">
-                                <TextBlock Text="✕" />
+                                <Path Data="M 0 0 L 7 7 M 7 0 L 0 7" Stroke="White" StrokeThickness="1.2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Button>
                         </StackPanel>
                     </Grid>
