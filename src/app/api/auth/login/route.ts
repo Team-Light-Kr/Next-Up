@@ -208,10 +208,12 @@ export async function POST(request: Request) {
     if (cleanEmail === "admin@koharu.live" || cleanEmail === "admin@nextups.xyz") {
       userRole = "ADMIN";
       if (user.role !== "ADMIN") {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { role: "ADMIN" },
-        });
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role: "ADMIN" },
+          });
+        } catch {}
       }
     }
 

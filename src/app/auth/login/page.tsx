@@ -58,7 +58,7 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "로그인에 실패했습니다.");
+        throw new Error(data.detail || data.error || "로그인에 실패했습니다.");
       }
 
       // Check if 2FA challenge is requested
@@ -393,14 +393,14 @@ export default function LoginPage() {
             </div>
           )}
 
-          {twoFactorMethod !== "OTP" && (
+          {require2FA && twoFactorMethod !== "OTP" && (
             <div className="flex items-center justify-between pt-1">
               <button
                 type="button"
                 onClick={handleSend2FACode}
                 className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
               >
-                {require2FA ? "인증번호 재발송 요청" : "2단계 보안코드 수동 요청"}
+                인증번호 재발송 요청
               </button>
             </div>
           )}
