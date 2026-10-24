@@ -8,8 +8,7 @@ export async function GET(request: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
 
-  // Target update versions
-  // Set latest version to 1.0.1 so clients running 1.0.0 will trigger update detection for testing
+  // Target update versions (v1.0.2)
   const latestVersions: Record<string, {
     version: string;
     releaseDate: string;
@@ -18,34 +17,33 @@ export async function GET(request: Request) {
     mandatory: boolean;
     changelog: string[];
   }> = {
-
     windows: {
-      version: "1.0.1",
+      version: "1.0.2",
       releaseDate: "2026-10-24",
       downloadUrl: `${appUrl}/api/download?file=exe`,
       webDownloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
-        "Microsoft WebView2 완전 제거 및 Chromium 자체 독립 엔진 탑재",
-        "커스텀 프레임리스 타이틀바 UI 및 다크 컨트롤 적용",
-        "Google 세이프 브라우징 검사 통과 및 ZIP 무설치 패키지 추가",
-        "신규 인앱 자동 업데이트 실시간 프로그레스 다운로더 연동",
+        "상단 타이틀바 UI 전면 개편 (둥근 모서리, 브랜드 심볼 로고, 다크 모던 스타일 적용)",
+        "Chromium 태그 및 네온 배지 완전 제거",
+        "구버전 프로세스 자동 종료 및 클린 덮어쓰기 지원",
+        "공식 Authenticode 디지털 인증서 서명 적용 (Team Light)",
+        "인앱 실시간 자동 업데이트 프로그레스 다운로더 지원",
       ],
     },
     android: {
-      version: "1.0.1",
+      version: "1.0.2",
       releaseDate: "2026-10-24",
       downloadUrl: `${appUrl}/api/download?file=apk`,
       webDownloadUrl: `${appUrl}/download`,
       mandatory: false,
       changelog: [
-        "모바일 반응형 뷰포트 정규화 및 데스크톱 모드 버그 해결",
-        "당겨서 새로고침(Swipe to Refresh) 성능 개선",
-        "안드로이드 실시간 패치 알림 인앱 자동 업데이트 확인 연동",
+        "모바일 반응형 뷰포트 정규화 및 터치 최적화",
+        "화면 당겨서 새로고침(Swipe Refresh) 감도 개선",
+        "인앱 최신 버전 감지 및 원클릭 다운로드 연동",
       ],
     },
   };
-
 
   const target = latestVersions[platform] || latestVersions.windows;
   // If version is less than latestVersion or if isTest is true, trigger update!

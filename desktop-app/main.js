@@ -6,7 +6,7 @@ const fs = require("fs");
 const os = require("os");
 const { spawn } = require("child_process");
 
-const APP_VERSION = "1.0.1";
+const APP_VERSION = "1.0.2";
 const LOGO_BASE64 = `data:image/png;base64,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`;
 
 const PRODUCTION_URL = "https://www.nextups.xyz";
@@ -35,7 +35,7 @@ function createWindow() {
     mainWindow.webContents.getUserAgent() + ` NextUpsDesktopApp/${APP_VERSION} (Windows)`
   );
 
-  // Inject custom titlebar with rounded styling, clean logo, no chromium tag, no neon
+  // Inject refined dark header with rounded top edges, no neon, no Chromium text
   mainWindow.webContents.on("dom-ready", () => {
     mainWindow.webContents.insertCSS(`
       #nextups-custom-titlebar {
@@ -44,8 +44,8 @@ function createWindow() {
         left: 0;
         right: 0;
         height: 38px;
-        background: #0f172a;
-        color: #f8fafc;
+        background: #090d16;
+        color: #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -55,8 +55,8 @@ function createWindow() {
         user-select: none;
         -webkit-app-region: drag;
         border-bottom: 1px solid #1e293b;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
       }
       #nextups-custom-titlebar .brand-group {
         display: flex;
@@ -66,7 +66,7 @@ function createWindow() {
       #nextups-custom-titlebar .brand-logo {
         width: 20px;
         height: 20px;
-        border-radius: 5px;
+        border-radius: 4px;
         object-fit: cover;
       }
       #nextups-custom-titlebar .brand-title {
@@ -86,17 +86,18 @@ function createWindow() {
       }
       #nextups-custom-titlebar .brand-badge {
         background: #1e293b;
-        color: #93c5fd;
+        color: #94a3b8;
         border: 1px solid #334155;
         font-size: 10px;
-        padding: 2px 7px;
-        border-radius: 6px;
+        padding: 2px 6px;
+        border-radius: 5px;
         font-weight: 600;
+        letter-spacing: 0.2px;
       }
       #nextups-custom-titlebar .window-controls {
         display: flex;
         align-items: center;
-        gap: 2px;
+        gap: 3px;
         -webkit-app-region: no-drag;
       }
       #nextups-custom-titlebar .win-btn-action {
@@ -124,13 +125,13 @@ function createWindow() {
         border: none;
         color: #94a3b8;
         width: 36px;
-        height: 34px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         font-size: 12px;
-        border-radius: 6px;
+        border-radius: 5px;
         transition: all 0.15s ease;
       }
       #nextups-custom-titlebar .win-btn:hover {
@@ -173,7 +174,6 @@ function createWindow() {
     `);
   });
 
-  // Try production first, fallback to localhost if offline/developing
   mainWindow.loadURL(PRODUCTION_URL).catch(() => {
     mainWindow.loadURL(LOCAL_URL);
   });
@@ -187,7 +187,6 @@ function createWindow() {
 }
 
 function checkForUpdates(isUserManualCheck = false) {
-  // Never pass test=true for production checks, compare version strictly
   const checkUrl = `${PRODUCTION_URL}/api/app/update?platform=windows&version=${APP_VERSION}`;
 
   const handleResponse = (res) => {
@@ -249,13 +248,12 @@ function checkForUpdates(isUserManualCheck = false) {
 function startInAppUpdateDownload(downloadUrl, latestVersion) {
   if (!mainWindow) return;
 
-  // Real-time progress banner directly inside window
   mainWindow.webContents.executeJavaScript(`
     let b = document.getElementById("nextups-inapp-update-bar");
     if (!b) {
       b = document.createElement("div");
       b.id = "nextups-inapp-update-bar";
-      b.style.cssText = "position:fixed;top:38px;left:0;right:0;z-index:99999;background:#0f172a;border-bottom:1px solid #2563eb;color:#fff;padding:12px 18px;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:8px;";
+      b.style.cssText = "position:fixed;top:38px;left:0;right:0;z-index:99999;background:#090d16;border-bottom:1px solid #2563eb;color:#fff;padding:12px 18px;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:8px;";
       b.innerHTML = \`
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div style="font-size:12px;font-weight:bold;color:#f8fafc;">NextUps v\${${JSON.stringify(latestVersion)}} 업데이트 다운로드 중...</div>

@@ -1,6 +1,6 @@
 ; Inno Setup 7 Script for NextUps Windows Desktop Client
 #define MyAppName "NextUps"
-#define MyAppVersion "1.0.1"
+#define MyAppVersion "1.0.2"
 #define MyAppPublisher "Team Light"
 #define MyAppURL "https://www.nextups.xyz"
 #define MyAppExeName "NextUps.exe"
@@ -25,6 +25,8 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
+CloseApplications=force
+RestartApplications=no
 
 [Languages]
 Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
@@ -43,3 +45,13 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  // 구버전 실행 중인 경우 강제 종료 후 덮어쓰기 보장
+  Exec('cmd.exe', '/c taskkill /F /IM NextUps.exe /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := True;
+end;

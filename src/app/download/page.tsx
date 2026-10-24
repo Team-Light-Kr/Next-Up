@@ -14,7 +14,7 @@ import { buildDownloadEmbed, toComponentEmbedJson } from "@/lib/discord-componen
 export const metadata = {
   title: "NextUps 앱 다운로드",
   description:
-    "NextUps 공식 Windows 데스크톱 클라이언트 및 Android 모바일 앱 최신 v1.0.1을 다운로드하세요.",
+    "NextUps 공식 Windows 데스크톱 클라이언트 및 Android 모바일 앱 최신 v1.0.2를 다운로드하세요.",
   other: {
     "discord:component-embed": toComponentEmbedJson(buildDownloadEmbed()),
   },
@@ -37,7 +37,7 @@ export default function DownloadPage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>v1.0.1 최신 정식 빌드 배포 완료</span>
+          <span>v1.0.2 최신 정식 빌드 배포 완료</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
           NextUps 앱 다운로드
@@ -57,7 +57,7 @@ export default function DownloadPage() {
                 <Monitor className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
-                v1.0.1 (Windows x64)
+                v1.0.2 (Windows x64)
               </span>
             </div>
 
@@ -73,11 +73,11 @@ export default function DownloadPage() {
             <div className="space-y-2.5 pt-1 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>독립 실행형 네이티브 데스크톱 클라이언트</span>
+                <span>둥근 모서리 커스텀 타이틀바 및 로고 적용 (네온 제거)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>둥근 모서리 커스텀 타이틀바 및 로고 적용</span>
+                <span>구버전 자동 종료 및 클린 덮어쓰기 인스톨러</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
@@ -96,7 +96,7 @@ export default function DownloadPage() {
               className="w-full py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
             >
               <Download className="w-4 h-4" />
-              <span>Windows 설치 프로그램 (v1.0.1 .exe)</span>
+              <span>Windows 설치 프로그램 (v1.0.2 .exe)</span>
             </a>
 
             <a
@@ -104,7 +104,7 @@ export default function DownloadPage() {
               className="w-full py-2.5 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium text-xs flex items-center justify-center gap-2 border border-slate-200 transition-colors"
             >
               <Archive className="w-3.5 h-3.5 text-slate-500" />
-              <span>무설치 포터블 버전 (v1.0.1 .zip)</span>
+              <span>무설치 포터블 버전 (v1.0.2 .zip)</span>
             </a>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
@@ -122,7 +122,7 @@ export default function DownloadPage() {
                 <Smartphone className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-                v1.0.1 Android
+                v1.0.2 Android
               </span>
             </div>
 
@@ -161,7 +161,7 @@ export default function DownloadPage() {
               className="w-full py-3 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
             >
               <Download className="w-4 h-4" />
-              <span>Android APK 다운로드 (v1.0.1)</span>
+              <span>Android APK 다운로드 (v1.0.2)</span>
             </a>
 
             <div className="py-2.5 text-center text-xs text-slate-600 font-medium">
@@ -176,7 +176,7 @@ export default function DownloadPage() {
         </div>
       </div>
 
-      {/* Changelog Section (v1.0.1 Release Notes) */}
+      {/* Changelog Section (v1.0.2 Release Notes) */}
       <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs space-y-5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center gap-2.5">
@@ -184,12 +184,12 @@ export default function DownloadPage() {
               <History className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">v1.0.1 주요 업데이트 내역 (Changelog)</h3>
+              <h3 className="text-sm font-bold text-slate-900">v1.0.2 주요 업데이트 내역 (Changelog)</h3>
               <p className="text-[11px] text-slate-500">배포일자: 2026년 10월 24일</p>
             </div>
           </div>
           <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
-            안정성 패치 완료
+            UI 및 버전 동기화 패치
           </span>
         </div>
 
@@ -197,23 +197,20 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Monitor className="w-3.5 h-3.5 text-blue-600" />
-              <span>Windows 데스크톱 v1.0.1 변경사항</span>
+              <span>Windows 데스크톱 v1.0.2 변경사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>
-                <strong className="text-slate-800">Microsoft WebView2 완전 제거</strong>: 독립 실행형 자체 Chromium 엔진으로 전환하여 설치 안정성 대폭 향상
+                <strong className="text-slate-800">상단바 UI 전면 개편</strong>: 둥근 모서리와 공식 브랜드 심볼 로고, 단정한 다크 슬레이트 스타일 적용 (Chromium 문구 및 네온 배지 완전 제거)
               </li>
               <li>
-                <strong className="text-slate-800">UI 리디자인</strong>: 상단 타이틀바 둥근 모서리 및 공식 NextUps 심볼 로고 적용, 네온 효과 제거
+                <strong className="text-slate-800">구버전 자동 종료 및 덮어쓰기</strong>: 설치 시 실행 중이던 이전 프로세스를 강제 종료하고 최신 파일로 완전 교체
               </li>
               <li>
-                <strong className="text-slate-800">디지털 인증서 서명 적용</strong>: Microsoft Authenticode 코드 서명을 적용하여 SmartScreen 보안 경고 방지
+                <strong className="text-slate-800">디지털 인증서 서명 갱신</strong>: 공식 Authenticode 코드 서명 및 타임스탬프 적용 (게시자: Team Light)
               </li>
               <li>
-                <strong className="text-slate-800">인앱 자동 다운로더 탑재</strong>: 새 버전 알림 시 브라우저 이동 없이 창 내에서 진행률 그래프와 함께 즉시 다운로드 및 자동 재시작
-              </li>
-              <li>
-                <strong className="text-slate-800">무설치 포터블 패키지(.zip)</strong> 제공 시작
+                <strong className="text-slate-800">인앱 자동 다운로더 안정화</strong>: 업데이트 감지 시 새 버전 패키지 즉시 다운로드 및 자동 재실행
               </li>
             </ul>
           </div>
@@ -221,20 +218,17 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-slate-800" />
-              <span>Android 모바일 v1.0.1 변경사항</span>
+              <span>Android 모바일 v1.0.2 변경사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>
-                <strong className="text-slate-800">모바일 반응형 최적화</strong>: 데스크톱 뷰포트 고정 현상 수정 및 모바일 전용 터치 최적화 레이아웃 적용
+                <strong className="text-slate-800">모바일 터치 최적화</strong>: 반응형 화면 정규화 및 모바일 기기 터치 반응 속도 개선
               </li>
               <li>
-                <strong className="text-slate-800">Swipe-to-Refresh 개선</strong>: 화면 상단을 아래로 당겨 실시간 패치 소식을 즉시 갱신하는 제스처 동작 안정화
+                <strong className="text-slate-800">Swipe-to-Refresh 안정화</strong>: 실시간 패치 소식 새로고침 감도 개선
               </li>
               <li>
-                <strong className="text-slate-800">인앱 최신 버전 감지</strong>: 앱 실행 시 최신 APK 빌드 여부를 자동 검사하고 간편 다운로드 링크 제공
-              </li>
-              <li>
-                <strong className="text-slate-800">5.3MB 초경량화</strong>: 빠른 로딩과 불필요한 캐시 소비 방지
+                <strong className="text-slate-800">인앱 최신 버전 알림</strong>: 새 버전 배포 감지 및 원클릭 수신
               </li>
             </ul>
           </div>

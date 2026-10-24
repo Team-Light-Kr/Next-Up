@@ -2,31 +2,40 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-// GitHub Releases 공식 영구 CDN 다운로드 베이스 URL (v1.0.1 최신)
+// GitHub Releases 공식 영구 CDN 다운로드 베이스 URL (v1.0.2 최신)
 const GITHUB_RELEASE_BASE =
-  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.1";
+  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.2";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const fileType = searchParams.get("file")?.toLowerCase() || "exe"; // exe, zip, apk
-  const requestedVersion = searchParams.get("v") || "v1.0.1";
+  const requestedVersion = searchParams.get("v") || "v1.0.2";
 
-  let fileName = "NextUps-Setup-v1.0.1.exe";
+  let fileName = "NextUps-Setup-v1.0.2.exe";
   let contentType = "application/vnd.microsoft.portable-executable";
 
   if (fileType === "zip") {
-    fileName = "NextUps-Windows-v1.0.1.zip";
+    fileName = "NextUps-Windows-v1.0.2.zip";
     contentType = "application/zip";
   } else if (fileType === "apk") {
-    fileName = "NextUps-v1.0.1.apk";
+    fileName = "NextUps-v1.0.2.apk";
     contentType = "application/vnd.android.package-archive";
   }
 
-
   const downloadsDir = path.join(process.cwd(), "public", "downloads");
-  const filePath = path.join(downloadsDir, fileName);
+  let filePath = path.join(downloadsDir, fileName);
 
-  // 로컬에 파일이 실제로 존재하는 경우 (개발 환경 또는 파일 포함 빌드)
+  // 로컬 폴더에 최신 파일이 없으면 v1.0.1 파일로 유연하게 폴백
+  if (!fs.existsSync(filePath)) {
+    const fallbackName = fileName.replace("1.0.2", "1.0.1");
+    const fallbackPath = path.join(downloadsDir, fallbackName);
+    if (fs.existsSync(fallbackPath)) {
+      filePath = fallbackPath;
+      fileName = fallbackName;
+    }
+  }
+
+  // 로컬에 파일이 실제로 존재하는 경우
   if (fs.existsSync(filePath)) {
     const stat = fs.statSync(filePath);
     const fileStream = fs.createReadStream(filePath);
@@ -51,8 +60,7 @@ export async function GET(request: Request) {
     });
   }
 
-  // Vercel Serverless / 프로덕션 환경: 대용량 바이너리(80MB+)는 GitHub Releases CDN으로 302 리디렉션
+  // CDN 리디렉션
   const remoteDownloadUrl = `${GITHUB_RELEASE_BASE}/${fileName}`;
   return NextResponse.redirect(remoteDownloadUrl, 302);
 }
-
