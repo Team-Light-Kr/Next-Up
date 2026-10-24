@@ -117,7 +117,7 @@ export default async function HomePage() {
               게임 업데이트와 패치 노트
             </h1>
             <p className="text-base text-neutral-600 leading-relaxed">
-              Windows, Android, iOS, macOS 플랫폼별 공식 릴리스 버전과 상세 변경 사항을 모아 제공합니다.
+              Windows, PlayStation, Nintendo Switch, Android, iOS, macOS 플랫폼별 공식 릴리스 버전과 상세 변경 사항을 모아 제공합니다.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-2.5">
@@ -161,7 +161,7 @@ export default async function HomePage() {
           <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wider">
             플랫폼 바로가기
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <Link
               href="/platforms/windows"
               className="p-4 rounded-xl border border-neutral-200 bg-white hover:border-neutral-400 transition-colors flex items-center gap-3"
@@ -172,6 +172,32 @@ export default async function HomePage() {
               <div>
                 <div className="font-semibold text-sm text-neutral-900">Windows</div>
                 <div className="text-[11px] text-neutral-400">PC / Steam</div>
+              </div>
+            </Link>
+
+            <Link
+              href="/platforms/playstation"
+              className="p-4 rounded-xl border border-neutral-200 bg-white hover:border-neutral-400 transition-colors flex items-center gap-3"
+            >
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
+                <Gamepad2 className="w-4 h-4 text-indigo-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-neutral-900">PlayStation</div>
+                <div className="text-[11px] text-neutral-400">PS5 / PS4</div>
+              </div>
+            </Link>
+
+            <Link
+              href="/platforms/nintendo"
+              className="p-4 rounded-xl border border-neutral-200 bg-white hover:border-neutral-400 transition-colors flex items-center gap-3"
+            >
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center">
+                <Gamepad2 className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-neutral-900">Nintendo</div>
+                <div className="text-[11px] text-neutral-400">Switch</div>
               </div>
             </Link>
 

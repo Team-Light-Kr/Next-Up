@@ -19,6 +19,7 @@ import {
   Shield,
   Activity,
   Download,
+  Gamepad2,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -174,6 +175,26 @@ export default function Navbar() {
                 >
                   <Apple className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
                   <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>iOS</span>
+                </Link>
+                <Link
+                  href="/platforms/playstation"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/playstation")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
+                >
+                  <Gamepad2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>PlayStation</span>
+                </Link>
+                <Link
+                  href="/platforms/nintendo"
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch("/platforms/nintendo")}
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
+                >
+                  <Gamepad2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Nintendo</span>
                 </Link>
                 <Link
                   href="/platforms/macos"
@@ -357,6 +378,22 @@ export default function Navbar() {
                 className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
               >
                 <Apple className="w-3.5 h-3.5 text-neutral-800" /> iOS
+              </Link>
+              <Link
+                href="/platforms/playstation"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Gamepad2 className="w-3.5 h-3.5 text-indigo-600" /> PlayStation
+              </Link>
+              <Link
+                href="/platforms/nintendo"
+                prefetch={true}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2.5 py-1.5 text-xs rounded-md bg-neutral-50 hover:bg-neutral-100 flex items-center gap-1.5"
+              >
+                <Gamepad2 className="w-3.5 h-3.5 text-red-600" /> Nintendo Switch
               </Link>
               <Link
                 href="/platforms/macos"

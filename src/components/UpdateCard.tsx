@@ -54,12 +54,12 @@ export default function UpdateCard({ update }: UpdateCardProps) {
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
           >
             {update.game.iconUrl ? (
-              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-200 shadow-xs overflow-hidden flex items-center justify-center p-0.5 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 shadow-xs overflow-hidden shrink-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={update.game.iconUrl}
                   alt={update.game.canonicalName}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </div>

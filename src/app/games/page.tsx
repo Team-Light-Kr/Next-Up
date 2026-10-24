@@ -28,7 +28,7 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  // 실시간 DB 직접 조회 (소프트/하드 삭제 즉시 반영 보장)
+  // 실시간 DB 직접 조회 (타겟 필드 선별 쿼리로 로딩 속도 극대화)
   const [platforms, allGamesRaw] = await Promise.all([
     prisma.platform.findMany({
       orderBy: { order: "asc" },
@@ -69,9 +69,18 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
         sort === "name"
           ? { canonicalName: "asc" }
           : { updatedAt: "desc" },
-      include: {
+      select: {
+        id: true,
+        slug: true,
+        canonicalName: true,
+        developer: true,
+        description: true,
+        iconUrl: true,
+        coverImageUrl: true,
+        genres: true,
         platforms: {
-          include: {
+          select: {
+            latestKnownVersion: true,
             platform: {
               select: {
                 key: true,
@@ -84,12 +93,8 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
     }),
   ]);
 
-  // 장르 목록 추출
-  const allGenresList = await prisma.game.findMany({
-    where: { status: "ACTIVE" },
-    select: { genres: true },
-  });
-  const allGenres = Array.from(new Set(allGenresList.flatMap((g) => g.genres || [])));
+  // 장르 목록 추출 (중복 쿼리 제거하여 로딩 지연 제거)
+  const allGenres = Array.from(new Set(allGamesRaw.flatMap((g) => g.genres || [])));
 
   const discordJson = toComponentEmbedJson(buildGamesListEmbed(allGamesRaw.length));
 

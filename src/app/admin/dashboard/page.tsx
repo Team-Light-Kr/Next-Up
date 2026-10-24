@@ -29,11 +29,16 @@ import {
   Smartphone,
   Eye,
   RefreshCw,
+  Search,
+  UserCheck,
+  UserX,
+  Trash2,
+  Radio,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"collector" | "email" | "reports" | "audit">("collector");
+  const [activeTab, setActiveTab] = useState<"collector" | "email" | "reports" | "audit" | "users">("collector");
   const [stats, setStats] = useState<any>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
@@ -41,6 +46,16 @@ export default function AdminDashboardPage() {
   const [runningCollector, setRunningCollector] = useState(false);
   const [collectorResult, setCollectorResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // User Management States
+  const [users, setUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userSearch, setUserSearch] = useState("");
+
+  // Real-time Live Security Audit Polling
+  const [livePolling, setLivePolling] = useState(true);
+  const [lastPollTime, setLastPollTime] = useState<string>("");
+  const [auditFilter, setAuditFilter] = useState<string>("ALL");
 
   // Custom email broadcaster states
   const [emailForm, setEmailForm] = useState({
@@ -52,10 +67,79 @@ export default function AdminDashboardPage() {
   const [sendingCustomEmail, setSendingCustomEmail] = useState(false);
   const [customEmailStatus, setCustomEmailStatus] = useState<string | null>(null);
 
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users || []);
+      }
+    } catch (err) {
+      console.error("fetchUsers error:", err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleUpdateUserStatus = async (userId: string, newStatus: string) => {
+    const actionLabel = newStatus === "ACTIVE" ? "활성" : "정지";
+    if (!confirm(`해당 회원의 계정 상태를 '${actionLabel}'(으)로 변경하시겠습니까?`)) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, status: newStatus } : u)));
+      fetchDashboardData();
+    } catch (err: any) {
+      alert(err.message || "상태 변경 실패");
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+    if (!confirm(`해당 회원의 권한을 '${newRole}'(으)로 변경하시겠습니까?`)) return;
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
+      fetchDashboardData();
+    } catch (err: any) {
+      alert(err.message || "권한 변경 실패");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string) => {
+    if (!confirm(`[경고] 회원 '${email}' 계정을 영구 삭제/탈퇴 처리하시겠습니까?`)) return;
+    try {
+      const res = await fetch(`/api/admin/users?userId=${userId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      fetchDashboardData();
+    } catch (err: any) {
+      alert(err.message || "삭제 실패");
+    }
+  };
+
   const handleSendCustomEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailForm.subject.trim() || !emailForm.message.trim()) {
       alert("제목과 내용을 모두 입력해 주세요.");
+      return;
+    }
+    if (emailForm.targetType === "CUSTOM" && !emailForm.customEmail) {
+      alert("수신할 회원을 목록에서 선택해 주세요.");
       return;
     }
     setSendingCustomEmail(true);
@@ -108,7 +192,29 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchUsers();
   }, []);
+
+  // Real-time live polling for Security Logs & Audit stream
+  useEffect(() => {
+    if (!livePolling) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/admin/stats");
+        if (res.ok) {
+          const d = await res.json();
+          if (d.recentLogs) {
+            setRecentLogs(d.recentLogs);
+          }
+          const now = new Date();
+          setLastPollTime(`${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`);
+        }
+      } catch (err) {
+        // silent
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [livePolling]);
 
 
   const handleRunCollector = async () => {
@@ -315,10 +421,10 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-200 space-x-6 text-xs sm:text-sm font-bold">
+      <div className="flex border-b border-slate-200 space-x-6 text-xs sm:text-sm font-bold overflow-x-auto">
         <button
           onClick={() => setActiveTab("collector")}
-          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
             activeTab === "collector"
               ? "border-blue-600 text-blue-600"
               : "border-transparent text-slate-500 hover:text-slate-800"
@@ -328,10 +434,21 @@ export default function AdminDashboardPage() {
           <span>실시간 데이터 자동 수집 센터</span>
         </button>
 
+        <button
+          onClick={() => setActiveTab("users")}
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
+            activeTab === "users"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <UserCheck className="w-4 h-4 text-purple-600" />
+          <span>회원 통합 관리 ({users.length})</span>
+        </button>
 
         <button
           onClick={() => setActiveTab("email")}
-          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
             activeTab === "email"
               ? "border-blue-600 text-blue-600"
               : "border-transparent text-slate-500 hover:text-slate-800"
@@ -343,7 +460,7 @@ export default function AdminDashboardPage() {
 
         <button
           onClick={() => setActiveTab("reports")}
-          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
             activeTab === "reports"
               ? "border-blue-600 text-blue-600"
               : "border-transparent text-slate-500 hover:text-slate-800"
@@ -355,14 +472,14 @@ export default function AdminDashboardPage() {
 
         <button
           onClick={() => setActiveTab("audit")}
-          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+          className={`pb-3.5 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 ${
             activeTab === "audit"
               ? "border-blue-600 text-blue-600"
               : "border-transparent text-slate-500 hover:text-slate-800"
           }`}
         >
-          <History className="w-4 h-4" />
-          <span>보안 감사 실시간 로그</span>
+          <Radio className="w-4 h-4 text-emerald-500 animate-pulse" />
+          <span>실시간 보안 및 사용자 감시 로그</span>
         </button>
       </div>
 
@@ -444,6 +561,169 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* TAB: Integrated User Management */}
+      {activeTab === "users" && (
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs space-y-6 p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <UserCheck className="w-5 h-5 text-purple-600" />
+                <span>회원 통합 관리 센터</span>
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                전체 가입 회원의 계정 상태(활성/정지), 권한(USER/ADMIN) 관리 및 탈퇴 처리를 총괄합니다.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="이메일 또는 닉네임 검색..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <button
+                onClick={fetchUsers}
+                disabled={loadingUsers}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? "animate-spin" : ""}`} />
+                <span>새로고침</span>
+              </button>
+            </div>
+          </div>
+
+          {/* User Table */}
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
+                  <th className="py-3 px-4">회원 정보</th>
+                  <th className="py-3 px-4">권한 (Role)</th>
+                  <th className="py-3 px-4">계정 상태</th>
+                  <th className="py-3 px-4">가입 일자</th>
+                  <th className="py-3 px-4 text-right">관리 작업</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {users
+                  .filter((u) => {
+                    if (!userSearch) return true;
+                    const q = userSearch.toLowerCase();
+                    return (
+                      u.email.toLowerCase().includes(q) ||
+                      (u.displayName && u.displayName.toLowerCase().includes(q))
+                    );
+                  })
+                  .map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          {u.avatarUrl ? (
+                            <img
+                              src={u.avatarUrl}
+                              alt=""
+                              className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
+                              {(u.displayName || u.email)[0].toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-bold text-slate-900">
+                              {u.displayName || "이름 미설정"}
+                            </div>
+                            <div className="text-[11px] text-slate-500 font-mono">
+                              {u.email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-bold text-[10px] ${
+                            u.role === "ADMIN"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          {u.role === "ADMIN" ? "관리자 (ADMIN)" : "일반 회원 (USER)"}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md font-bold text-[10px] ${
+                            u.status === "ACTIVE"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              u.status === "ACTIVE" ? "bg-emerald-500" : "bg-red-500"
+                            }`}
+                          />
+                          {u.status === "ACTIVE" ? "정상 이용중" : "이용 정지 (SUSPENDED)"}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-500 text-[11px] font-mono">
+                        {new Date(u.createdAt).toLocaleDateString("ko-KR")}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="inline-flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              handleUpdateUserRole(u.id, u.role === "ADMIN" ? "USER" : "ADMIN")
+                            }
+                            title="권한 변경"
+                            className="px-2.5 py-1 text-[11px] rounded-lg border border-slate-200 hover:bg-slate-100 font-semibold text-slate-700 transition-colors cursor-pointer"
+                          >
+                            {u.role === "ADMIN" ? "일반으로 강등" : "관리자 임명"}
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleUpdateUserStatus(
+                                u.id,
+                                u.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE"
+                              )
+                            }
+                            title="계정 정지 토글"
+                            className={`px-2.5 py-1 text-[11px] rounded-lg font-semibold transition-colors cursor-pointer ${
+                              u.status === "ACTIVE"
+                                ? "bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200"
+                                : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                            }`}
+                          >
+                            {u.status === "ACTIVE" ? "정지" : "정지 해제"}
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.email)}
+                            title="회원 영구 탈퇴/삭제"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* TAB: Custom Email Broadcaster */}
       {activeTab === "email" && (
@@ -498,16 +778,21 @@ export default function AdminDashboardPage() {
               {emailForm.targetType === "CUSTOM" && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    수신자 이메일 주소 *
+                    수신 회원 선택 * ({users.length}명 등록됨)
                   </label>
-                  <input
-                    type="email"
+                  <select
                     required
-                    placeholder="user@example.com"
                     value={emailForm.customEmail}
                     onChange={(e) => setEmailForm({ ...emailForm, customEmail: e.target.value })}
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                  />
+                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                  >
+                    <option value="">-- 수신할 회원을 선택하세요 --</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.email}>
+                        {u.displayName ? `${u.displayName} (${u.email})` : u.email} [{u.role === "ADMIN" ? "관리자" : "일반"}] {u.status === "SUSPENDED" ? "(정지계정)" : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             </div>
@@ -643,56 +928,185 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 4: Security Audit Logs Hub */}
+      {/* TAB 4: Real-time User Activity & Suspicious Anomaly Watch Stream */}
       {activeTab === "audit" && (
         <div className="space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <History className="w-4 h-4 text-blue-600" />
-                  <span>실시간 보안 감사 로그 스트림</span>
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Radio className="w-5 h-5 text-emerald-500 animate-pulse" />
+                    <span>실시간 사용자 행동 및 이상 징후 감시 레이더</span>
+                  </h2>
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                    3초 주기 자동 감시
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 mt-1">
-                  모든 계정 변경, 로그인, 게임 등록, 패치 발행 이벤트가 Discord Webhook 및 DB에 즉시 기록됩니다.
+                  회원 로그인, 비정상 요청, 권한 탈취 시도, 계정 제재, 패치 등록 등의 활동을 실시간 스트리밍합니다.
                 </p>
               </div>
-              <Link
-                href="/admin/logs"
-                className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs"
-              >
-                감사 로그 전체 보기 ↗
-              </Link>
+
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => setLivePolling(!livePolling)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    livePolling
+                      ? "bg-emerald-600 text-white shadow-xs"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${livePolling ? "animate-spin" : ""}`} />
+                  <span>{livePolling ? "실시간 감시 중" : "감시 일시중지"}</span>
+                </button>
+
+                <button
+                  onClick={fetchDashboardData}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  수동 갱신
+                </button>
+
+                <Link
+                  href="/admin/logs"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs"
+                >
+                  전체 로그 ↗
+                </Link>
+              </div>
             </div>
 
-            <div className="divide-y divide-slate-100">
-              {recentLogs.length > 0 ? (
-                recentLogs.map((l: any) => (
-                  <div key={l.id} className="p-4 hover:bg-slate-50/60 transition-colors flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
-                          {l.action}
-                        </span>
-                        <span className="text-xs font-bold text-slate-900">
-                          {l.title || "보안 이벤트"}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {l.user?.email && <span>사용자: <code>{l.user.email}</code> | </span>}
-                        <span>IP: <code>{l.ipAddress || "127.0.0.1"}</code></span>
-                      </div>
-                    </div>
+            {/* Filter Pills */}
+            <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-500 text-[11px]">필터링:</span>
+                {[
+                  { id: "ALL", label: "전체 로그" },
+                  { id: "ANOMALY", label: "⚠️ 이상 징후 / 경고 감지" },
+                  { id: "AUTH", label: "🔐 인증 및 계정 활동" },
+                  { id: "SYSTEM", label: "⚙️ 시스템 및 패치 작업" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setAuditFilter(f.id)}
+                    className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-colors cursor-pointer ${
+                      auditFilter === f.id
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
 
-                    <Link
-                      href={`/admin/logs/${l.id}`}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-white hover:text-blue-600 transition-colors shrink-0"
+              {lastPollTime && (
+                <span className="text-[10px] text-slate-400 font-mono">
+                  최근 핑: {lastPollTime}
+                </span>
+              )}
+            </div>
+
+            {/* Stream Logs */}
+            <div className="divide-y divide-slate-100">
+              {recentLogs
+                .filter((l: any) => {
+                  const act = (l.action || "").toUpperCase();
+                  if (auditFilter === "ANOMALY") {
+                    return (
+                      act.includes("FAIL") ||
+                      act.includes("SUSPEND") ||
+                      act.includes("BAN") ||
+                      act.includes("DELETE") ||
+                      act.includes("WARN") ||
+                      act.includes("ERROR") ||
+                      act.includes("DENIED") ||
+                      act.includes("UNAUTHORIZED")
+                    );
+                  }
+                  if (auditFilter === "AUTH") {
+                    return act.includes("USER") || act.includes("LOGIN") || act.includes("AUTH") || act.includes("ROLE");
+                  }
+                  if (auditFilter === "SYSTEM") {
+                    return act.includes("COLLECT") || act.includes("PATCH") || act.includes("GAME") || act.includes("EMAIL");
+                  }
+                  return true;
+                })
+                .map((l: any) => {
+                  const act = (l.action || "").toUpperCase();
+                  const isAnomaly =
+                    act.includes("FAIL") ||
+                    act.includes("SUSPEND") ||
+                    act.includes("BAN") ||
+                    act.includes("DELETE") ||
+                    act.includes("WARN") ||
+                    act.includes("ERROR") ||
+                    act.includes("DENIED");
+
+                  return (
+                    <div
+                      key={l.id}
+                      className={`p-4 transition-colors flex items-center justify-between gap-4 ${
+                        isAnomaly ? "bg-red-50/50 hover:bg-red-50" : "hover:bg-slate-50/60"
+                      }`}
                     >
-                      상세 보기
-                    </Link>
-                  </div>
-                ))
-              ) : (
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                              isAnomaly
+                                ? "bg-red-100 text-red-700 border border-red-200 animate-pulse"
+                                : "bg-slate-100 text-slate-700"
+                            }`}
+                          >
+                            {l.action}
+                          </span>
+
+                          {isAnomaly && (
+                            <span className="text-[10px] font-bold text-red-600 bg-red-100/70 px-1.5 py-0.5 rounded">
+                              이상 징후 감지
+                            </span>
+                          )}
+
+                          <span className="text-xs font-bold text-slate-900 truncate">
+                            {l.title || "보안 감사 이벤트"}
+                          </span>
+
+                          <span className="text-[11px] text-slate-400 font-mono ml-auto">
+                            {new Date(l.createdAt).toLocaleTimeString("ko-KR")}
+                          </span>
+                        </div>
+
+                        <div className="text-[11px] text-slate-500 flex items-center gap-3 flex-wrap">
+                          {l.user?.email && (
+                            <span>
+                              회원: <code className="text-purple-600 font-semibold">{l.user.email}</code>
+                            </span>
+                          )}
+                          <span>
+                            IP: <code className="text-slate-600">{l.ipAddress || "127.0.0.1"}</code>
+                          </span>
+                          {l.details && (
+                            <span className="text-slate-400 truncate max-w-md">
+                              | {typeof l.details === "string" ? l.details : JSON.stringify(l.details)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <Link
+                        href={`/admin/logs/${l.id}`}
+                        className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-white hover:text-blue-600 transition-colors shrink-0"
+                      >
+                        상세
+                      </Link>
+                    </div>
+                  );
+                })}
+
+              {recentLogs.length === 0 && (
                 <div className="p-10 text-center text-xs text-slate-400">
                   기록된 보안 감사 로그가 없습니다.
                 </div>

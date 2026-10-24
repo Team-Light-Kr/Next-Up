@@ -32,9 +32,11 @@ export interface FastGame {
 
 const FALLBACK_PLATFORMS: FastPlatform[] = [
   { id: "cmvjkgnfq0000uy2wl833nvd6", key: "windows", name: "Windows", order: 1 },
-  { id: "cmvjkgnfr0001uy2wk3i71k7x", key: "android", name: "Android", order: 2 },
-  { id: "cmvjkgnfr0002uy2wq8x9m1t5", key: "ios", name: "iOS", order: 3 },
-  { id: "cmvjkgnfr0003uy2w2p4n7v8e", key: "macos", name: "macOS", order: 4 },
+  { id: "cmvjkgnfq0004uy2w9z8v1p3a", key: "playstation", name: "PlayStation", order: 2 },
+  { id: "cmvjkgnfq0005uy2w4r6x7k2b", key: "nintendo", name: "Nintendo Switch", order: 3 },
+  { id: "cmvjkgnfr0001uy2wk3i71k7x", key: "android", name: "Android", order: 4 },
+  { id: "cmvjkgnfr0002uy2wq8x9m1t5", key: "ios", name: "iOS", order: 5 },
+  { id: "cmvjkgnfr0003uy2w2p4n7v8e", key: "macos", name: "macOS", order: 6 },
 ];
 
 export const FALLBACK_GAMES: FastGame[] = [];

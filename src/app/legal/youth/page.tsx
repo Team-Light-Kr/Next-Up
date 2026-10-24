@@ -45,7 +45,7 @@ export default function YouthProtectionPage() {
           <div className="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              <span>시행일자: 2026년 10월 25일 (정식 출시)</span>
+              <span>시행일자: 2026년 10월 25일</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-400">
               <span>(현재 시스템 기준일: <CurrentDate format="full" />)</span>

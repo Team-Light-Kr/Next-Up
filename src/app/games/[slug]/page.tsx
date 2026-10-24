@@ -172,12 +172,12 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
             {/* Game Icon */}
             {game.iconUrl ? (
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border border-slate-200 shadow-sm bg-slate-900 overflow-hidden flex items-center justify-center p-1.5 shrink-0">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl border border-slate-200 shadow-sm bg-slate-100 overflow-hidden shrink-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={game.iconUrl}
                   alt={game.canonicalName}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -283,11 +283,18 @@ export default async function GameDetailPage({ params }: GameDetailPageProps) {
                   </div>
 
                   <div className="space-y-1">
-                    <div className="text-xs text-slate-500">
-                      최신 확인 버전
+                    <div className="text-xs text-slate-500 font-medium">
+                      공식 빌드 버전
                     </div>
                     <div className="text-lg font-mono font-bold text-slate-900">
-                      {gp.latestKnownVersion || "정보 없음"}
+                      {(() => {
+                        const v = gp.latestKnownVersion;
+                        if (v && !v.includes("공식 정기 패치") && !v.includes("최신 확인")) {
+                          return v;
+                        }
+                        const u = game.updates?.find((up: any) => up.platformId === gp.platformId || up.platform?.key === gp.platform?.key);
+                        return u?.version || game.updates?.[0]?.version || "최신 안정 버전";
+                      })()}
                     </div>
                   </div>
                 </div>
