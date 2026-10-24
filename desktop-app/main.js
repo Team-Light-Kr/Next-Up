@@ -4,8 +4,8 @@ const http = require("http");
 const https = require("https");
 
 const APP_VERSION = "1.0.0";
-const PRIMARY_URL = "http://localhost:3000";
-const FALLBACK_URL = "https://www.nextups.xyz";
+const PRODUCTION_URL = "https://www.nextups.xyz";
+const LOCAL_URL = "http://localhost:3000";
 
 let mainWindow = null;
 
@@ -119,23 +119,20 @@ function createWindow() {
     `);
   });
 
-  // Try localhost first, fallback to production
-  const testReq = http.get(PRIMARY_URL, (res) => {
-    mainWindow.loadURL(PRIMARY_URL);
-  });
-  testReq.on("error", () => {
-    mainWindow.loadURL(FALLBACK_URL);
+  // Try production first, fallback to localhost if offline/developing
+  mainWindow.loadURL(PRODUCTION_URL).catch(() => {
+    mainWindow.loadURL(LOCAL_URL);
   });
 
   // Check for updates after window loads
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
-    setTimeout(checkForUpdates, 2500);
+    setTimeout(checkForUpdates, 2000);
   });
 }
 
 function checkForUpdates() {
-  const checkUrl = `${PRIMARY_URL}/api/app/update?platform=windows&version=${APP_VERSION}&test=true`;
+  const checkUrl = `${PRODUCTION_URL}/api/app/update?platform=windows&version=${APP_VERSION}&test=true`;
   
   const handleResponse = (res) => {
     let data = "";
@@ -166,10 +163,10 @@ function checkForUpdates() {
     });
   };
 
-  const req = http.get(checkUrl, handleResponse);
+  const req = https.get(checkUrl, handleResponse);
   req.on("error", () => {
-    const fallbackReq = https.get(
-      `${FALLBACK_URL}/api/app/update?platform=windows&version=${APP_VERSION}&test=true`,
+    const fallbackReq = http.get(
+      `${LOCAL_URL}/api/app/update?platform=windows&version=${APP_VERSION}&test=true`,
       handleResponse
     );
     fallbackReq.on("error", () => {});

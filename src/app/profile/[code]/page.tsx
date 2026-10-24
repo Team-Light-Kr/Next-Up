@@ -6,6 +6,8 @@ import { getCurrentUser } from "@/lib/auth";
 import GameCard from "@/components/GameCard";
 import { User, ShieldCheck, Heart, Settings, Calendar, ExternalLink, Share2 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface ProfilePageProps {
   params: Promise<{
     code: string;

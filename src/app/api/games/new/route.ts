@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { logToDiscord } from "@/lib/discord";
+import { invalidateGamesCache } from "@/lib/games-cache";
 
 export async function POST(request: Request) {
   try {
@@ -93,6 +94,9 @@ export async function POST(request: Request) {
         platformCount: platforms?.length || 0,
       },
     });
+
+    // Invalidate in-memory games cache immediately
+    invalidateGamesCache();
 
     return NextResponse.json({ success: true, game });
   } catch (error: any) {

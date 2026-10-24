@@ -14,16 +14,7 @@ import {
   Gamepad2,
 } from "lucide-react";
 
-export const revalidate = 30; // ISR: cache and serve in < 1ms
-
-export function generateStaticParams() {
-  return [
-    { platform: "windows" },
-    { platform: "android" },
-    { platform: "ios" },
-    { platform: "macos" },
-  ];
-}
+export const dynamic = "force-dynamic";
 
 interface PlatformMeta {
   key: string;

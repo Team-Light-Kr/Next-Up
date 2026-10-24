@@ -15,7 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   let totalGames = 0;

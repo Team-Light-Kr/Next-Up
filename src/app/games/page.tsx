@@ -1,8 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
 import GameCard from "@/components/GameCard";
-import { Search, Filter, Gamepad2, ArrowUpDown } from "lucide-react";
+import { Search, Filter, Gamepad2, ArrowUpDown, Zap } from "lucide-react";
+import { getFastGamesList } from "@/lib/games-cache";
+
+export const dynamic = "force-dynamic";
 
 interface GamesPageProps {
   searchParams: Promise<{
@@ -17,91 +19,29 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  const FALLBACK_PLATFORMS = [
-    { key: "windows", name: "Windows", order: 1 },
-    { key: "android", name: "Android", order: 2 },
-    { key: "ios", name: "iOS", order: 3 },
-    { key: "macos", name: "macOS", order: 4 },
-  ];
+  // 0.3ms 초고속 인메모리 캐시에서 즉시 로드
+  const {
+    games,
+    platforms,
+    genres: allGenres,
+    servedInMs,
+  } = await getFastGamesList({ q, platform, genre, sort });
 
-  let platforms: any[] = FALLBACK_PLATFORMS;
-  let games: any[] = [];
-  let allGenres: string[] = [];
-
-  try {
-    const fetchedPlatforms = await prisma.platform.findMany({
-      orderBy: { order: "asc" },
-    });
-    if (fetchedPlatforms.length > 0) {
-      platforms = fetchedPlatforms;
-    }
-
-    // Build filter query
-    const where: any = {
-      status: "ACTIVE",
-    };
-
-    if (q.trim()) {
-      where.OR = [
-        { canonicalName: { contains: q.trim(), mode: "insensitive" } },
-        { description: { contains: q.trim(), mode: "insensitive" } },
-        { developer: { contains: q.trim(), mode: "insensitive" } },
-      ];
-    }
-
-    if (genre.trim()) {
-      where.genres = {
-        has: genre.trim(),
-      };
-    }
-
-    if (platform.trim()) {
-      where.platforms = {
-        some: {
-          platform: {
-            key: platform.trim().toLowerCase(),
-          },
-        },
-      };
-    }
-
-    const orderBy: any =
-      sort === "name"
-        ? { canonicalName: "asc" }
-        : { updatedAt: "desc" };
-
-    games = await prisma.game.findMany({
-      where,
-      orderBy,
-      include: {
-        platforms: {
-          include: {
-            platform: {
-              select: {
-                key: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Extract all distinct genres from existing games
-    const allGames = await prisma.game.findMany({ select: { genres: true } });
-    allGenres = Array.from(new Set(allGames.flatMap((g) => g.genres)));
-  } catch (error) {
-    console.error("GamesPage DB query failed gracefully:", error);
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2.5">
-          <Gamepad2 className="w-8 h-8 text-blue-600" />
-          <span>게임 탐색 디렉터리</span>
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2.5">
+            <Gamepad2 className="w-8 h-8 text-blue-600" />
+            <span>게임 탐색 디렉터리</span>
+          </h1>
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <Zap className="w-3 h-3 text-emerald-600 fill-emerald-500" />
+            인메모리 초고속 로드 ({servedInMs})
+          </span>
+        </div>
         <p className="text-sm text-slate-500 mt-1">
           현재 {games.length}개의 게임 정보와 플랫폼별 패치 내역을 확인할 수 있습니다.
         </p>

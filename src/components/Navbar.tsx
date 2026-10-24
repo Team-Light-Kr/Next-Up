@@ -99,12 +99,13 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-neutral-600 shrink-0">
+            <nav className="hidden md:flex items-center gap-2 text-sm font-medium text-neutral-600 shrink-0 whitespace-nowrap" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
               <Link
                 href="/"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/")}
-                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap"
+                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap shrink-0"
+                style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
               >
                 홈
               </Link>
@@ -112,7 +113,8 @@ export default function Navbar() {
                 href="/games"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/games")}
-                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap"
+                className="px-2.5 py-1.5 rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors whitespace-nowrap shrink-0"
+                style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
               >
                 게임
               </Link>
@@ -120,86 +122,93 @@ export default function Navbar() {
                 href="/download"
                 prefetch={true}
                 onMouseEnter={() => router.prefetch("/download")}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs hover:bg-blue-100 transition-colors whitespace-nowrap shrink-0"
+                style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
               >
                 <Download className="w-3.5 h-3.5 shrink-0" />
-                <span>다운로드</span>
+                <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>다운로드</span>
               </Link>
 
-              <div className="h-3.5 w-px bg-neutral-200 mx-1 shrink-0" />
+              <div className="hidden 2xl:block h-3.5 w-px bg-neutral-200 mx-1 shrink-0" />
 
-              <div className="hidden lg:flex items-center gap-1 shrink-0">
+              <div className="hidden 2xl:flex items-center gap-1 shrink-0 whitespace-nowrap">
                 <Link
                   href="/platforms/windows"
                   prefetch={true}
                   onMouseEnter={() => router.prefetch("/platforms/windows")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
                   <Monitor className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                  <span>Windows</span>
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Windows</span>
                 </Link>
                 <Link
                   href="/platforms/android"
                   prefetch={true}
                   onMouseEnter={() => router.prefetch("/platforms/android")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
                   <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Android</span>
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>Android</span>
                 </Link>
                 <Link
                   href="/platforms/ios"
                   prefetch={true}
                   onMouseEnter={() => router.prefetch("/platforms/ios")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
                   <Apple className="w-3.5 h-3.5 text-neutral-800 shrink-0" />
-                  <span>iOS</span>
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>iOS</span>
                 </Link>
                 <Link
                   href="/platforms/macos"
                   prefetch={true}
                   onMouseEnter={() => router.prefetch("/platforms/macos")}
-                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-2 py-1 text-xs rounded-md hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
                   <Laptop className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                  <span>macOS</span>
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>macOS</span>
                 </Link>
               </div>
             </nav>
           </div>
 
           {/* Search Bar & User Actions */}
-          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
-            <form onSubmit={handleSearchSubmit} className="relative">
+          <div className="hidden sm:flex items-center gap-2 shrink-0 whitespace-nowrap" style={{ whiteSpace: "nowrap" }}>
+            <form onSubmit={handleSearchSubmit} className="relative shrink-0">
               <input
                 type="text"
-                placeholder="게임 또는 패치 검색..."
+                placeholder="게임·패치 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-48 lg:w-56 pl-8 pr-3 py-1.5 text-xs rounded-md border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                className="w-32 md:w-36 lg:w-48 pl-7 pr-2.5 py-1 text-xs rounded-md border border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-400 shrink-0"
               />
-              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-neutral-400" />
+              <Search className="w-3.5 h-3.5 absolute left-2 top-2 text-neutral-400" />
             </form>
 
             {currentUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap" style={{ whiteSpace: "nowrap", flexShrink: 0 }}>
                 {/* Member Game Registration Button */}
                 <Link
                   href="/games/new"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100 transition-colors"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100 transition-colors whitespace-nowrap shrink-0"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>게임 등록</span>
+                  <Plus className="w-3.5 h-3.5 shrink-0" />
+                  <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>게임 등록</span>
                 </Link>
 
                 {/* Notifications */}
                 <Link
                   href="/notifications"
-                  className="relative p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 transition-colors"
+                  className="relative p-1.5 rounded-md text-neutral-500 hover:text-neutral-900 transition-colors shrink-0"
                   title="알림함"
+                  style={{ flexShrink: 0 }}
                 >
-                  <Bell className="w-4 h-4" />
+                  <Bell className="w-4 h-4 shrink-0" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-600" />
                   )}
@@ -208,30 +217,33 @@ export default function Navbar() {
                 {/* Profile Link */}
                 <Link
                   href={`/profile/${currentUser.profileCode}`}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 text-neutral-800 hover:bg-neutral-200 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-neutral-100 text-neutral-800 hover:bg-neutral-200 transition-colors whitespace-nowrap shrink-0 max-w-[130px] truncate"
+                  style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                 >
-                  <User className="w-3.5 h-3.5" />
-                  <span>{currentUser.displayName}</span>
+                  <User className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate" style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>{currentUser.displayName}</span>
                 </Link>
 
                 {/* Admin Only Dashboard Button */}
                 {(currentUser.role === "ADMIN" || currentUser.email === "admin@koharu.live") && (
                   <Link
                     href="/admin/dashboard"
-                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-neutral-900 text-white hover:opacity-90"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-neutral-900 text-white hover:opacity-90 whitespace-nowrap shrink-0"
                     title="관리자 전용 대시보드"
+                    style={{ whiteSpace: "nowrap", flexShrink: 0, wordBreak: "keep-all" }}
                   >
-                    <Activity className="w-3 h-3 text-emerald-400" />
-                    <span>어드민</span>
+                    <Activity className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span style={{ whiteSpace: "nowrap", wordBreak: "keep-all" }}>어드민</span>
                   </Link>
                 )}
 
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 text-neutral-400 hover:text-neutral-700 transition-colors"
+                  className="p-1.5 text-neutral-400 hover:text-neutral-700 transition-colors shrink-0 cursor-pointer"
                   title="로그아웃"
+                  style={{ flexShrink: 0 }}
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
                 </button>
               </div>
             ) : (

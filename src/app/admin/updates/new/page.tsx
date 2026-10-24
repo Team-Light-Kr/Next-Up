@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import UpdateForm from "./UpdateForm";
 import { ArrowLeft } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function NewUpdatePage() {
   const [games, platforms] = await Promise.all([
     prisma.game.findMany({

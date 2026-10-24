@@ -27,6 +27,19 @@ body {
   min-height: 100vh;
 }
 
+/* Force navbar and header items to never break into multiple lines */
+header nav a,
+header nav span,
+header nav button,
+header a,
+header button {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  flex-shrink: 0 !important;
+}
+
+
 /* Custom Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

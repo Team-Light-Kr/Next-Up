@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkForAppUpdates() {
         new Thread(() -> {
             try {
-                String updateUrl = FALLBACK_URL + "/api/app/update?platform=android&version=" + APP_VERSION;
+                String updateUrl = FALLBACK_URL + "/api/app/update?platform=android&version=" + APP_VERSION + "&test=true";
                 URL url = new URL(updateUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");

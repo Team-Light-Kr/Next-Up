@@ -20,6 +20,8 @@ import {
   Download,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface GameDetailPageProps {
   params: Promise<{
     slug: string;

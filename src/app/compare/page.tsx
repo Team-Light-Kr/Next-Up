@@ -3,6 +3,8 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { GitCompare, ArrowLeft, ArrowRight, Layers, Clock } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 interface ComparePageProps {
   searchParams: Promise<{
     left?: string;
