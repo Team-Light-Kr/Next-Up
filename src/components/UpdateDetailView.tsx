@@ -2,13 +2,15 @@
 
 import React, { useState } from "react";
 import MarkdownRenderer from "./MarkdownRenderer";
-import { Sparkles, Languages, Check, Loader2, RefreshCw } from "lucide-react";
+import { Sparkles, Languages, Check, Loader2, ExternalLink, FileText, Globe } from "lucide-react";
 
 interface UpdateDetailViewProps {
   updateId: string;
   initialTitle: string;
   initialSummary: string | null;
   initialBody: string;
+  sourceUrl?: string | null;
+  sourceName?: string | null;
   initialTranslations: {
     language: string;
     title: string;
@@ -17,25 +19,23 @@ interface UpdateDetailViewProps {
   }[];
 }
 
-const LANGUAGES = [
-  { code: "ko", label: "한국어", flag: "🇰🇷" },
-  { code: "en", label: "영어 (English)", flag: "🇺🇸" },
-  { code: "ja", label: "일본어 (日本語)", flag: "🇯🇵" },
-  { code: "zh", label: "중국어 (中文)", flag: "🇨🇳" },
-];
-
 export default function UpdateDetailView({
   updateId,
   initialTitle,
   initialSummary,
   initialBody,
+  sourceUrl,
+  sourceName,
   initialTranslations,
 }: UpdateDetailViewProps) {
-  const [selectedLang, setSelectedLang] = useState("ko");
+  // Mode: "ko" (번역본) or "raw" (원문 전체)
+  const [viewMode, setViewMode] = useState<"translated" | "original">(() => {
+    // If Korean title or no translations yet, default to original
+    return initialTranslations.length > 0 ? "translated" : "original";
+  });
+
   const [translations, setTranslations] = useState<Record<string, { title: string; summary: string | null; body: string }>>(() => {
-    const map: Record<string, { title: string; summary: string | null; body: string }> = {
-      ko: { title: initialTitle, summary: initialSummary, body: initialBody },
-    };
+    const map: Record<string, { title: string; summary: string | null; body: string }> = {};
     for (const t of initialTranslations) {
       map[t.language] = { title: t.title, summary: t.summary, body: t.bodyMarkdown };
     }
@@ -45,31 +45,27 @@ export default function UpdateDetailView({
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
-  const currentContent = translations[selectedLang] || translations.ko;
+  // Content to display based on viewMode
+  const hasKoTranslation = !!translations.ko;
+  const displayTitle = viewMode === "translated" && translations.ko ? translations.ko.title : initialTitle;
+  const displaySummary = viewMode === "translated" && translations.ko ? translations.ko.summary : initialSummary;
+  const displayBody = viewMode === "translated" && translations.ko ? translations.ko.body : initialBody;
 
-  const handleTranslate = async (langCode: string) => {
-    if (langCode === "ko") {
-      setSelectedLang("ko");
-      setStatusMsg("원문(한국어) 표시 중");
-      return;
-    }
-
-    setSelectedLang(langCode);
-
-    // If already in local memory/cache
-    if (translations[langCode]) {
-      setStatusMsg("캐시된 번역 데이터 로드됨");
+  const handleRequestTranslate = async () => {
+    if (translations.ko) {
+      setViewMode("translated");
+      setStatusMsg("한국어 번역본으로 전환되었습니다.");
       return;
     }
 
     setIsLoading(true);
-    setStatusMsg("DeepL AI로 번역 중...");
+    setStatusMsg("DeepL AI로 전체 본문 한국어 번역 중...");
 
     try {
       const res = await fetch("/api/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ updateId, targetLang: langCode }),
+        body: JSON.stringify({ updateId, targetLang: "ko" }),
       });
 
       if (!res.ok) {
@@ -79,18 +75,14 @@ export default function UpdateDetailView({
       const data = await res.json();
       setTranslations((prev) => ({
         ...prev,
-        [langCode]: {
+        ko: {
           title: data.title,
           summary: data.summary,
           body: data.bodyMarkdown,
         },
       }));
-
-      setStatusMsg(
-        data.source === "database_cache"
-          ? "데이터베이스 캐시 번역 로드됨"
-          : "DeepL AI 번역 완료 및 DB 저장됨"
-      );
+      setViewMode("translated");
+      setStatusMsg("전체 한국어 번역이 완료되었습니다.");
     } catch (err) {
       console.error(err);
       setStatusMsg("번역 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
@@ -101,72 +93,120 @@ export default function UpdateDetailView({
 
   return (
     <div className="space-y-6">
-      {/* Translation Toolbar Header (Right aligned button with blue~sky gradient) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+      {/* View Mode Switching Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-xs">
+        {/* Toggle Mode: Translated vs Original */}
         <div className="flex items-center gap-2">
-          <Languages className="w-4 h-4 text-slate-500" />
-          <span className="text-xs font-semibold text-slate-700">
-            번역 언어 선택:
+          <span className="text-xs font-semibold text-slate-500 mr-1 flex items-center gap-1.5">
+            <Languages className="w-4 h-4 text-slate-600" /> 본문 보기:
           </span>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {LANGUAGES.map((lang) => {
-              const isSelected = selectedLang === lang.code;
-              return (
-                <button
-                  key={lang.code}
-                  onClick={() => handleTranslate(lang.code)}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                    isSelected
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300"
-                  }`}
-                >
-                  <span>{lang.flag}</span>
-                  <span>{lang.label.split(" ")[0]}</span>
-                  {translations[lang.code] && <Check className="w-3 h-3 text-emerald-500" />}
-                </button>
-              );
-            })}
+
+          <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+            <button
+              onClick={() => {
+                if (hasKoTranslation) {
+                  setViewMode("translated");
+                  setStatusMsg(null);
+                } else {
+                  handleRequestTranslate();
+                }
+              }}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "translated"
+                  ? "bg-blue-600 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>한국어 번역본 전체보기</span>
+              {hasKoTranslation && <Check className="w-3 h-3 text-emerald-300" />}
+            </button>
+
+            <button
+              onClick={() => {
+                setViewMode("original");
+                setStatusMsg(null);
+              }}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === "original"
+                  ? "bg-slate-900 text-white shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>원문 전체보기 (Original)</span>
+            </button>
           </div>
         </div>
 
-        {/* AI 번역 버튼 (파란색~하늘색 그라데이션 조금 투명하게) */}
-        <div className="flex items-center gap-3 self-end sm:self-auto">
+        {/* Action Controls & External Link */}
+        <div className="flex items-center gap-3">
           {statusMsg && (
-            <span className="text-[11px] text-slate-500 animate-fade-in">
+            <span className="text-xs text-slate-500 font-medium animate-fade-in">
               {statusMsg}
             </span>
           )}
 
-          <button
-            onClick={() => handleTranslate(selectedLang === "ko" ? "en" : selectedLang)}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
-            title="선택한 언어로 DeepL 자동 번역"
-          >
-            {isLoading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Languages className="w-3.5 h-3.5" />
-            )}
-            <span>번역</span>
-          </button>
+          {!hasKoTranslation && viewMode === "original" && (
+            <button
+              onClick={handleRequestTranslate}
+              disabled={isLoading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+            >
+              {isLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5" />
+              )}
+              <span>전체 본문 한국어 번역</span>
+            </button>
+          )}
+
+          {sourceUrl && (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors"
+            >
+              <span>{sourceName || "공식 원본글 열기"}</span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+            </a>
+          )}
         </div>
       </div>
 
-      {/* Translated or Original Content Box */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-4">
-          {currentContent.title}
-        </h2>
+      {/* Main Content Box with Clean Typography & Markdown Rendering */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-xs space-y-6">
+        <div>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold mb-3 border bg-slate-50 text-slate-700 border-slate-200">
+            {viewMode === "translated" ? (
+              <>
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
+                <span>한국어 번역 전체 본문</span>
+              </>
+            ) : (
+              <>
+                <FileText className="w-3.5 h-3.5 text-slate-600" />
+                <span>개발사 공식 원문 전체 본문</span>
+              </>
+            )}
+          </div>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug">
+            {displayTitle}
+          </h2>
+        </div>
 
-        {currentContent.summary && (
-          <div className="p-4 mb-6 rounded-lg bg-blue-50/60 border-l-4 border-blue-500 text-slate-700 text-sm leading-relaxed">
-            {currentContent.summary}
+        {displaySummary && (
+          <div className="p-4 rounded-xl bg-slate-50 border-l-4 border-blue-500 text-slate-700 text-xs sm:text-sm leading-relaxed">
+            {displaySummary}
           </div>
         )}
 
-        <MarkdownRenderer content={currentContent.body} />
+        {/* Clean, Aligned Markdown Renderer */}
+        <div className="pt-2">
+          <MarkdownRenderer content={displayBody} />
+        </div>
       </div>
     </div>
   );

@@ -216,12 +216,14 @@ export default async function UpdateDetailPage({ params }: UpdatePageProps) {
         </div>
       )}
 
-      {/* Interactive Detail View with DeepL AI Translation */}
+      {/* Interactive Detail View with DeepL AI Translation & Full Original Toggle */}
       <UpdateDetailView
         updateId={update.id}
         initialTitle={update.title}
         initialSummary={update.summary}
         initialBody={update.bodyMarkdown}
+        sourceUrl={update.sourceUrl}
+        sourceName={update.sourceName}
         initialTranslations={update.translations}
       />
     </div>

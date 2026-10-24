@@ -43,6 +43,17 @@ export default function GameCard({ game }: GameCardProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
+        {/* Latest Version Badge */}
+        {(() => {
+          const v = game.platforms?.find((p) => p.latestKnownVersion && !p.latestKnownVersion.includes("공식 정기 패치") && !p.latestKnownVersion.includes("최신 확인"))?.latestKnownVersion;
+          if (!v) return null;
+          return (
+            <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-mono font-bold border border-white/20 shadow-xs">
+              {v}
+            </span>
+          );
+        })()}
+
         {/* Floating icon */}
         <div className="absolute -bottom-3 left-4">
           {game.iconUrl ? (
