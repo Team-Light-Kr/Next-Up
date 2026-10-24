@@ -14,7 +14,7 @@ import { buildDownloadEmbed, toComponentEmbedJson } from "@/lib/discord-componen
 export const metadata = {
   title: "NextUps 앱 다운로드",
   description:
-    "NextUps 공식 Windows 데스크톱 클라이언트 및 Android 모바일 앱 최신 v1.0.2를 다운로드하세요.",
+    "NextUps 공식 Windows 데스크톱 클라이언트 및 Android 모바일 앱 최신 v1.0.3을 다운로드하세요.",
   other: {
     "discord:component-embed": toComponentEmbedJson(buildDownloadEmbed()),
   },
