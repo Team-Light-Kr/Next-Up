@@ -24,7 +24,8 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String APP_VERSION = "1.0.0";
+    private static final String APP_VERSION = "1.0.1";
+
     private static final String APP_URL = "http://10.0.2.2:3000"; // Android Emulator or public URL
     private static final String FALLBACK_URL = "https://www.nextups.xyz";
 
@@ -57,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setUserAgentString(settings.getUserAgentString() + " Mobile NextUpsApp/1.0.0 (Android)");
+        settings.setUserAgentString(settings.getUserAgentString() + " Mobile NextUpsApp/1.0.1 (Android)");
+
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
