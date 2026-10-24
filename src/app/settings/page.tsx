@@ -373,19 +373,51 @@ export default function SettingsPage() {
           </div>
 
           {formData.twoFactorType === "SMS" && (
-            <div className="pt-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                문자 수신 휴대전화 번호
+            <div className="pt-2 p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/80 space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700">
+                문자 수신 휴대전화 번호 *
               </label>
               <input
                 type="tel"
                 placeholder="010-1234-5678"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
-                ※ Sendwich 서비스 연동 번호로 인증 문자가 발송됩니다.
+              <p className="text-[11px] text-emerald-700">
+                ※ 로그인 시 Sendwich SMS를 통해 이 번호로 6자리 인증번호가 발송됩니다.
+              </p>
+            </div>
+          )}
+
+          {formData.twoFactorType === "OTP" && user?.totpSecret && (
+            <div className="pt-2 p-3.5 rounded-xl bg-purple-50/50 border border-purple-200/80 space-y-2">
+              <div className="text-xs font-bold text-purple-900">
+                Google Authenticator (OTP) 등록 안내
+              </div>
+              <p className="text-[11px] text-slate-600 leading-relaxed">
+                스마트폰의 Google Authenticator 또는 OTP 앱에서 [계정 추가] → [설정 키 입력]을 선택하고 아래 키를 등록해 주세요.
+              </p>
+              <div className="p-2.5 rounded-lg bg-white border border-purple-200 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] text-slate-400 font-semibold">내 계정 보안 키 (Base32)</div>
+                  <div className="font-mono text-sm font-bold text-purple-700 tracking-wider select-all">
+                    {user.totpSecret}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(user.totpSecret);
+                    alert("OTP 보안 키가 클립보드에 복사되었습니다!");
+                  }}
+                  className="px-2.5 py-1 text-[11px] font-semibold bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-md transition-colors"
+                >
+                  키 복사
+                </button>
+              </div>
+              <p className="text-[10px] text-purple-700">
+                ※ 계정 이름: NextUps ({user.email}) / 키 유형: 시간 기준(TOTP)
               </p>
             </div>
           )}

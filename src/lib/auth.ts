@@ -65,6 +65,80 @@ export function verifyPassword(password: string, combinedHash: string): boolean 
   }
 }
 
+// RFC 6238 TOTP (Google Authenticator) Helper Functions
+const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+export function toBase32(buffer: Buffer): string {
+  let bits = 0;
+  let value = 0;
+  let output = "";
+  for (let i = 0; i < buffer.length; i++) {
+    value = (value << 8) | buffer[i];
+    bits += 8;
+    while (bits >= 5) {
+      output += BASE32_ALPHABET[(value >>> (bits - 5)) & 31];
+      bits -= 5;
+    }
+  }
+  if (bits > 0) {
+    output += BASE32_ALPHABET[(value << (5 - bits)) & 31];
+  }
+  return output;
+}
+
+export function fromBase32(str: string): Buffer {
+  let bits = 0;
+  let value = 0;
+  const bytes: number[] = [];
+  const cleanStr = str.toUpperCase().replace(/=+$/, "");
+  for (let i = 0; i < cleanStr.length; i++) {
+    const val = BASE32_ALPHABET.indexOf(cleanStr[i]);
+    if (val === -1) continue;
+    value = (value << 5) | val;
+    bits += 5;
+    if (bits >= 8) {
+      bytes.push((value >>> (bits - 8)) & 255);
+      bits -= 8;
+    }
+  }
+  return Buffer.from(bytes);
+}
+
+export function generateUserTotpSecret(userId: string): string {
+  const hash = crypto.createHmac("sha256", SECRET).update(`totp:${userId}`).digest();
+  return toBase32(hash.subarray(0, 20));
+}
+
+export function generateTotpCode(secretBase32: string, timeStep = Math.floor(Date.now() / 1000 / 30)): string {
+  const secretBytes = fromBase32(secretBase32);
+  const timeBuffer = Buffer.alloc(8);
+  timeBuffer.writeBigInt64BE(BigInt(timeStep));
+
+  const hmac = crypto.createHmac("sha1", secretBytes).update(timeBuffer).digest();
+  const offset = hmac[hmac.length - 1] & 0xf;
+  const codeInt =
+    ((hmac[offset] & 0x7f) << 24) |
+    ((hmac[offset + 1] & 0xff) << 16) |
+    ((hmac[offset + 2] & 0xff) << 8) |
+    (hmac[offset + 3] & 0xff);
+
+  const code = (codeInt % 1000000).toString().padStart(6, "0");
+  return code;
+}
+
+export function verifyTotpCode(secretBase32: string, token: string): boolean {
+  if (!token || token.trim().length !== 6) return false;
+  const currentStep = Math.floor(Date.now() / 1000 / 30);
+  // Check -1, 0, +1 time windows (allows +- 30 seconds clock drift)
+  for (let step = currentStep - 1; step <= currentStep + 1; step++) {
+    if (generateTotpCode(secretBase32, step) === token.trim()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
 // Get current user from server context (cookies)
 export async function getCurrentUser() {
   try {

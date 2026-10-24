@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, generateUserTotpSecret } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -29,10 +29,12 @@ export async function GET() {
       // ignore notification count error if db connection jitter
     }
 
+    const totpSecret = generateUserTotpSecret(user.id);
+
     return NextResponse.json(
       {
         authenticated: true,
-        user,
+        user: { ...user, totpSecret },
         unreadNotificationCount: unreadCount,
       },
       {

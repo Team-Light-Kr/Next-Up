@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [require2FA, setRequire2FA] = useState(false);
+  const [twoFactorMethod, setTwoFactorMethod] = useState<"NONE" | "EMAIL" | "SMS" | "OTP">("NONE");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -28,6 +29,14 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "로그인에 실패했습니다.");
+      }
+
+      // Check if 2FA challenge is requested
+      if (data.require2FA) {
+        setRequire2FA(true);
+        setTwoFactorMethod(data.twoFactorType || "EMAIL");
+        setSuccessMsg(data.message || "2단계 인증 코드를 입력해 주세요.");
+        return;
       }
 
       window.dispatchEvent(new Event("auth-state-changed"));
@@ -54,7 +63,10 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "인증번호 발송 실패");
-      setSuccessMsg("이메일로 6자리 보안 코드가 발송되었습니다.");
+      setSuccessMsg(data.message || "인증번호가 발송되었습니다.");
+      if (data.method) {
+        setTwoFactorMethod(data.method);
+      }
       setRequire2FA(true);
     } catch (err: any) {
       setErrorMsg(err.message);
@@ -135,33 +147,51 @@ export default function LoginPage() {
           </div>
 
           {require2FA && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                이메일 6자리 일회용 보안 코드 (2FA)
+            <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2">
+              <label className="block text-xs font-bold text-slate-800">
+                {twoFactorMethod === "SMS"
+                  ? "📱 휴대전화 문자(SMS) 6자리 인증번호 *"
+                  : twoFactorMethod === "OTP"
+                  ? "🔑 Google Authenticator(OTP) 앱 6자리 보안코드 *"
+                  : "✉️ 이메일 6자리 일회용 보안 코드 *"}
               </label>
               <div className="relative">
                 <input
                   type="text"
+                  required
                   maxLength={6}
-                  placeholder="123456"
+                  placeholder="000000"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm font-mono tracking-widest text-center rounded-lg border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-colors"
+                  className="w-full pl-9 pr-3 py-2.5 text-base font-mono tracking-widest text-center rounded-lg border border-blue-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
-                <KeyRound className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+                <KeyRound className="w-4 h-4 absolute left-3 top-3 text-blue-500" />
               </div>
+              <p className="text-[11px] text-slate-500">
+                {twoFactorMethod === "SMS"
+                  ? "가입 시 등록된 휴대전화로 전송된 6자리 번호를 입력해 주세요."
+                  : twoFactorMethod === "OTP"
+                  ? "스마트폰 OTP 앱(Google Authenticator)에 표시된 6자리를 입력해 주세요."
+                  : "가입된 이메일 편지함으로 전송된 6자리 코드를 입력해 주세요."}
+              </p>
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-1">
-            <button
-              type="button"
-              onClick={handleSend2FACode}
-              className="text-[11px] text-blue-600 hover:underline cursor-pointer"
-            >
-              {require2FA ? "인증번호 재발송" : "이메일 일회용 보안코드 받기 (선택)"}
-            </button>
-          </div>
+          {twoFactorMethod !== "OTP" && (
+            <div className="flex items-center justify-between pt-1">
+              <button
+                type="button"
+                onClick={handleSend2FACode}
+                className="text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
+              >
+                {require2FA
+                  ? twoFactorMethod === "SMS"
+                    ? "문자(SMS) 인증번호 재발송"
+                    : "이메일 인증번호 재발송"
+                  : "2단계 보안코드 수동 요청 (선택)"}
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"

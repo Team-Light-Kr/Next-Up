@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { signSessionToken, verifyPassword, hashPassword } from "@/lib/auth";
+import {
+  signSessionToken,
+  verifyPassword,
+  hashPassword,
+  generateVerificationCode,
+  sendEmailVerificationCode,
+  sendSmsVerificationCode,
+  generateUserTotpSecret,
+  verifyTotpCode,
+} from "@/lib/auth";
 import { logToDiscord } from "@/lib/discord";
 
 export async function POST(request: Request) {
@@ -64,30 +73,95 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Email verification code check (2FA or standard code)
-    if (code) {
-      const validCode = await prisma.verificationCode.findFirst({
-        where: {
-          email: cleanEmail,
-          code: code.trim(),
-          purpose: { in: ["LOGIN", "2FA"] },
-          used: false,
-          expiresAt: { gt: new Date() },
-        },
-        orderBy: { createdAt: "desc" },
-      });
+    // 2. 2FA (Two-Factor Authentication) Enforcement
+    const twoFactorType = user.twoFactorType || "NONE";
 
-      if (!validCode) {
-        return NextResponse.json(
-          { error: "인증번호가 일치하지 않거나 만료되었습니다." },
-          { status: 400 }
-        );
+    if (twoFactorType !== "NONE") {
+      // If 2FA is enabled but code is not provided yet, initiate challenge
+      if (!code) {
+        if (twoFactorType === "SMS") {
+          if (!user.phoneNumber) {
+            return NextResponse.json(
+              { error: "SMS 2단계 인증이 활성화되어 있으나 등록된 전화번호가 없습니다." },
+              { status: 400 }
+            );
+          }
+          const smsCode = generateVerificationCode();
+          await prisma.verificationCode.create({
+            data: {
+              email: cleanEmail,
+              code: smsCode,
+              purpose: "2FA",
+              expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+            },
+          });
+          await sendSmsVerificationCode(user.phoneNumber, smsCode);
+          const masked = user.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, "$1-****-$2");
+          return NextResponse.json({
+            require2FA: true,
+            twoFactorType: "SMS",
+            message: `등록된 휴대폰(${masked})으로 6자리 SMS 인증번호가 발송되었습니다.`,
+          });
+        } else if (twoFactorType === "OTP") {
+          return NextResponse.json({
+            require2FA: true,
+            twoFactorType: "OTP",
+            message: "Google Authenticator 앱의 6자리 보안 코드를 입력해 주세요.",
+          });
+        } else if (twoFactorType === "EMAIL") {
+          const emailCode = generateVerificationCode();
+          await prisma.verificationCode.create({
+            data: {
+              email: cleanEmail,
+              code: emailCode,
+              purpose: "2FA",
+              expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+            },
+          });
+          await sendEmailVerificationCode(cleanEmail, emailCode, "2단계 인증");
+          return NextResponse.json({
+            require2FA: true,
+            twoFactorType: "EMAIL",
+            message: `${cleanEmail} 주소로 6자리 이메일 인증 코드가 발송되었습니다.`,
+          });
+        }
       }
 
-      await prisma.verificationCode.update({
-        where: { id: validCode.id },
-        data: { used: true },
-      });
+      // If code was provided, verify according to 2FA type
+      if (twoFactorType === "OTP") {
+        const secret = generateUserTotpSecret(user.id);
+        const isValidTotp = verifyTotpCode(secret, code.trim());
+        if (!isValidTotp) {
+          return NextResponse.json(
+            { error: "Google Authenticator 보안 코드가 일치하지 않습니다. (시간을 확인해 주세요)" },
+            { status: 400 }
+          );
+        }
+      } else {
+        // SMS or EMAIL code verification
+        const validCode = await prisma.verificationCode.findFirst({
+          where: {
+            email: cleanEmail,
+            code: code.trim(),
+            purpose: { in: ["LOGIN", "2FA"] },
+            used: false,
+            expiresAt: { gt: new Date() },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        if (!validCode) {
+          return NextResponse.json(
+            { error: "인증번호가 일치하지 않거나 만료되었습니다." },
+            { status: 400 }
+          );
+        }
+
+        await prisma.verificationCode.update({
+          where: { id: validCode.id },
+          data: { used: true },
+        });
+      }
     }
 
     // Check admin escalation for admin@koharu.live

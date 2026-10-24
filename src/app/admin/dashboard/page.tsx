@@ -31,6 +31,8 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [sendingTermsEmail, setSendingTermsEmail] = useState(false);
   const [termsEmailStatus, setTermsEmailStatus] = useState<string | null>(null);
+  const [sendingPrivacyEmail, setSendingPrivacyEmail] = useState(false);
+  const [privacyEmailStatus, setPrivacyEmailStatus] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -73,6 +75,26 @@ export default function AdminDashboardPage() {
       alert(err.message || "발송 중 오류가 발생했습니다.");
     } finally {
       setSendingTermsEmail(false);
+    }
+  };
+
+  const handleBroadcastPrivacyHistory = async () => {
+    if (!confirm("대한민국 개인정보보호법 제20조의2에 따라, 전체 회원에게 연 1회 개인정보 이용·제공 내역 안내 메일을 발송하시겠습니까?")) {
+      return;
+    }
+    setSendingPrivacyEmail(true);
+    setPrivacyEmailStatus(null);
+    try {
+      const res = await fetch("/api/admin/broadcast-privacy-history", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "발송 실패");
+      setPrivacyEmailStatus(`개인정보보호법 제20조의2 법정 의무 통지 완료: 전체 ${data.totalCount}명 대상 (성공 ${data.successCount}건)`);
+    } catch (err: any) {
+      alert(err.message || "발송 중 오류가 발생했습니다.");
+    } finally {
+      setSendingPrivacyEmail(false);
     }
   };
 
@@ -171,6 +193,18 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {privacyEmailStatus && (
+        <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-medium flex items-center justify-between">
+          <span>{privacyEmailStatus}</span>
+          <button
+            onClick={() => setPrivacyEmailStatus(null)}
+            className="text-blue-600 hover:text-blue-900 font-bold ml-4"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -193,6 +227,26 @@ export default function AdminDashboardPage() {
             <History className="w-3.5 h-3.5 text-blue-400" />
             <span>보안 감사 로그</span>
           </Link>
+          <Link
+            href="/legal/privacy-notice"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <span>개인정보 통지 서식 보기</span>
+          </Link>
+          <button
+            onClick={handleBroadcastPrivacyHistory}
+            disabled={sendingPrivacyEmail}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors disabled:opacity-50 shadow-xs"
+          >
+            {sendingPrivacyEmail ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
+            <span>개인정보 이용내역 연례 발송 (법 제20조의2)</span>
+          </button>
           <button
             onClick={handleBroadcastTerms}
             disabled={sendingTermsEmail}
