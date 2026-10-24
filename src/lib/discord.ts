@@ -12,7 +12,48 @@ const DEFAULT_WEBHOOK_URL = [
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || DEFAULT_WEBHOOK_URL;
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
+const DEFAULT_APP_URL = "https://www.nextups.xyz";
+
+/**
+ * Ensures that any URL sent to Discord webhooks starts with https://www.nextups.xyz
+ * Discordbot fails to unfurl redirects or localhost, so www. is strictly required.
+ */
+export function ensureWwwUrl(url?: string | null): string {
+  if (!url) return DEFAULT_APP_URL;
+
+  // 1. Relative paths
+  if (url.startsWith("/")) {
+    return `${DEFAULT_APP_URL}${url}`;
+  }
+
+  // 2. Replace localhost or 127.0.0.1
+  let normalized = url.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, DEFAULT_APP_URL);
+
+  // 3. Replace non-www nextups.xyz with www.nextups.xyz
+  normalized = normalized.replace(/^https?:\/\/nextups\.xyz/, DEFAULT_APP_URL);
+
+  // 4. If starts with nextups.xyz or www.nextups.xyz without protocol
+  if (normalized.startsWith("nextups.xyz")) {
+    normalized = `https://www.${normalized}`;
+  } else if (normalized.startsWith("www.nextups.xyz")) {
+    normalized = `https://${normalized}`;
+  }
+
+  // 5. Canonicalize any lingering nextups.xyz hostname to www.nextups.xyz
+  try {
+    const parsed = new URL(normalized);
+    if (parsed.hostname === "nextups.xyz") {
+      parsed.hostname = "www.nextups.xyz";
+      return parsed.toString();
+    }
+  } catch {
+    // fallback
+  }
+
+  return normalized;
+}
+
+const APP_URL = ensureWwwUrl(process.env.NEXT_PUBLIC_APP_URL || DEFAULT_APP_URL);
 
 export interface LogEventOptions {
   action:
@@ -85,7 +126,7 @@ export async function logToDiscord(options: LogEventOptions) {
 
   // 2. Prepare secret admin-only log URL
   const logUrl = `${APP_URL}/admin/logs/${logId}`;
-  const targetUrl = options.targetUrl || logUrl;
+  const targetUrl = ensureWwwUrl(options.targetUrl || logUrl);
 
   // 3. Send using Link Transmission Format so Discord unfurls Component Embed V2!
   const discordPayload = {

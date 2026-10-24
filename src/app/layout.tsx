@@ -35,10 +35,11 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png",
     apple: "/logo.png",
   },
+  metadataBase: new URL("https://www.nextups.xyz"),
   openGraph: {
     title: "NextUps",
     description: "공식 개발사 및 스토어 출처 기반 멀티플랫폼 게임 업데이트 허브",
-    url: "https://nextups.xyz",
+    url: "https://www.nextups.xyz",
     siteName: "NextUps",
     locale: "ko_KR",
     type: "website",
