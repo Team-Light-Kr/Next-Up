@@ -1,6 +1,8 @@
 ; Inno Setup 7 Script for NextUps Windows Desktop Client
 #define MyAppName "NextUps"
-#define MyAppVersion "1.0.2"
+#ifndef MyAppVersion
+#define MyAppVersion "1.0.3"
+#endif
 #define MyAppPublisher "Team Light"
 #define MyAppURL "https://www.nextups.xyz"
 #define MyAppExeName "NextUps.exe"

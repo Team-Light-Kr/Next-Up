@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 
+const rootDir = process.cwd();
+const versionJsonPath = path.join(rootDir, "version.json");
+const config = JSON.parse(fs.readFileSync(versionJsonPath, "utf-8"));
+
 let TOKEN = process.env.GITHUB_TOKEN;
 if (!TOKEN) {
   try {
@@ -16,8 +20,9 @@ if (!TOKEN) {
 
 const OWNER = "Team-Light-Kr";
 const REPO = "Next-Up";
-const TAG = "v1.0.1";
-
+const winVersion = config.windows.version;
+const androidVersion = config.android.version;
+const TAG = `v${winVersion}`;
 
 async function main() {
   console.log(`[1] Checking if release '${TAG}' exists...`);
@@ -42,8 +47,8 @@ async function main() {
       body: JSON.stringify({
         tag_name: TAG,
         target_commitish: "main",
-        name: "NextUps v1.0.1 최신 정식 출시 (Windows & Android)",
-        body: `## 🚀 NextUps v1.0.1 공식 최신 릴리즈\n\n- **Windows 설치 프로그램**: NextUps-Setup-v1.0.1.exe (인앱 실시간 프로그레스 다운로더 지원)\n- **Windows 무설치 ZIP**: NextUps-Windows-v1.0.1.zip\n- **Android APK**: NextUps-v1.0.1.apk (모바일 반응형 최적화)`,
+        name: `NextUps ${TAG} 공식 최신 출시 (Windows & Android)`,
+        body: `## 🚀 NextUps ${TAG} 공식 최신 릴리즈\n\n- **Windows 설치 프로그램**: NextUps-Setup-${TAG}.exe (Authenticode 디지털 서명 및 타임스탬프 적용)\n- **Windows 무설치 ZIP**: NextUps-Windows-${TAG}.zip\n- **Android APK**: NextUps-v${androidVersion}.apk (모바일 반응형 최적화)`,
         draft: false,
         prerelease: false,
       }),
@@ -59,18 +64,20 @@ async function main() {
     console.log(`Release already exists: ${release.html_url}`);
   }
 
-  const uploadUrlTemplate = release.upload_url; // e.g. https://uploads.github.com/repos/.../assets{?name,label}
+  const uploadUrlTemplate = release.upload_url;
   const baseUrl = uploadUrlTemplate.split("{")[0];
 
   const files = [
-    { name: "NextUps-Setup-v1.0.1.exe", type: "application/vnd.microsoft.portable-executable" },
-    { name: "NextUps-Windows-v1.0.1.zip", type: "application/zip" },
-    { name: "NextUps-v1.0.1.apk", type: "application/vnd.android.package-archive" },
+    { name: `NextUps-Setup-${TAG}.exe`, type: "application/vnd.microsoft.portable-executable" },
+    { name: `NextUps-Windows-${TAG}.zip`, type: "application/zip" },
+    { name: `NextUps-v${androidVersion}.apk`, type: "application/vnd.android.package-archive" },
+    // Legacy mirror
+    { name: "NextUps-Setup-v1.0.2.exe", type: "application/vnd.microsoft.portable-executable" },
+    { name: "NextUps-Windows-v1.0.2.zip", type: "application/zip" },
   ];
 
-
   for (const file of files) {
-    const filePath = path.join(process.cwd(), "public", "downloads", file.name);
+    const filePath = path.join(rootDir, "public", "downloads", file.name);
     if (!fs.existsSync(filePath)) {
       console.warn(`File not found: ${filePath}, skipping...`);
       continue;
@@ -79,7 +86,6 @@ async function main() {
     const stat = fs.statSync(filePath);
     console.log(`Uploading ${file.name} (${(stat.size / (1024 * 1024)).toFixed(1)} MB)...`);
 
-    // Check if asset already exists in release
     const existingAsset = release.assets?.find((a) => a.name === file.name);
     if (existingAsset) {
       console.log(`Asset ${file.name} already exists. Deleting first...`);

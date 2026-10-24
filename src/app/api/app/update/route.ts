@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     changelog: string[];
   }> = {
     windows: {
-      version: "1.0.2",
+      version: "1.0.3",
       releaseDate: "2026-10-24",
       downloadUrl: `${appUrl}/api/download?file=exe`,
       webDownloadUrl: `${appUrl}/download`,
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       ],
     },
     android: {
-      version: "1.0.2",
+      version: "1.0.3",
       releaseDate: "2026-10-24",
       downloadUrl: `${appUrl}/api/download?file=apk`,
       webDownloadUrl: `${appUrl}/download`,

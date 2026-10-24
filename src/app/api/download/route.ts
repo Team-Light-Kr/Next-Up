@@ -4,21 +4,21 @@ import path from "path";
 
 // GitHub Releases 공식 영구 CDN 다운로드 베이스 URL (v1.0.2 최신)
 const GITHUB_RELEASE_BASE =
-  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.2";
+  "https://github.com/Team-Light-Kr/Next-Up/releases/download/v1.0.3";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const fileType = searchParams.get("file")?.toLowerCase() || "exe"; // exe, zip, apk
-  const requestedVersion = searchParams.get("v") || "v1.0.2";
+  const requestedVersion = searchParams.get("v") || "v1.0.3";
 
-  let fileName = "NextUps-Setup-v1.0.2.exe";
+  let fileName = "NextUps-Setup-v1.0.3.exe";
   let contentType = "application/vnd.microsoft.portable-executable";
 
   if (fileType === "zip") {
-    fileName = "NextUps-Windows-v1.0.2.zip";
+    fileName = "NextUps-Windows-v1.0.3.zip";
     contentType = "application/zip";
   } else if (fileType === "apk") {
-    fileName = "NextUps-v1.0.2.apk";
+    fileName = "NextUps-v1.0.3.apk";
     contentType = "application/vnd.android.package-archive";
   }
 

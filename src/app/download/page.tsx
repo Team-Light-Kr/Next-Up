@@ -37,7 +37,7 @@ export default function DownloadPage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>v1.0.2 최신 정식 빌드 배포 완료</span>
+          <span>v1.0.3 최신 정식 빌드 배포 완료</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
           NextUps 앱 다운로드
@@ -57,7 +57,7 @@ export default function DownloadPage() {
                 <Monitor className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-100">
-                v1.0.2 (Windows x64)
+                v1.0.3 (Windows x64)
               </span>
             </div>
 
@@ -96,7 +96,7 @@ export default function DownloadPage() {
               className="w-full py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
             >
               <Download className="w-4 h-4" />
-              <span>Windows 설치 프로그램 (v1.0.2 .exe)</span>
+              <span>Windows 설치 프로그램 (v1.0.3 .exe)</span>
             </a>
 
             <a
@@ -104,7 +104,7 @@ export default function DownloadPage() {
               className="w-full py-2.5 px-5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium text-xs flex items-center justify-center gap-2 border border-slate-200 transition-colors"
             >
               <Archive className="w-3.5 h-3.5 text-slate-500" />
-              <span>무설치 포터블 버전 (v1.0.2 .zip)</span>
+              <span>무설치 포터블 버전 (v1.0.3 .zip)</span>
             </a>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
@@ -122,7 +122,7 @@ export default function DownloadPage() {
                 <Smartphone className="w-6 h-6" />
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-                v1.0.2 Android
+                v1.0.3 Android
               </span>
             </div>
 
@@ -161,7 +161,7 @@ export default function DownloadPage() {
               className="w-full py-3 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
             >
               <Download className="w-4 h-4" />
-              <span>Android APK 다운로드 (v1.0.2)</span>
+              <span>Android APK 다운로드 (v1.0.3)</span>
             </a>
 
             <div className="py-2.5 text-center text-xs text-slate-600 font-medium">
@@ -184,7 +184,7 @@ export default function DownloadPage() {
               <History className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">v1.0.2 주요 업데이트 내역 (Changelog)</h3>
+              <h3 className="text-sm font-bold text-slate-900">v1.0.3 주요 업데이트 내역 (Changelog)</h3>
               <p className="text-[11px] text-slate-500">배포일자: 2026년 10월 24일</p>
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Monitor className="w-3.5 h-3.5 text-blue-600" />
-              <span>Windows 데스크톱 v1.0.2 변경사항</span>
+              <span>Windows 데스크톱 v1.0.3 변경사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>
@@ -218,7 +218,7 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-slate-800" />
-              <span>Android 모바일 v1.0.2 변경사항</span>
+              <span>Android 모바일 v1.0.3 변경사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>

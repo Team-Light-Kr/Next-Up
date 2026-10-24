@@ -7,7 +7,11 @@
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "release": "node scripts/release.mjs all patch",
+    "release:windows": "node scripts/release.mjs windows patch",
+    "release:android": "node scripts/release.mjs android patch",
+    "release:build": "node scripts/release.mjs all"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
