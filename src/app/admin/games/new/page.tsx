@@ -22,8 +22,10 @@ export default function NewGamePage() {
 
   const [platforms, setPlatforms] = useState<Record<string, { enabled: boolean; version: string; storeUrl: string }>>({
     windows: { enabled: true, version: "v1.0.0", storeUrl: "" },
-    android: { enabled: true, version: "v1.0.0", storeUrl: "" },
-    ios: { enabled: true, version: "v1.0.0", storeUrl: "" },
+    playstation: { enabled: false, version: "", storeUrl: "" },
+    nintendo: { enabled: false, version: "", storeUrl: "" },
+    android: { enabled: false, version: "", storeUrl: "" },
+    ios: { enabled: false, version: "", storeUrl: "" },
     macos: { enabled: false, version: "", storeUrl: "" },
   });
 
@@ -251,9 +253,17 @@ export default function NewGamePage() {
               지원 플랫폼 및 스토어 설정
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(["windows", "android", "ios", "macos"] as const).map((key) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(["windows", "playstation", "nintendo", "android", "ios", "macos"] as const).map((key) => {
                 const p = platforms[key];
+                const labels: Record<string, string> = {
+                  windows: "Windows",
+                  playstation: "PlayStation",
+                  nintendo: "Nintendo Switch",
+                  android: "Android",
+                  ios: "iOS",
+                  macos: "macOS",
+                };
                 return (
                   <div
                     key={key}
@@ -276,8 +286,8 @@ export default function NewGamePage() {
                           }
                           className="rounded text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="font-bold text-xs uppercase tracking-wider text-slate-900">
-                          {key}
+                        <span className="font-bold text-xs tracking-wider text-slate-900">
+                          {labels[key] || key}
                         </span>
                       </label>
                     </div>

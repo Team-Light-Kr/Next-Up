@@ -40,7 +40,7 @@ export function buildHomeEmbed(appUrl = DEFAULT_APP_URL) {
       h(
         TextDisplay,
         null,
-        `# [NextUps](${appUrl})\n**멀티플랫폼 게임 업데이트 정보 통합 플랫폼**\nWindows, Android, iOS 공식 최신 패치노트와 버전 정보를 실시간으로 확인하세요.`
+        `# [NextUps](${appUrl})\n**멀티플랫폼 게임 업데이트 정보 통합 플랫폼**\nWindows, PlayStation, Nintendo Switch, Android, iOS, macOS 공식 최신 패치노트와 버전 정보를 실시간으로 확인하세요.`
       )
     ),
     h(Separator, { divider: true, spacing: "small" }),
@@ -49,7 +49,15 @@ export function buildHomeEmbed(appUrl = DEFAULT_APP_URL) {
       null,
       h(LinkButton, {
         url: `${appUrl}/games`,
-        label: "최신 게임 패치 보기",
+        label: "최신 게임 패치",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/platforms/playstation`,
+        label: "PlayStation 허브",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/platforms/nintendo`,
+        label: "Nintendo Switch 허브",
       }),
       h(LinkButton, {
         url: `${appUrl}/download`,
@@ -78,7 +86,7 @@ export function buildGamesListEmbed(count?: number, appUrl = DEFAULT_APP_URL) {
       h(
         TextDisplay,
         null,
-        `# [NextUps 게임 디렉터리](${appUrl}/games)${countText}\n**멀티플랫폼 게임 패치 및 버전 검색**\nPC Windows, 모바일 안드로이드, iOS의 최신 업데이트 내역과 패치노트를 탐색해보세요.`
+        `# [NextUps 게임 디렉터리](${appUrl}/games)${countText}\n**멀티플랫폼 게임 패치 및 버전 검색**\nPC Windows, 콘솔(PlayStation, Nintendo Switch), 모바일 Android, iOS, macOS의 최신 패치노트와 업데이트 내역을 탐색해보세요.`
       )
     ),
     h(Separator, { divider: true, spacing: "small" }),
@@ -87,11 +95,19 @@ export function buildGamesListEmbed(count?: number, appUrl = DEFAULT_APP_URL) {
       null,
       h(LinkButton, {
         url: `${appUrl}/games`,
-        label: "게임 목록 전체보기",
+        label: "전체 게임 탐색",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/platforms/playstation`,
+        label: "PlayStation 패치",
+      }),
+      h(LinkButton, {
+        url: `${appUrl}/platforms/nintendo`,
+        label: "Nintendo 패치",
       }),
       h(LinkButton, {
         url: `${appUrl}/compare`,
-        label: "플랫폼 버전 비교하기",
+        label: "버전 비교 도구",
       })
     )
   );
@@ -214,9 +230,22 @@ export function buildPlatformEmbed(
   const countDesc = count !== undefined ? ` • ${count}개 타이틀 등록` : "";
   const desc = (platform.description || `${platform.name} 환경의 실시간 게임 업데이트 및 패치 정보를 확인하세요.`).slice(0, 180);
 
+  const platformColors: Record<string, number> = {
+    playstation: 0x003791,
+    ps5: 0x003791,
+    ps4: 0x003791,
+    nintendo: 0xe60012,
+    switch: 0xe60012,
+    windows: 0x0078d4,
+    android: 0x10b981,
+    ios: 0x0f172a,
+    macos: 0x8b5cf6,
+  };
+  const accentColor = platformColors[platform.key.toLowerCase()] || 0x2563eb;
+
   return h(
     Container,
-    { accentColor: 0x2563eb },
+    { accentColor },
     h(
       Section,
       {
@@ -228,7 +257,7 @@ export function buildPlatformEmbed(
       h(
         TextDisplay,
         null,
-        `# [${platform.name} 게임 허브](${appUrl}/platforms/${platform.key})${countDesc}\n${desc}`
+        `# [${platform.name} 게임 패치 허브](${appUrl}/platforms/${platform.key})${countDesc}\n${desc}`
       )
     ),
     h(Separator, { divider: true, spacing: "small" }),
@@ -265,7 +294,7 @@ export function buildCompareEmbed(appUrl = DEFAULT_APP_URL) {
       h(
         TextDisplay,
         null,
-        `# [NextUps 플랫폼 버전 비교](${appUrl}/compare)\n**플랫폼별 버전 격차 및 동기화 현황 분석**\nWindows, Android, iOS 간의 버전 불일치와 크로스플랫폼 패치 현황을 한눈에 비교하세요.`
+        `# [NextUps 플랫폼 버전 비교](${appUrl}/compare)\n**플랫폼별 버전 격차 및 동기화 현황 분석**\nWindows, PlayStation, Nintendo Switch, Android, iOS, macOS 간의 버전 불일치와 크로스플랫폼 패치 현황을 한눈에 비교하세요.`
       )
     ),
     h(Separator, { divider: true, spacing: "small" }),

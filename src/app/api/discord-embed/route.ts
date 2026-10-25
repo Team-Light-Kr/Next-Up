@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
     } else {
       card = buildGenericEmbed(
         "NextUps 멀티플랫폼 게임 업데이트",
-        "Windows, Android, iOS 공식 패치노트와 최신 버전 정보를 확인하세요.",
+        "Windows, PlayStation, Nintendo Switch, Android, iOS, macOS 공식 패치노트와 최신 버전 정보를 확인하세요.",
         path,
         "페이지 열기",
         appUrl

@@ -18,7 +18,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Windows, Android, iOS, macOS 멀티플랫폼 게임 업데이트 및 패치 정보를 통합 제공하는 비영리 공공 플랫폼입니다.
+              Windows, PlayStation, Nintendo Switch, Android, iOS, macOS 멀티플랫폼 게임 업데이트 및 패치 정보를 통합 제공하는 비영리 공공 플랫폼입니다.
             </p>
             <div className="text-xs text-neutral-500">
               Team Light 운영
@@ -34,6 +34,16 @@ export default function Footer() {
               <li>
                 <Link href="/platforms/windows" className="hover:text-neutral-900">
                   Windows PC
+                </Link>
+              </li>
+              <li>
+                <Link href="/platforms/playstation" className="hover:text-neutral-900">
+                  PlayStation
+                </Link>
+              </li>
+              <li>
+                <Link href="/platforms/nintendo" className="hover:text-neutral-900">
+                  Nintendo Switch
                 </Link>
               </li>
               <li>

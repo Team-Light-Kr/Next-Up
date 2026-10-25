@@ -17,6 +17,7 @@ import {
   Smartphone,
   Apple,
   Laptop,
+  Gamepad2,
   CheckCircle2,
   ChevronDown,
   Sparkles,
@@ -190,6 +191,8 @@ export default function UpdateForm({ games: initialGames, platforms: initialPlat
 
   const platformButtons = [
     { key: "windows", name: "Windows", icon: Monitor, color: "text-blue-600", activeBg: "bg-blue-50 border-blue-600 text-blue-700" },
+    { key: "playstation", name: "PlayStation", icon: Gamepad2, color: "text-indigo-600", activeBg: "bg-indigo-50 border-indigo-600 text-indigo-700" },
+    { key: "nintendo", name: "Nintendo Switch", icon: Gamepad2, color: "text-red-600", activeBg: "bg-red-50 border-red-600 text-red-700" },
     { key: "android", name: "Android", icon: Smartphone, color: "text-emerald-600", activeBg: "bg-emerald-50 border-emerald-600 text-emerald-700" },
     { key: "ios", name: "iOS", icon: Apple, color: "text-slate-900", activeBg: "bg-slate-100 border-slate-900 text-slate-900" },
     { key: "macos", name: "macOS", icon: Laptop, color: "text-purple-600", activeBg: "bg-purple-50 border-purple-600 text-purple-700" },

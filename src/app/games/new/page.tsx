@@ -22,6 +22,8 @@ export default function MemberNewGamePage() {
 
   const [platforms, setPlatforms] = useState<Record<string, { enabled: boolean; version: string; storeUrl: string }>>({
     windows: { enabled: true, version: "v1.0.0", storeUrl: "" },
+    playstation: { enabled: false, version: "", storeUrl: "" },
+    nintendo: { enabled: false, version: "", storeUrl: "" },
     android: { enabled: false, version: "", storeUrl: "" },
     ios: { enabled: false, version: "", storeUrl: "" },
     macos: { enabled: false, version: "", storeUrl: "" },
@@ -228,19 +230,27 @@ export default function MemberNewGamePage() {
             <span className="text-xs font-semibold text-neutral-900">
               지원 플랫폼 선택
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {(["windows", "android", "ios", "macos"] as const).map((key) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {(["windows", "playstation", "nintendo", "android", "ios", "macos"] as const).map((key) => {
                 const p = platforms[key];
+                const labels: Record<string, string> = {
+                  windows: "Windows",
+                  playstation: "PlayStation",
+                  nintendo: "Nintendo Switch",
+                  android: "Android",
+                  ios: "iOS",
+                  macos: "macOS",
+                };
                 return (
                   <label
                     key={key}
-                    className={`p-3 rounded-lg border text-xs cursor-pointer flex items-center justify-between ${
+                    className={`p-3 rounded-lg border text-xs cursor-pointer flex items-center justify-between transition-colors ${
                       p.enabled
                         ? "border-blue-500 bg-blue-50/50 text-blue-900 font-semibold"
-                        : "border-neutral-200 text-neutral-500"
+                        : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                     }`}
                   >
-                    <span className="uppercase">{key}</span>
+                    <span>{labels[key] || key}</span>
                     <input
                       type="checkbox"
                       checked={p.enabled}
