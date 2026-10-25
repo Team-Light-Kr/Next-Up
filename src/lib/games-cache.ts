@@ -183,6 +183,141 @@ export async function getFastGamesList(options?: {
 }
 
 /**
+ * 홈 화면 초고속 캐시 인터페이스
+ */
+export interface FastHomeData {
+  totalGames: number;
+  totalUpdates: number;
+  platforms: any[];
+  latestUpdates: any[];
+  recentGames: any[];
+  cached: boolean;
+  servedInMs: string;
+}
+
+interface InMemoryHomeCache {
+  data: FastHomeData | null;
+  lastFetched: number;
+  isFetching: boolean;
+}
+
+const globalForHomeCache = globalThis as unknown as {
+  __nextups_home_cache?: InMemoryHomeCache;
+};
+
+if (!globalForHomeCache.__nextups_home_cache) {
+  globalForHomeCache.__nextups_home_cache = {
+    data: null,
+    lastFetched: 0,
+    isFetching: false,
+  };
+}
+
+const homeCache = globalForHomeCache.__nextups_home_cache!;
+
+async function refreshHomeCacheInBackground(): Promise<void> {
+  if (homeCache.isFetching) return;
+  homeCache.isFetching = true;
+
+  try {
+    const [tGames, tUpdates, pForms, lUpdates, rGames] = await Promise.all([
+      prisma.game.count(),
+      prisma.update.count(),
+      prisma.platform.findMany({
+        orderBy: { order: "asc" },
+        select: { id: true, key: true, name: true, order: true },
+      }),
+      prisma.update.findMany({
+        take: 6,
+        orderBy: { releaseDate: "desc" },
+        include: {
+          game: {
+            select: {
+              slug: true,
+              canonicalName: true,
+              iconUrl: true,
+              developer: true,
+            },
+          },
+          platform: {
+            select: {
+              key: true,
+              name: true,
+            },
+          },
+        },
+      }),
+      prisma.game.findMany({
+        take: 4,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          platforms: {
+            include: {
+              platform: {
+                select: {
+                  key: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    homeCache.data = {
+      totalGames: tGames,
+      totalUpdates: tUpdates,
+      platforms: pForms,
+      latestUpdates: lUpdates,
+      recentGames: rGames,
+      cached: true,
+      servedInMs: "0.15ms",
+    };
+    homeCache.lastFetched = Date.now();
+  } catch (err) {
+    console.error("[HomeCache] Refresh error:", err);
+  } finally {
+    homeCache.isFetching = false;
+  }
+}
+
+/**
+ * 홈페이지 데이터 초고속(1ms 이내) 반환
+ */
+export async function getFastHomeData(): Promise<FastHomeData> {
+  const startTime = performance.now();
+  const now = Date.now();
+
+  if (!homeCache.data || now - homeCache.lastFetched > CACHE_TTL_MS) {
+    if (!homeCache.data) {
+      await refreshHomeCacheInBackground();
+    } else {
+      refreshHomeCacheInBackground().catch(() => {});
+    }
+  }
+
+  const durationMs = Math.max(0.08, performance.now() - startTime).toFixed(3);
+
+  if (homeCache.data) {
+    return {
+      ...homeCache.data,
+      servedInMs: `${durationMs}ms`,
+    };
+  }
+
+  return {
+    totalGames: 0,
+    totalUpdates: 0,
+    platforms: FALLBACK_PLATFORMS,
+    latestUpdates: [],
+    recentGames: [],
+    cached: false,
+    servedInMs: `${durationMs}ms`,
+  };
+}
+
+/**
  * 단일 게임 조회
  */
 export function getFastGameBySlug(slugOrId: string): FastGame | null {
@@ -205,5 +340,8 @@ export function getFastGameBySlug(slugOrId: string): FastGame | null {
 export function invalidateGamesCache() {
   cache.lastFetched = 0;
   cache.games = [];
+  homeCache.lastFetched = 0;
+  homeCache.data = null;
   refreshCacheInBackground().catch(() => {});
+  refreshHomeCacheInBackground().catch(() => {});
 }

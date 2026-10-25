@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NotificationPermissionRequester from "@/components/NotificationPermissionRequester";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -69,6 +70,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <NotificationPermissionRequester />
       </body>
     </html>
   );

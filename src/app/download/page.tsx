@@ -37,13 +37,13 @@ export default function DownloadPage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-          <span>v1.0.3 최신 정식 빌드 배포 완료</span>
+          <span>v1.0.3 공식 정식 빌드 배포 완료</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
           NextUps 앱 다운로드
         </h1>
         <p className="text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-          PC와 스마트폰에서 실시간 게임 업데이트 소식과 패치노트를 가장 빠르게 확인하세요.
+          PC와 모바일 환경에서 관심 게임의 실시간 패치노트와 버전 업데이트를 가장 신속하게 확인하세요.
         </p>
       </div>
 
@@ -63,29 +63,29 @@ export default function DownloadPage() {
 
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Windows
+                Windows 데스크톱
               </h2>
               <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                바탕화면에서 빠르게 실행하고 패치 소식을 실시간으로 확인하는 PC 전용 프로그램입니다.
+                바탕화면에서 가볍게 실행되며, 관심 게임의 패치 릴리스를 시스템 알림과 함께 실시간으로 전달합니다.
               </p>
             </div>
 
             <div className="space-y-2.5 pt-1 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>둥근 모서리 커스텀 타이틀바 및 로고 적용 (네온 제거)</span>
+                <span>NextUps 슬레이트 디자인 시스템 기반 전용 프레임워크</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>구버전 자동 종료 및 클린 덮어쓰기 인스톨러</span>
+                <span>원클릭 간편 인스톨러 (이전 설치 환경 자동 감지 및 업그레이드)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>인앱 실시간 자동 업데이트 프로그레스 다운로더</span>
+                <span>무중단 백그라운드 자동 업데이트 및 실시간 다운로드 진행률 표시</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>공식 Authenticode 디지털 서명 적용 (Team Light)</span>
+                <span>Team Light 공식 Authenticode 코드 서명 및 바이너리 무결성 검증</span>
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function DownloadPage() {
             </a>
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
-              <span>Windows 10, 11 (64-bit)</span>
+              <span>Windows 10 / 11 (64-bit)</span>
               <span>약 80 MB • 인증서 서명 완료</span>
             </div>
           </div>
@@ -128,29 +128,29 @@ export default function DownloadPage() {
 
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Android
+                Android 모바일
               </h2>
               <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                모바일 화면에 최적화된 인터페이스로 언제 어디서나 최신 패치를 모니터링합니다.
+                모바일 환경에 완벽히 대응하는 직관적인 레이아웃으로 이동 중에도 최신 패치 내역을 손쉽게 모니터링합니다.
               </p>
             </div>
 
             <div className="space-y-2.5 pt-1 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>모바일 화면에 맞춘 최적화 레이아웃</span>
+                <span>모바일 디스플레이에 최적화된 고반응성 피드 뷰</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>화면 당겨서 새로고침(Swipe Refresh)</span>
+                <span>당겨서 새로고침(Swipe-to-Refresh) 제스처 지원</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>인앱 업데이트 확인 및 원클릭 패키지 수신</span>
+                <span>신규 버전 출시 시 인앱 원클릭 패키지 수신</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>약 5.3MB의 초경량 패키지</span>
+                <span>초경량 패키지 설계로 리소스 점유 및 배터리 소모 최소화</span>
               </div>
             </div>
           </div>
@@ -170,13 +170,13 @@ export default function DownloadPage() {
 
             <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
               <span>Android 7.0 이상</span>
-              <span>약 5.3 MB • 정식 패키지</span>
+              <span>약 5.3 MB • 정식 배포본</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Changelog Section (v1.0.2 Release Notes) */}
+      {/* Changelog Section */}
       <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xs space-y-5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
           <div className="flex items-center gap-2.5">
@@ -184,12 +184,12 @@ export default function DownloadPage() {
               <History className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">v1.0.3 주요 업데이트 내역 (Changelog)</h3>
+              <h3 className="text-sm font-bold text-slate-900">v1.0.3 릴리스 노트 (Release Notes)</h3>
               <p className="text-[11px] text-slate-500">배포일자: 2026년 10월 25일</p>
             </div>
           </div>
           <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
-            UI 및 버전 동기화 패치
+            안정성 및 동기화 향상 패치
           </span>
         </div>
 
@@ -197,20 +197,20 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Monitor className="w-3.5 h-3.5 text-blue-600" />
-              <span>Windows 데스크톱 v1.0.3 변경사항</span>
+              <span>Windows 데스크톱 v1.0.3 개선사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>
-                <strong className="text-slate-800">상단바 UI 전면 개편</strong>: 둥근 모서리와 공식 브랜드 심볼 로고, 단정한 다크 슬레이트 스타일 적용 (Chromium 문구 및 네온 배지 완전 제거)
+                <strong className="text-slate-800">UI/UX 완성도 개선</strong>: 데스크톱 상단 프레임 및 공식 브랜드 심볼의 일관성을 강화하고 시인성을 개선했습니다.
               </li>
               <li>
-                <strong className="text-slate-800">구버전 자동 종료 및 덮어쓰기</strong>: 설치 시 실행 중이던 이전 프로세스를 강제 종료하고 최신 파일로 완전 교체
+                <strong className="text-slate-800">설치 및 업그레이드 프로세스 고도화</strong>: 기존 버전이 설치된 환경에서도 충돌 없이 최신 바이너리로 안전하게 갱신되도록 패키징을 보강했습니다.
               </li>
               <li>
-                <strong className="text-slate-800">디지털 인증서 서명 갱신</strong>: 공식 Authenticode 코드 서명 및 타임스탬프 적용 (게시자: Team Light)
+                <strong className="text-slate-800">보안 코드 서명 갱신</strong>: 공식 Authenticode 디지털 서명 및 타임스탬프를 갱신하여 윈도우 보안 경고 없는 안정적 실행을 지원합니다.
               </li>
               <li>
-                <strong className="text-slate-800">인앱 자동 다운로더 안정화</strong>: 업데이트 감지 시 새 버전 패키지 즉시 다운로드 및 자동 재실행
+                <strong className="text-slate-800">백그라운드 동기화 엔진 최적화</strong>: 패치 알림 수신 주기 및 다운로더 재시도 로직의 네트워크 신뢰성을 향상했습니다.
               </li>
             </ul>
           </div>
@@ -218,17 +218,17 @@ export default function DownloadPage() {
           <div className="space-y-3">
             <h4 className="font-bold text-slate-800 flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-slate-800" />
-              <span>Android 모바일 v1.0.3 변경사항</span>
+              <span>Android 모바일 v1.0.3 개선사항</span>
             </h4>
             <ul className="space-y-2 text-slate-600 list-disc list-inside">
               <li>
-                <strong className="text-slate-800">모바일 터치 최적화</strong>: 반응형 화면 정규화 및 모바일 기기 터치 반응 속도 개선
+                <strong className="text-slate-800">터치 인터랙션 반응성 향상</strong>: 터치 피드백 지연을 최소화하고 화면 스크롤 부드러움을 대폭 향상했습니다.
               </li>
               <li>
-                <strong className="text-slate-800">Swipe-to-Refresh 안정화</strong>: 실시간 패치 소식 새로고침 감도 개선
+                <strong className="text-slate-800">제스처 새로고침 정밀 조정</strong>: 피드 상단 당겨서 새로고침(Swipe-to-Refresh) 시의 트리거 감도를 안정적으로 튜닝했습니다.
               </li>
               <li>
-                <strong className="text-slate-800">인앱 최신 버전 알림</strong>: 새 버전 배포 감지 및 원클릭 수신
+                <strong className="text-slate-800">신규 버전 감지 로직 강화</strong>: 앱 실행 시 새 릴리스 빌드 여부를 신속하게 체크하여 안내합니다.
               </li>
             </ul>
           </div>

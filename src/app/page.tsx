@@ -17,11 +17,13 @@ import {
 
 import { buildHomeEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
 
+import { getFastHomeData } from "@/lib/games-cache";
+
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "NextUps - 멀티플랫폼 게임 업데이트 정보 통합 플랫폼",
-  description: "Windows, Android, iOS 공식 최신 패치노트와 버전 정보를 실시간으로 확인하세요.",
+  title: "NextUps",
+  description: "Windows, PlayStation, Nintendo Switch, Android, iOS, macOS 멀티플랫폼 게임 업데이트 정보 통합 플랫폼",
   other: {
     "discord:component-embed": toComponentEmbedJson(buildHomeEmbed()),
   },
@@ -33,65 +35,8 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  let totalGames = 0;
-  let totalUpdates = 0;
-  let platforms: any[] = [];
-  let latestUpdates: any[] = [];
-  let recentGames: any[] = [];
-
-  try {
-    const [tGames, tUpdates, pForms, lUpdates, rGames] = await Promise.all([
-      prisma.game.count(),
-      prisma.update.count(),
-      prisma.platform.findMany({
-        orderBy: { order: "asc" },
-      }),
-      prisma.update.findMany({
-        take: 6,
-        orderBy: { releaseDate: "desc" },
-        include: {
-          game: {
-            select: {
-              slug: true,
-              canonicalName: true,
-              iconUrl: true,
-              developer: true,
-            },
-          },
-          platform: {
-            select: {
-              key: true,
-              name: true,
-            },
-          },
-        },
-      }),
-      prisma.game.findMany({
-        take: 4,
-        orderBy: { updatedAt: "desc" },
-        include: {
-          platforms: {
-            include: {
-              platform: {
-                select: {
-                  key: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-    ]);
-
-    totalGames = tGames;
-    totalUpdates = tUpdates;
-    platforms = pForms;
-    latestUpdates = lUpdates;
-    recentGames = rGames;
-  } catch (error) {
-    console.error("HomePage DB query failed gracefully:", error);
-  }
+  const homeData = await getFastHomeData();
+  const { totalGames, totalUpdates, platforms, latestUpdates, recentGames } = homeData;
 
   const homeEmbedJson = toComponentEmbedJson(buildHomeEmbed());
 

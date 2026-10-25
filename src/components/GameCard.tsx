@@ -91,7 +91,7 @@ export default function GameCard({ game }: GameCardProps) {
 
         {/* Genres */}
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {game.genres.slice(0, 3).map((g) => (
+          {(game.genres || []).slice(0, 3).map((g) => (
             <span
               key={g}
               className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"
@@ -104,7 +104,7 @@ export default function GameCard({ game }: GameCardProps) {
         {/* Platform Badges */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex flex-wrap items-center gap-1">
-            {game.platforms.map((p) => (
+            {(game.platforms || []).map((p) => (
               <PlatformBadge
                 key={p.platform.key}
                 platformKey={p.platform.key}

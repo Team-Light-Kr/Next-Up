@@ -76,45 +76,63 @@ export async function generateMetadata({ params }: ProfilePageProps) {
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { code } = await params;
 
-  const profileUser = await prisma.user.findUnique({
-    where: { profileCode: code },
-    include: {
-      follows: {
-        include: {
-          game: {
-            include: {
-              platforms: {
-                include: {
-                  platform: true,
+  if (!code || typeof code !== "string") {
+    notFound();
+  }
+
+  let profileUser: any = null;
+  try {
+    profileUser = await prisma.user.findUnique({
+      where: { profileCode: code },
+      include: {
+        follows: {
+          include: {
+            game: {
+              include: {
+                platforms: {
+                  include: {
+                    platform: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (dbErr) {
+    console.error("Profile page DB query error:", dbErr);
+  }
 
   if (!profileUser) {
     notFound();
   }
 
-  const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUser().catch(() => null);
   const isOwner = currentUser?.id === profileUser.id;
 
-  const joinDate = new Date(profileUser.createdAt).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-  });
+  const validFollows = (profileUser.follows || []).filter(
+    (f: any) => f && f.game && f.game.id
+  );
+
+  const displayName = profileUser.displayName || "회원";
+  const userInitials = displayName.slice(0, 2);
+
+  const joinDate = profileUser.createdAt
+    ? new Date(profileUser.createdAt).toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "long",
+      })
+    : "최근";
 
   const profileCard = buildProfileEmbed({
-    displayName: profileUser.displayName,
+    displayName,
     email: profileUser.email,
     profileCode: profileUser.profileCode,
     avatarUrl: profileUser.avatarUrl,
     role: profileUser.role,
     createdAt: profileUser.createdAt,
-    followsCount: profileUser.follows.length,
+    followsCount: validFollows.length,
   });
   const profileJson = toComponentEmbedJson(profileCard);
 
@@ -137,19 +155,19 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={profileUser.avatarUrl}
-                alt={profileUser.displayName}
+                alt={displayName}
                 className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md"
               />
             ) : (
               <div className="w-20 h-20 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-2xl shadow-xs">
-                {profileUser.displayName.slice(0, 2)}
+                {userInitials}
               </div>
             )}
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-bold text-slate-900">
-                  {profileUser.displayName}
+                  {displayName}
                 </h1>
                 {profileUser.role === "ADMIN" && (
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
@@ -204,7 +222,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <span>관심 게임 목록</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              관심 등록한 게임에 새 업데이트가 출시되면 알림을 받아봅니다. (총 {profileUser.follows.length}개)
+              관심 등록한 게임에 새 업데이트가 출시되면 알림을 받아봅니다. (총 {validFollows.length}개)
             </p>
           </div>
           <Link
@@ -215,9 +233,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </Link>
         </div>
 
-        {profileUser.follows.length > 0 ? (
+        {validFollows.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {profileUser.follows.map((follow) => (
+            {validFollows.map((follow: any) => (
               <GameCard key={follow.id} game={follow.game as any} />
             ))}
           </div>

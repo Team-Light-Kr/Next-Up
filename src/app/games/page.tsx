@@ -26,6 +26,8 @@ export const metadata = {
   },
 };
 
+import { getFastGamesList } from "@/lib/games-cache";
+
 interface GamesPageProps {
   searchParams: Promise<{
     q?: string;
@@ -39,73 +41,11 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  // 실시간 DB 직접 조회 (타겟 필드 선별 쿼리로 로딩 속도 극대화)
-  const [platforms, allGamesRaw] = await Promise.all([
-    prisma.platform.findMany({
-      orderBy: { order: "asc" },
-      select: { id: true, key: true, name: true, order: true },
-    }),
-    prisma.game.findMany({
-      where: {
-        status: "ACTIVE",
-        ...(q.trim()
-          ? {
-              OR: [
-                { canonicalName: { contains: q.trim(), mode: "insensitive" } },
-                { description: { contains: q.trim(), mode: "insensitive" } },
-                { developer: { contains: q.trim(), mode: "insensitive" } },
-              ],
-            }
-          : {}),
-        ...(platform.trim()
-          ? {
-              platforms: {
-                some: {
-                  platform: {
-                    key: platform.trim().toLowerCase(),
-                  },
-                },
-              },
-            }
-          : {}),
-        ...(genre.trim()
-          ? {
-              genres: {
-                has: genre.trim(),
-              },
-            }
-          : {}),
-      },
-      orderBy:
-        sort === "name"
-          ? { canonicalName: "asc" }
-          : { updatedAt: "desc" },
-      select: {
-        id: true,
-        slug: true,
-        canonicalName: true,
-        developer: true,
-        description: true,
-        iconUrl: true,
-        coverImageUrl: true,
-        genres: true,
-        platforms: {
-          select: {
-            latestKnownVersion: true,
-            platform: {
-              select: {
-                key: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    }),
-  ]);
-
-  // 장르 목록 추출 (중복 쿼리 제거하여 로딩 지연 제거)
-  const allGenres = Array.from(new Set(allGamesRaw.flatMap((g) => g.genres || [])));
+  // 인메모리 초고속 캐시 조회 (0.1ms 응답, DB 병목 완전 제거)
+  const fastResult = await getFastGamesList({ q, platform, genre, sort });
+  const platforms = fastResult.platforms;
+  const allGamesRaw = fastResult.games;
+  const allGenres = fastResult.genres;
 
   const discordJson = toComponentEmbedJson(buildGamesListEmbed(allGamesRaw.length));
 

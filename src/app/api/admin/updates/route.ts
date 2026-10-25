@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { logToDiscord } from "@/lib/discord";
+import { notifyGameFollowers } from "@/lib/patch-notification";
+import { invalidateGamesCache } from "@/lib/games-cache";
 
 export async function POST(request: Request) {
   try {
@@ -101,6 +103,21 @@ export async function POST(request: Request) {
               }
             : undefined,
       },
+    });
+
+    // 캐시 무효화 (초고속 캐시 즉시 반영)
+    invalidateGamesCache();
+
+    // 팔로워들에게 알림 발송 (인앱 및 이메일 대체)
+    notifyGameFollowers({
+      gameId: update.gameId,
+      updateId: update.id,
+      version: update.version,
+      title: update.title,
+      summary: update.summary,
+      platformName: platform.name,
+    }).catch((err) => {
+      console.error("notifyGameFollowers failed in admin update:", err);
     });
 
     await logToDiscord({
