@@ -11,7 +11,7 @@ $versionJsonPath = Join-Path $rootPath "version.json"
 
 if (-not $Version) {
     if (Test-Path $versionJsonPath) {
-        $vConfig = Get-Content $versionJsonPath -Raw | ConvertFrom-Json
+        $vConfig = Get-Content $versionJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
         $Version = $vConfig.windows.version
     } else {
         $Version = "1.0.3"
@@ -28,17 +28,13 @@ Write-Host "`n[1/5] Packing desktop-app into app.asar..." -ForegroundColor Yello
 npx -y @electron/asar pack "$rootPath\desktop-app" "$rootPath\desktop-dist\NextUps-win32-x64\resources\app.asar"
 Write-Host " -> app.asar successfully packed." -ForegroundColor Green
 
-# 3. Retrieve or Create Code Signing Certificate
-Write-Host "`n[2/5] Locating Code Signing Certificate..." -ForegroundColor Yellow
-$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*NextUps Official Publisher*" } | Select-Object -First 1
+# 3. Retrieve Team Light Code Signing Certificate
+Write-Host "`n[2/5] Locating Team Light Code Signing Certificate..." -ForegroundColor Yellow
+$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*CN=Team Light*" } | Select-Object -First 1
 
 if (-not $cert) {
-    $cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.Subject -like "*NextUps*" } | Select-Object -First 1
-}
-
-if (-not $cert) {
-    Write-Host "Generating self-signed publisher certificate..." -ForegroundColor DarkYellow
-    $cert = New-SelfSignedCertificate -Subject "CN=NextUps Official Publisher, O=Team Light, C=KR" -Type CodeSigningCert -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(5)
+    Write-Host "Generating official Team Light Code Signing certificate..." -ForegroundColor DarkYellow
+    $cert = New-SelfSignedCertificate -Subject "CN=Team Light, O=Team Light, C=KR" -Type CodeSigningCert -CertStoreLocation Cert:\CurrentUser\My -NotAfter (Get-Date).AddYears(5)
 }
 
 Write-Host " -> Code Signing Certificate:" $cert.Subject -ForegroundColor Green

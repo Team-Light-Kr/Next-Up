@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth";
 import GameCard from "@/components/GameCard";
 import { User, ShieldCheck, Heart, Settings, Calendar, ExternalLink, Share2 } from "lucide-react";
 
-import { buildProfileEmbed, toComponentEmbedJson } from "@/lib/discord-component-embed";
+import { buildProfileEmbed, safeToComponentEmbedJson, toFullUrl } from "@/lib/discord-component-embed";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: ProfilePageProps) {
         },
         appUrl
       );
-      const embedJson = toComponentEmbedJson(card);
+      const embedJson = safeToComponentEmbedJson(card);
 
       return {
         title: `${profileUser.displayName}님의 프로필 | NextUps`,
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: ProfilePageProps) {
         openGraph: {
           title: `${profileUser.displayName}님의 프로필`,
           description: `관심 게임 ${profileUser._count.follows}개 구독 중`,
-          images: [profileUser.avatarUrl || `${appUrl}/logo.png`],
+          images: [toFullUrl(profileUser.avatarUrl, appUrl)],
         },
       };
     }
@@ -105,7 +105,36 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   }
 
   if (!profileUser) {
-    notFound();
+    const currentUser = await getCurrentUser().catch(() => null);
+    return (
+      <div className="max-w-md mx-auto my-20 p-8 bg-white border border-slate-200 rounded-2xl text-center shadow-xs space-y-5">
+        <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mx-auto">
+          <User className="w-7 h-7" />
+        </div>
+        <div className="space-y-1.5">
+          <h2 className="text-lg font-bold text-slate-900">회원 프로필을 찾을 수 없습니다</h2>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            해당 프로필 코드(<span className="font-mono font-semibold text-slate-700">{code}</span>)의 사용자가 존재하지 않거나 탈퇴한 계정입니다.
+          </p>
+        </div>
+        <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
+          {currentUser && currentUser.profileCode && (
+            <Link
+              href={`/profile/${currentUser.profileCode}`}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors"
+            >
+              <span>내 프로필로 이동</span>
+            </Link>
+          )}
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors"
+          >
+            <span>홈으로 이동</span>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   const currentUser = await getCurrentUser().catch(() => null);
@@ -134,7 +163,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     createdAt: profileUser.createdAt,
     followsCount: validFollows.length,
   });
-  const profileJson = toComponentEmbedJson(profileCard);
+  const profileJson = safeToComponentEmbedJson(profileCard);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">

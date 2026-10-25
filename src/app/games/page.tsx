@@ -26,8 +26,6 @@ export const metadata = {
   },
 };
 
-import { getFastGamesList } from "@/lib/games-cache";
-
 interface GamesPageProps {
   searchParams: Promise<{
     q?: string;
@@ -41,11 +39,80 @@ export default async function GamesPage({ searchParams }: GamesPageProps) {
   const { q = "", platform = "", genre = "", sort = "latest" } =
     await searchParams;
 
-  // 인메모리 초고속 캐시 조회 (0.1ms 응답, DB 병목 완전 제거)
-  const fastResult = await getFastGamesList({ q, platform, genre, sort });
-  const platforms = fastResult.platforms;
-  const allGamesRaw = fastResult.games;
-  const allGenres = fastResult.genres;
+  const platformFilter = platform.trim().toLowerCase();
+  const genreFilter = genre.trim();
+  const qFilter = q.trim();
+
+  let platforms: any[] = [];
+  let allGamesRaw: any[] = [];
+
+  try {
+    const [fetchedPlatforms, fetchedGames] = await Promise.all([
+      prisma.platform.findMany({
+        orderBy: { order: "asc" },
+        select: { id: true, key: true, name: true, order: true },
+      }),
+      prisma.game.findMany({
+        where: {
+          status: "ACTIVE",
+          ...(qFilter
+            ? {
+                OR: [
+                  { canonicalName: { contains: qFilter, mode: "insensitive" } },
+                  { description: { contains: qFilter, mode: "insensitive" } },
+                  { developer: { contains: qFilter, mode: "insensitive" } },
+                  { slug: { contains: qFilter, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+          ...(platformFilter
+            ? {
+                platforms: {
+                  some: {
+                    platform: {
+                      key: { equals: platformFilter, mode: "insensitive" },
+                    },
+                  },
+                },
+              }
+            : {}),
+          ...(genreFilter
+            ? {
+                genres: {
+                  has: genreFilter,
+                },
+              }
+            : {}),
+        },
+        orderBy:
+          sort === "name"
+            ? { canonicalName: "asc" }
+            : { updatedAt: "desc" },
+        include: {
+          platforms: {
+            include: {
+              platform: {
+                select: {
+                  key: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    platforms = fetchedPlatforms;
+    allGamesRaw = fetchedGames;
+  } catch (err) {
+    console.error("GamesPage query error:", err);
+  }
+
+  // 전체 장르 목록 추출
+  const allGenres = Array.from(
+    new Set(allGamesRaw.flatMap((g) => g.genres || []))
+  );
 
   const discordJson = toComponentEmbedJson(buildGamesListEmbed(allGamesRaw.length));
 

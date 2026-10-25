@@ -15,7 +15,7 @@ import {
 const DEFAULT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.nextups.xyz";
 
 export function toFullUrl(pathOrUrl?: string | null, appUrl = DEFAULT_APP_URL): string {
-  if (!pathOrUrl) return `${appUrl}/logo.png`;
+  if (!pathOrUrl || pathOrUrl.startsWith("data:")) return `${appUrl}/logo.png`;
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
     return pathOrUrl;
   }
@@ -548,7 +548,7 @@ export function buildProfileEmbed(
   const name = user.displayName || user.profileCode;
   const roleText = user.role === "ADMIN" ? "NextUps 최고 관리자" : "NextUps 정회원";
   const followsText = user.followsCount !== undefined ? ` • 관심 게임 ${user.followsCount}개 구독` : "";
-  const avatar = user.avatarUrl || `${appUrl}/logo.png`;
+  const avatar = toFullUrl(user.avatarUrl, appUrl);
 
   return h(
     Container,
@@ -745,8 +745,18 @@ export function buildGenericEmbed(
   );
 }
 
+function safeToComponentEmbedJson(card: any): string {
+  try {
+    return toComponentEmbedJson(card);
+  } catch (err) {
+    console.warn("Component embed serialization fallback:", err);
+    return JSON.stringify({ type: "container", components: [] });
+  }
+}
+
 export {
   toComponentEmbedJson,
+  safeToComponentEmbedJson,
   toComponentEmbedScript,
   componentEmbedResponse,
 };

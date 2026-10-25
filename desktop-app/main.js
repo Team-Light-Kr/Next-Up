@@ -49,14 +49,13 @@ function createWindow() {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 10px;
+        padding: 0 0 0 12px;
         z-index: 999999;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
         user-select: none;
         -webkit-app-region: drag;
         border-bottom: 1px solid #1e293b;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+        border-radius: 0 !important;
       }
       #nextups-custom-titlebar .brand-group {
         display: flex;
@@ -64,20 +63,20 @@ function createWindow() {
         gap: 8px;
       }
       #nextups-custom-titlebar .brand-logo {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 4px;
         object-fit: cover;
       }
       #nextups-custom-titlebar .brand-title {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         color: #ffffff;
         letter-spacing: -0.2px;
       }
       #nextups-custom-titlebar .brand-divider {
         color: #475569;
-        font-size: 11px;
+        font-size: 10px;
       }
       #nextups-custom-titlebar .brand-desc {
         color: #94a3b8;
@@ -89,15 +88,16 @@ function createWindow() {
         color: #94a3b8;
         border: 1px solid #334155;
         font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 5px;
+        padding: 1px 5px;
+        border-radius: 4px;
         font-weight: 600;
         letter-spacing: 0.2px;
       }
       #nextups-custom-titlebar .window-controls {
         display: flex;
         align-items: center;
-        gap: 3px;
+        height: 100%;
+        gap: 0;
         -webkit-app-region: no-drag;
       }
       #nextups-custom-titlebar .win-btn-action {
@@ -105,11 +105,11 @@ function createWindow() {
         border: 1px solid #334155;
         color: #cbd5e1;
         padding: 3px 8px;
-        border-radius: 5px;
+        border-radius: 4px;
         font-size: 11px;
         font-weight: 600;
         cursor: pointer;
-        margin-right: 6px;
+        margin-right: 8px;
         display: inline-flex;
         align-items: center;
         gap: 4px;
@@ -124,14 +124,14 @@ function createWindow() {
         background: transparent;
         border: none;
         color: #94a3b8;
-        width: 36px;
-        height: 32px;
+        width: 44px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        font-size: 12px;
-        border-radius: 5px;
+        font-size: 11px;
+        border-radius: 0;
         transition: all 0.15s ease;
       }
       #nextups-custom-titlebar .win-btn:hover {
@@ -139,7 +139,7 @@ function createWindow() {
         color: #ffffff;
       }
       #nextups-custom-titlebar .win-btn.close:hover {
-        background: #ef4444;
+        background: #e11d48;
         color: #ffffff;
       }
       body {
